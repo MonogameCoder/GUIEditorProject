@@ -275,7 +275,7 @@ namespace _GUIProject.UI
                 _layoutCBG.SetSelected(_free);
 
                 MainWindow.RemoveContainer();
-                MainWindow.RootContainer = UIFactory<UIObject, IContainer>.CreateContainer(MainWindow.RootContainer, new Frame("FrameEditorTX", DrawPriority.NORMAL, MoveOption.STATIC), MainWindow._mainBatch);
+                MainWindow.RootContainer = UIFactory<UIObject, IContainer>.CreateContainer(MainWindow.RootContainer, new Frame("FrameEditorTX", DrawPriority.NORMAL), MainWindow._mainBatch);
                 MainWindow.AddContainer();
                 MainWindow.RootContainer.Show();
 
