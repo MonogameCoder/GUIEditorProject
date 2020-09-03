@@ -40,7 +40,7 @@ namespace _GUIProject.UI
         public override void Setup()
         {
             base.Setup();
-            Resize(Caption.TextSize.ToPoint());
+            Resize(Caption.TextSize);
         }
     }
 }

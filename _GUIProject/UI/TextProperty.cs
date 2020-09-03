@@ -106,7 +106,7 @@ namespace _GUIProject.UI
                 };
                 _text.KeyboardEvents.onKeyReleased += (sender, args) =>
                 {
-                    Owner.Text = _text.Text;                   
+                    Owner.Text = _text.Text;
                 };
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             }

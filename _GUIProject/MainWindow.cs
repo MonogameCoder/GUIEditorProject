@@ -21,7 +21,7 @@ using Microsoft.Xna.Framework.Content;
 namespace _GUIProject
 {
     // TODO:
-    // Fix UIOBject manual scaling and add preffered Size Policy
+    // Fix UIOBject manual scaling and add preffered Size Policy  
     // Implement export and save, by exporting all to XML using Serialization
 
     public class MainWindow : Game
@@ -34,7 +34,8 @@ namespace _GUIProject
 
         // Save and Load elements
         ComboBox _fileMenu;
-      
+
+        // Actual window elements       
         Label _mainFrameCaption;
 
         // Toolbox elements
@@ -48,8 +49,7 @@ namespace _GUIProject
         SliderBar _toolShelfSlider;
         MultiTextBox _toolShelfMultilineTextbox;
 
-        // Basic frame elements
-        
+        // Basic frame elements       
         public static IContainer RootContainer { get; set; }         
         public static UIObject CurrentObject { get; set; }
 
@@ -212,12 +212,11 @@ namespace _GUIProject
        
 
         protected override void LoadContent()
-        {
-            
-            _spriteBatch = new SpriteBatch(GraphicsDevice);      
-  
+        {            
+            _spriteBatch = new SpriteBatch(GraphicsDevice);                  
+      
             MouseGUI.Setup();
-            //_propertiesPanel.Update(new GameTime());
+           
             for (int i = 0; i < _guiList.Count; i++)
             {                
                 _guiList[i].Setup();
@@ -361,7 +360,7 @@ namespace _GUIProject
                                 CurrentObject.InitPropertyPanel();                           
                                 CurrentObject.AddSpriteRenderer(_mainBatch);
                                 CurrentObject.AddStringRenderer(_mainBatch);
-                                CurrentObject.AddPropertyRenderer(_mainBatch);
+                                CurrentObject.AddPropertyRenderer(_mainBatch);                              
                                 RootContainer.Update(gameTime);
                                 RootContainer.UpdateLayout();
 

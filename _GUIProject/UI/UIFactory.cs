@@ -38,9 +38,8 @@ namespace _GUIProject.UI
             var newObj = Activator.CreateInstance(obj.GetType()) as T;          
             newObj.Initialize();
             newObj.Setup();
-            newObj.MoveState = MoveOption.DYNAMIC;           
-            newObj.Name = obj.GetType().Name + container.Slots.Where((s) => s.Item.GetType() == obj.GetType()).Count();
-           
+            newObj.MoveState = MoveOption.DYNAMIC;         
+            newObj.Name = obj.GetType().Name + container.Slots.Where((s) => s.Item.GetType() == obj.GetType()).Count();           
             newObj.Editable = true;         
             newObj.Active = true;                       
        

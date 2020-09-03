@@ -175,3 +175,4 @@ C:\Users\ForbiddenArea\source\repos\_GUIProject\_GUIProject\obj\Debug\netcoreapp
 C:\Users\ForbiddenArea\source\repos\_GUIProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.csproj.CopyComplete
 C:\Users\ForbiddenArea\source\repos\_GUIProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.dll
 C:\Users\ForbiddenArea\source\repos\_GUIProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.pdb
+C:\Users\ForbiddenArea\source\repos\_GUIProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.csprojAssemblyReference.cache

@@ -18,30 +18,27 @@ namespace _GUIProject.UI
 
         Vector2 _labelPosition;
         Vector2 _labelScale;
-
-
         public bool IsEmpty 
         { 
             get { return Text.Length == 0; }
         }
         public override string Text { get; set; }           
         public override ColorObject ColorValue { get; set; }        
-        public FontContent TextFont { get; set; }
-        public Point Dimension { get; set; }
+        public FontContent TextFont { get; set; }      
         public override Point Position { get; set; }
         public override Point Size
         {
             get { return Rect.Size ; }
             set { Rect = new Rectangle(Position.X, Position.Y, value.X, value.Y); }
         }
-        public virtual Vector2 TextSize
+        public virtual Point TextSize
         {
-            get { return TextFont.Font.MeasureString(Text); }
+            get { return TextFont.Font.MeasureString(Text).ToPoint(); }
         }
 
         public Label()
         {
-            Text = "This is an example text";           
+            Text = "This is a Sample text";           
         }
         public Label(string label)
         { 
@@ -63,6 +60,7 @@ namespace _GUIProject.UI
             _labelPosition = Vector2.Zero;
             _labelScale = Vector2.One;
 
+          
             Active = true;
         }
         public override void InitPropertyPanel()
@@ -75,8 +73,8 @@ namespace _GUIProject.UI
         {
             Singleton.Content.LoadResources();
 
-            Dimension = TextSize.ToPoint();
-            Rect = new Rectangle(Position.X, Position.Y, Dimension.X, Dimension.Y);
+         
+            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
             DefaultSize = Rect.Size;
         }
         public void AddFontPack()
@@ -105,15 +103,16 @@ namespace _GUIProject.UI
         }
         public override void Resize(Point amount)
         {            
-            float x = amount.X / TextSize.X;
-            float y = amount.Y / TextSize.Y;
+            float x = amount.X / (float)TextSize.X;
+            float y = amount.Y / (float)TextSize.Y;
             Vector2 textSize = new Vector2(x, y);
-            _labelScale += textSize;
-            Size += amount;          
+            Size += amount;
+            _labelScale += textSize;                
         }
         public override void ResetSize()
         {
             _labelScale = Vector2.One;
+            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
         }
 
         public override bool Contains(Point position)
@@ -147,8 +146,9 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                Point dim = (TextSize * _labelScale).ToPoint();
-                Rect = new Rectangle(Position,dim);               
+                Point dim = (TextSize.ToVector2() * _labelScale).ToPoint();
+                Rect = new Rectangle(Position, dim);
+
             }
             if (Property != null)
             {
