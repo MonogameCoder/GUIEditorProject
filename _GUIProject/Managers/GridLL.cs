@@ -227,7 +227,7 @@ namespace _GUIProject
                             else
                             {
 
-                                while (temp._down != null && data.Position.Y > temp._data.Position.Y + temp.Height + MIN_SPACE)
+                                while (temp._down != null && data.Position.Y > temp._data.Position.Y + temp.Height)
                                 {
                                     temp = temp._down;
                                 }
@@ -363,7 +363,7 @@ namespace _GUIProject
                             else
                             {
 
-                                while (temp._down != null && data.Position.Y > temp._data.Position.Y + temp.Height + MIN_SPACE)
+                                while (temp._down != null && data.Position.Y > temp._data.Position.Y + temp.Height)
                                 {
                                     temp = temp._down;
                                 }
