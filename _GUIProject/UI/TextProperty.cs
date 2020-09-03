@@ -106,8 +106,7 @@ namespace _GUIProject.UI
                 };
                 _text.KeyboardEvents.onKeyReleased += (sender, args) =>
                 {
-                    Owner.Text = _text.Text;
-                    MainWindow.RootContainer.UpdateLayout();
+                    Owner.Text = _text.Text;                   
                 };
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             }
