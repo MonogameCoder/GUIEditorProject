@@ -22,8 +22,6 @@ namespace _GUIProject
 {
     // TODO:
     // Fix UIOBject manual scaling and add preffered Size Policy
-    // Create a property panel for each UIObject
-    // Figure out how to change Container Type during runtime
     // Implement export and save, by exporting all to XML using Serialization
 
     public class MainWindow : Game
@@ -36,9 +34,7 @@ namespace _GUIProject
 
         // Save and Load elements
         ComboBox _fileMenu;
-
-        // Actual window elements
-        //Frame _mainWindowFrame;
+      
         Label _mainFrameCaption;
 
         // Toolbox elements
@@ -218,15 +214,8 @@ namespace _GUIProject
         protected override void LoadContent()
         {
             
-            _spriteBatch = new SpriteBatch(GraphicsDevice);                  
-           
-            //_objPropEvtOnClickPicker.Position = new Point(_objPropEvents.Position.X - _objPropEvtOnClickPicker.Width, _objPropEvents.Rect.Center.Y - _objPropEvtOnClickPicker.Height / 2);
-           
-            //_objPropEvtOnMouseOverPicker.Position = new Point(_objPropEvents.Position.X - _objPropEvtOnMouseOverPicker.Width, _objPropEvents.Rect.Center.Y - _objPropEvtOnMouseOverPicker.Height / 2);
-            
-            //_objPropEvtOnMouseOutPicker.Position = new Point(_objPropEvents.Position.X - _objPropEvtOnMouseOutPicker.Width, _objPropEvents.Rect.Center.Y - _objPropEvtOnMouseOutPicker.Height / 2);
-          
-            
+            _spriteBatch = new SpriteBatch(GraphicsDevice);      
+  
             MouseGUI.Setup();
             //_propertiesPanel.Update(new GameTime());
             for (int i = 0; i < _guiList.Count; i++)
