@@ -376,7 +376,7 @@ namespace _GUIProject
                 }
 
             }
-            if (MouseGUI.Focus != null)
+            if (MouseGUI.Focus != null && !MouseGUI.Focus.Locked)
             {
                 if (MouseGUI.LeftIsPressed && _fromContainer != UIToolShelf)
                 {
