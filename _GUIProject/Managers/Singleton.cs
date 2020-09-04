@@ -3,7 +3,7 @@
     class Singleton
     {      
         
-        static InputManager _input;
+        private static InputManager _input;
         public static InputManager Input
         {
             get
@@ -15,7 +15,7 @@
                 return _input;
             }
         }
-        static FontManager _font;
+        private static FontManager _font;
         public static FontManager Font
         {
             get
@@ -27,7 +27,7 @@
                 return _font;
             }
         }
-        static AssetManager _content;
+        private static AssetManager _content;
         public static AssetManager Content
         {
             get

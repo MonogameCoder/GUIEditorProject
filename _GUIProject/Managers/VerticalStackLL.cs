@@ -29,8 +29,8 @@ namespace _GUIProject
         }
 
         public Rectangle Rect { get; set; }
-        Node _head;
-        const int MIN_SPACE = 7;
+        private Node _head;
+        private const int MIN_SPACE = 7;
        
         public VerticalStackLL()
         {

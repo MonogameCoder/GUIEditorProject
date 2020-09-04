@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using static _GUIProject.UI.BasicSprite;
 using static _GUIProject.UI.PropertyPanel;
 using static _GUIProject.UI.UIObject;
@@ -70,7 +71,7 @@ namespace _GUIProject.UI
                         }
                         else
                         {
-                            //msg.ShowAsync();
+                            MessageBox.Show("Message", "Item " + _comboAddConfirm.Text + " already exists: ", MessageBoxButtons.OK);
                         }
 
                     }
@@ -87,6 +88,10 @@ namespace _GUIProject.UI
 
                             _comboAddConfirm.Clear();
                         }
+                        else
+                        {
+                            MessageBox.Show("Message", "Item does not exist. ", MessageBoxButtons.OK);
+                        }
 
                     }
                 };               
@@ -95,7 +100,7 @@ namespace _GUIProject.UI
         }
         public void Update(GameTime gameTime)
         {
-
+            // Nothing
         }
     }
 }

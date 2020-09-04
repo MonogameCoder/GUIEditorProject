@@ -10,8 +10,7 @@ using static _GUIProject.UI.UIObject;
 namespace _GUIProject.UI
 {
     public class HorizontalStack : IContainer
-    {
-        HorizontalStackLL ItemList { get; set; }
+    {        
         public SortedSet<Slot<UIObject>> Slots { get; set; }
         public Point Position { get; set; }
         public Rectangle Rect
@@ -19,6 +18,8 @@ namespace _GUIProject.UI
             get { return FrameBackground.Rect; }
         }
         public BasicSprite FrameBackground { get; set; }
+
+        private HorizontalStackLL ItemList { get; set; }
         public HorizontalStack()
         {            
         }

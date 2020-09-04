@@ -17,13 +17,14 @@ namespace _GUIProject.UI
         {
             FLOAT,
             INT
-        }
-        Button _sliderButton;
-        ToolTip _toolTip;
-        PalleteMode _valueMode;
+        }     
 
         public byte PalleteValue { get; set; }
         public float PalleteFloatValue { get; set; }
+
+        private Button _sliderButton;
+        private ToolTip _toolTip;
+        private PalleteMode _valueMode;
         public SliderBar() : base("DefaultSliderBarTX", DrawPriority.NORMAL)
         {
         }

@@ -13,11 +13,7 @@ namespace _GUIProject.UI
 {
    
     public class Label : UIObject
-    {
-
-
-        Vector2 _labelPosition;
-        Vector2 _labelScale;
+    {        
         public bool IsEmpty 
         { 
             get { return Text.Length == 0; }
@@ -36,6 +32,8 @@ namespace _GUIProject.UI
             get { return TextFont.Font.MeasureString(Text).ToPoint(); }
         }
 
+        private Vector2 _labelPosition;
+        private Vector2 _labelScale;
         public Label()
         {
             Text = "This is a Sample text";           
@@ -72,7 +70,6 @@ namespace _GUIProject.UI
         public override void Setup()
         {
             Singleton.Content.LoadResources();
-
          
             Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
             DefaultSize = Rect.Size;

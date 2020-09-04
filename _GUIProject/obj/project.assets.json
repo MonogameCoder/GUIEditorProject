@@ -7385,11 +7385,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ForbiddenArea\\source\\repos\\_GUIProject\\_GUIProject\\_GUIProject.csproj",
+      "projectUniqueName": "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj",
       "projectName": "_GUIProject",
-      "projectPath": "C:\\Users\\ForbiddenArea\\source\\repos\\_GUIProject\\_GUIProject\\_GUIProject.csproj",
+      "projectPath": "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj",
       "packagesPath": "C:\\Users\\ForbiddenArea\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ForbiddenArea\\source\\repos\\_GUIProject\\_GUIProject\\obj\\",
+      "outputPath": "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ForbiddenArea\\AppData\\Roaming\\NuGet\\NuGet.Config",

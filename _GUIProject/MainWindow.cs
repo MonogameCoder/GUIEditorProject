@@ -23,31 +23,9 @@ namespace _GUIProject
     // TODO:
     // Fix UIOBject manual scaling and add preffered Size Policy  
     // Implement export and save, by exporting all to XML using Serialization
-
     public class MainWindow : Game
     {
-        public static MainWindow MainInstance;
-        GraphicsDeviceManager _graphics;
-        SpriteBatch _spriteBatch;
-
-        static List<IObject> _guiList;
-
-        // Save and Load elements
-        ComboBox _fileMenu;
-
-        // Actual window elements       
-        Label _mainFrameCaption;
-
-        // Toolbox elements
-        Frame UIToolShelf;
-        TextBox _toolShelfTextbox;
-        Label _toolShelfLabel;
-        Button _toolShelfButton;
-        CheckBox _toolShelfCheckbox;
-        ComboBox _toolShelfComboBox;
-        ToggleButton _toolShelfToggle;
-        SliderBar _toolShelfSlider;
-        MultiTextBox _toolShelfMultilineTextbox;
+        public static MainWindow MainInstance;    
 
         // Basic frame elements       
         public static IContainer RootContainer { get; set; }         
@@ -55,6 +33,28 @@ namespace _GUIProject
 
         public static SpriteBatch _mainBatch;      
         public static ElementSelection Selection { get; private set; }
+        private SpriteBatch _spriteBatch;
+
+        private static List<IObject> _guiList;
+
+        // Save and Load elements
+        private ComboBox _fileMenu;
+
+        // Actual window elements       
+        private Label _mainFrameCaption;
+
+        // Toolbox elements
+        private Frame UIToolShelf;
+        private TextBox _toolShelfTextbox;
+        private Label _toolShelfLabel;
+        private Button _toolShelfButton;
+        private CheckBox _toolShelfCheckbox;
+        private ComboBox _toolShelfComboBox;
+        private ToggleButton _toolShelfToggle;
+        private SliderBar _toolShelfSlider;
+        private MultiTextBox _toolShelfMultilineTextbox;
+
+        private readonly GraphicsDeviceManager _graphics;
 
         public static void AddContainer()
         {

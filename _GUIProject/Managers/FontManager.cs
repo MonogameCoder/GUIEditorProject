@@ -7,8 +7,6 @@ namespace _GUIProject
 {
     public class FontManager
     {
-      
-        
         public enum FontType
         {            
             STANDARD,           

@@ -10,15 +10,16 @@ using static _GUIProject.UI.UIObject;
 namespace _GUIProject.UI
 {
     public class Grid : IContainer
-    {
-        GridLL ItemList { get; set; }
+    {       
         public SortedSet<Slot<UIObject>> Slots { get; set; }
         public Point Position { get; set; }
         public Rectangle Rect 
         {
             get { return FrameBackground.Rect; }           
         }   
-        public BasicSprite FrameBackground { get; set; }       
+        public BasicSprite FrameBackground { get; set; }
+
+        private GridLL ItemList { get; set; }
         public Grid(DrawPriority priority = DrawPriority.NORMAL)
         {           
         }

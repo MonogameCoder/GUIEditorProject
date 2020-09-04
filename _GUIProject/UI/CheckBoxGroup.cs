@@ -4,9 +4,8 @@ using System.Collections.Generic;
 namespace _GUIProject.UI
 {
     public class CheckBoxGroup 
-    {     
-       
-        List<CheckBox> _itemList;
+    {
+        private readonly List<CheckBox> _itemList;
         public CheckBoxGroup()
         {
             _itemList = new List<CheckBox>();        

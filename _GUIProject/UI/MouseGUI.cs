@@ -19,12 +19,7 @@ namespace _GUIProject.UI
             MOUSE_HAND_CLOSED
         }
 
-        const double TimerDelay = 500;
-
-        public static BasicSprite _mouseScale;
-       
-        
-
+        public static BasicSprite _mouseScale;      
         public static BasicSprite MousePointer { get { return _mouseScale; } }
 
         public static MouseState _prevState = Mouse.GetState();

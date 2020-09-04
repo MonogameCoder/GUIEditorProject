@@ -277,7 +277,7 @@ namespace _GUIProject.UI
         public string SampleText { get; set; } = "";
         public string DisplayText { get; set; } = "";
 
-        bool _selected;
+        private bool _selected;
         public bool Selected
         {
             get { return _selected; }

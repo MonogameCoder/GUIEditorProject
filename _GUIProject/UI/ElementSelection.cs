@@ -7,10 +7,10 @@ namespace _GUIProject.UI
 {
     public class ElementSelection : BasicSprite
     {
-        BasicSprite _rightBar;
-        BasicSprite _leftBar;
-        BasicSprite _topBar;
-        BasicSprite _bottomBar;  
+        private BasicSprite _rightBar;
+        private BasicSprite _leftBar;
+        private BasicSprite _topBar;
+        private BasicSprite _bottomBar;
         public ElementSelection()
         {
            

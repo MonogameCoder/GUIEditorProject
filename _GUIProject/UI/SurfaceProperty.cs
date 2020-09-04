@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 using static _GUIProject.UI.PropertyPanel;
 using static _GUIProject.UI.UIObject;
 
@@ -14,15 +15,15 @@ namespace _GUIProject.UI
         public PropertyPanel Parent { get; private set; }
         public SortedDictionary<UIObject, Point> Properties { get; private set; }
 
-        Label _txPickLb;
-        Label _colorLb;
-        Label _alphaLb;
+        private Label _txPickLb;
+        private Label _colorLb;
+        private Label _alphaLb;
 
-        FilePicker _txPicker;
-        InputInfoArea _alpha;
-        ComboBox _color;
+        private FilePicker _txPicker;
+        private InputInfoArea _alpha;
+        private ComboBox _color;
 
-        readonly PngToXnb _converter;
+        private readonly PngToXnb _converter;
 
         public SurfaceProperty(PropertyPanel parent)
         {
@@ -40,12 +41,10 @@ namespace _GUIProject.UI
             _txPickLb = new Label("Texture:");
             _colorLb = new Label("Color:");
             _alphaLb = new Label("Alpha:");
-
            
             _color.Initialize();
             _txPicker.Initialize();
-            _alpha.Initialize();
-          
+            _alpha.Initialize();          
 
             _txPickLb.Initialize();
             _colorLb.Initialize();
@@ -55,8 +54,7 @@ namespace _GUIProject.UI
             
             _txPickLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _colorLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
-            _alphaLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
-           
+            _alphaLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);         
 
 
             int lbWidth = (int)_alphaLb.TextSize.X;
@@ -126,33 +124,21 @@ namespace _GUIProject.UI
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             _txPicker.MouseEvent.onMouseClick += (sender, args) =>
             {
-                // TODO: 
-
-                System.Windows.Forms.OpenFileDialog fileDlg = new System.Windows.Forms.OpenFileDialog();
-                fileDlg.DefaultExt = ".png";
-                fileDlg.Filter = "Images (.png)|*.png";
-                try
+                if (_txPicker.IsSuccess)
                 {
-                    if (fileDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    try
                     {
-                        string sourceFile = fileDlg.FileName;
-                        string fileName = fileDlg.SafeFileName;
-                        string targetPath = "Content";
-
-                        string destFile = System.IO.Path.Combine(targetPath, fileName);
-
-                        File.Copy(sourceFile, destFile, true);
-                        _converter.Run(destFile);
-                        fileName = fileName.Replace(".png", "");
-
-                        (Owner as BasicSprite).UpdateTexture(fileName);
-                        _txPicker.Text = fileName;
+                        string destination = Path.Combine("Content", _txPicker.FileName);
+                        File.Copy(_txPicker.FilePath, destination, true);
+                        _converter.Run(destination);
+                        (Owner as BasicSprite).UpdateTexture(_txPicker.FileName.Replace(".png", ""));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Image Load Error", "Image could not be loaded: " + ex.Message, MessageBoxButtons.OK);
                     }
                 }
-                catch (IOException e)
-                {
-                    //object p = System.Windows.MessageBox.Show("Image Load Error", "Image could not be loaded: " + e.Message, MessageBoxButton.OK);
-                }
+
             };
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             _alpha.Up.MouseEvent.onMouseClick += (sender, args) =>

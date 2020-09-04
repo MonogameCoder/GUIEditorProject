@@ -37,11 +37,11 @@ namespace _GUIProject
         }
 
         public Rectangle Rect { get; set; }
-        Node _head;
+        private Node _head;
 
-        const int MIN_SPACE = 7;
-        const float ONE_PER = 0.01f;
-        const float TWO_PER = 0.02f;
+        private const int MIN_SPACE = 7;
+        private const float ONE_PER = 0.01f;
+        private const float TWO_PER = 0.02f;
 
 
         public GridLL()

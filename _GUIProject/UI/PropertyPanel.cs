@@ -28,47 +28,47 @@ namespace _GUIProject.UI
             MULTITEXTBOX,
             CHECKBOX,
             TOGGLE,
-        }         
-     
-        CheckBox _showhide;
-        TextBox _search;
-        CheckBox _locker;
-      
-        CheckBox _grid;
-        CheckBox _free;
-        CheckBox _vertical;
-        CheckBox _horizontal;
-        
-     
-        Label _showhideLb;
-        Label _lockLb;   
-
-        ComboBox _events;
-        TextBoxConfirmAction _onClickConfirm;
-        TextBoxConfirmAction _onOverConfirm;
-        TextBoxConfirmAction _onOutConfirm;
-       
-        Button _okClickConfirm;        
-        Button _cancelClickConfirm;
-
-        Button _okOverConfirm;
-        Button _cancelOverConfirm;
-
-        Button _okOutConfirm;
-        Button _cancelOutConfirm;
-
-        ToolTip _lockerTooltip;       
+        }          
     
         public BasicSprite BGImage { get; set; }        
         public UIObject Owner { get; private set; }
 
-        readonly CheckBoxGroup _layoutCBG;
-        readonly TextProperty _textProperties;
-        readonly SurfaceProperty _surfaceProperties;
-        readonly GeneralProperty _generalProperties;
-        readonly AdvancedProperty _advancedProperties;
+        private CheckBox _showhide;
+        private TextBox _search;
+        private CheckBox _locker;
 
-        readonly SortedDictionary<UIObject, Point> _properties;
+        private CheckBox _grid;
+        private CheckBox _free;
+        private CheckBox _vertical;
+        private CheckBox _horizontal;
+
+
+        private Label _showhideLb;
+        private Label _lockLb;
+
+        private ComboBox _events;
+        private TextBoxConfirmAction _onClickConfirm;
+        private TextBoxConfirmAction _onOverConfirm;
+        private TextBoxConfirmAction _onOutConfirm;
+
+        private Button _okClickConfirm;
+        private Button _cancelClickConfirm;
+
+        private Button _okOverConfirm;
+        private Button _cancelOverConfirm;
+
+        private Button _okOutConfirm;
+        private Button _cancelOutConfirm;
+
+        private ToolTip _lockerTooltip;
+
+        private readonly CheckBoxGroup _layoutCBG;
+        private readonly TextProperty _textProperties;
+        private readonly SurfaceProperty _surfaceProperties;
+        private readonly GeneralProperty _generalProperties;
+        private readonly AdvancedProperty _advancedProperties;
+
+        private readonly SortedDictionary<UIObject, Point> _properties;
         public PropertyPanel(UIObject owner)
         {
             Owner = owner;                

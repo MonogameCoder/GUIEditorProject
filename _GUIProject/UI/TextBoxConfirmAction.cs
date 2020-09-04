@@ -11,10 +11,7 @@ using _GUIProject.Events;
 namespace _GUIProject.UI
 {
     public class TextBoxConfirmAction : BasicSprite
-    {
-        List<Button> _buttonList;    
-        TextBox _textBox; 
-     
+    {    
         public override string Text 
         {
             get { return _textBox.Text; }
@@ -27,6 +24,8 @@ namespace _GUIProject.UI
             set { _textBox.Selected = value; }
         }
 
+        private List<Button> _buttonList;
+        private TextBox _textBox;
         public TextBoxConfirmAction() : base("TextBoxConfirmPickerTX", DrawPriority.HIGH)
         {
             

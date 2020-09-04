@@ -10,23 +10,22 @@ namespace _GUIProject.UI
 {
     public class GeneralProperty
     {
-      
-        Label _expandLb;
-        Label _scaleLb;
-        Label _posLb;
-        Label _posXLb;
-        Label _posYLb;
-        Label _scaleXLb;
-        Label _scaleYLb;
-        Label _expandXLb;
-        Label _expandYLb;
+        private Label _expandLb;
+        private Label _scaleLb;
+        private Label _posLb;
+        private Label _posXLb;
+        private Label _posYLb;
+        private Label _scaleXLb;
+        private Label _scaleYLb;
+        private Label _expandXLb;
+        private Label _expandYLb;
 
-        InputInfoArea _scaleX;
-        InputInfoArea _scaleY;
-        InputInfoArea _posX;
-        InputInfoArea _posY;
-        CheckBox _expandX;
-        CheckBox _expandY;
+        private InputInfoArea _scaleX;
+        private InputInfoArea _scaleY;
+        private InputInfoArea _posX;
+        private InputInfoArea _posY;
+        private CheckBox _expandX;
+        private CheckBox _expandY;
 
         public UIObject Owner { get; private set; }
         public PropertyPanel Parent { get; private set; }

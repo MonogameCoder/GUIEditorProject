@@ -54,14 +54,8 @@ namespace _GUIProject.UI
         {
             get;
             protected set;
-        }
-        
-        
-        protected SpriteBatch _spriteRenderer;
-        protected SpriteBatch _stringRenderer;
-        const float FADE_SPEED = 2.0f;
-        const float MAX_ALPHA = 1.0f;
-        const float MIN_ALPHA = 0.0f;
+        }       
+       
         public float Alpha { get; set; } = 1.0f;
         public bool AlphaIncrease { get; private set; } = false;
         public PropertyPanel Property { get; set; }
@@ -134,6 +128,12 @@ namespace _GUIProject.UI
         public abstract void ResetSize();
         public abstract bool Contains(Point position);
         public abstract UIObject HitTest(Point mousePosition);
+
+        protected SpriteBatch _spriteRenderer;
+        protected SpriteBatch _stringRenderer;
+        private const float FADE_SPEED = 2.0f;
+        private const float MAX_ALPHA = 1.0f;
+        private const float MIN_ALPHA = 0.0f;
         public virtual void Update(GameTime gameTime)
         {
             if (FadeCapable && Active)

@@ -21,23 +21,22 @@ namespace _GUIProject.UI
             UP,
             DOWN,
             NONE
-        }
-        ScrollDirection direction;   
+        }        
 
         public Button SliderButton { get; private set; }
         public Button UpButton { get; private set; }
-        public Button DownButton { get; private set; }
-        
-        Frame _itemsContainer;
-        
+        public Button DownButton { get; private set; }      
+
         public ScrollDirection ScrollerDirection
         { 
             get { return direction; } 
         }
 
-        public int CurrentScrollValue { get; set; } = 0;       
+        public int CurrentScrollValue { get; set; } = 0;
 
-        ScrollEvents _scrollEvent;   
+        private Frame _itemsContainer;
+        private ScrollEvents _scrollEvent;
+        private ScrollDirection direction;
 
         public ScrollBar() : base("DefaultScrollbarTX", DrawPriority.LOW)
         {
@@ -271,16 +270,9 @@ namespace _GUIProject.UI
                         }
                     }
                 }     
-            }
-
-
-           
-
-           
-
+            }          
           
-            base.Update(gameTime);
-           
+            base.Update(gameTime);          
 
         }
 

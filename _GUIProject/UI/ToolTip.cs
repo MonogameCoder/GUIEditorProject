@@ -12,8 +12,8 @@ namespace _GUIProject.UI
     public class ToolTip : Button
     {
 
-      
-        UIObject _parent;
+
+        private UIObject _parent;
         public ToolTip(UIObject parent) :base("DefaultSliderBarTooltipTX", OverlayOption.NORMAL, DrawPriority.LOWEST)
         {
             _parent = parent;

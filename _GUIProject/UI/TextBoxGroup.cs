@@ -4,7 +4,7 @@ namespace _GUIProject.UI
 {
     public class TextBoxGroup
     {
-        private List<BasicSprite> _itemList;
+        private readonly List<BasicSprite> _itemList;
 
         public TextBoxGroup()
         {

@@ -11,7 +11,7 @@ namespace _GUIProject.UI
         
         public Point Offset { get; set; }
 
-        bool _selected;
+        private bool _selected;
         public bool Selected
         {
             get { return _selected; }

@@ -10,12 +10,13 @@ namespace _GUIProject.UI
 {
     public class Slot<T> :  IComparable
     {
-        DrawPriority Priority { get; set; }
+        
         public Point Position { get; set; }    
         public T Item { get; set; }
         public long Index { get; private set; }
         public static long GlobalIndex { get; private set; } = 0;
-    
+
+        private DrawPriority Priority { get; set; }
         public Slot(Point position, T item, DrawPriority priority)
         {
             Item = item;

@@ -6,8 +6,7 @@ namespace _GUIProject.UI
 
     public class ColorObject
     {
-        
-        Color _color;
+        private Color _color;
         public ColorObject()
         {
 

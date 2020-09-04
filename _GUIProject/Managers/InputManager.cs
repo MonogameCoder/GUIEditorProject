@@ -8,19 +8,16 @@ namespace _GUIProject
 {
     public class InputManager
     {
-        
-
-        KeyboardState _currentKeyState, _prevKeyState;
-        
-
         public KeyboardState State
         {
             get { return _currentKeyState; }
-        }
-      
+        }      
        
         public Keys CurrentKey { get; set; }
         public bool IsReceivingInput { get; private set; }
+
+        private KeyboardState _currentKeyState, _prevKeyState;
+
 
         public void Update()
         {

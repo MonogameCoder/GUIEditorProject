@@ -20,21 +20,22 @@ namespace _GUIProject.UI
             UP,
             DOWN
         }
-        // This will be used in future implementations
-        GrowDirection _direction;
 
-        Frame _buttonsContainer;
-        Button _footTX;
-        Button _defaultItem;
-        ElementSelection _buttonSelection;
+        // This will be used in future implementations
+        private GrowDirection _direction;
+
+        private Frame _buttonsContainer;
+        private Button _footTX;
+        private Button _defaultItem;
+        private ElementSelection _buttonSelection;
       
         readonly string _defaultTXName;
         readonly string _footTXName;
       
         public Point DefaultOffset { get; set; } = new Point(2, 3);
-        public Point _offset;   
-
-        BasicSprite _auxiliaryInfo;
+        public Point _offset;
+        
+        private BasicSprite _auxiliaryInfo;
         public ColorObject AuxilaryColor
         {
             get { return _auxiliaryInfo.ColorValue; }

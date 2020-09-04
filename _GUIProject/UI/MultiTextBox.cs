@@ -17,9 +17,7 @@ namespace _GUIProject.UI
 {
 
     public class MultiTextBox : TextBox
-    {
-       
-        ScrollBar _scrollBar;
+    {      
      
         public int NumberOfLines
         {
@@ -42,6 +40,7 @@ namespace _GUIProject.UI
             get { return TextFont.Font.MeasureString(LastLine.Replace('\n', ' ')); }
         }
 
+        private ScrollBar _scrollBar;
         public MultiTextBox() : base("DefaultMultiTexboxTX", "DefaultTextboxPointerTX", TextBoxType.TEXT, DrawPriority.NORMAL)
         {            
             MoveState = MoveOption.DYNAMIC;

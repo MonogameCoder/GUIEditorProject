@@ -12,17 +12,19 @@ namespace _GUIProject.UI
     public class TextProperty
     {
         // _name ->  will be later changed to an editable textbox
-        Label _name;
-        ComboBox _textColor;
-        TextBox _text;
      
-        Label _nameLb;
-        Label _textLb;
-        Label _txtColorLb;
         public UIObject Owner { get; private set; }
         public PropertyPanel Parent { get; private set; }
         public SortedDictionary<UIObject, Point> Properties { get; private set; }
-       
+
+        private Label _name;
+        private ComboBox _textColor;
+        private TextBox _text;
+
+        private Label _nameLb;
+        private Label _textLb;
+        private Label _txtColorLb;
+
         public TextProperty(PropertyPanel parent)
         {
             Properties = new SortedDictionary<UIObject, Point>();

@@ -13,12 +13,12 @@ using static _GUIProject.UI.TextBox;
 
 namespace _GUIProject.UI
 {
-
     
     public class Button : BasicSprite
     {   
         public Label Caption { get; set; }
-        ColorObject _textColor;      
+
+        private ColorObject _textColor;      
         public override ColorObject TextColor
         {
             get
