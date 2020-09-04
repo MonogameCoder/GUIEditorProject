@@ -9,10 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace _GUIProject.UI
 {
     public class InputInfoArea : BasicSprite
-    {
-        private TextBox _textInput;
-        private Frame _container;
-        private readonly string _baseTX;
+    {     
 
         public Button Up { get; private set; }
         public Button Down { get; private set; }
@@ -26,6 +23,10 @@ namespace _GUIProject.UI
             get { return _textInput.TextColor; }
             set { _textInput.TextColor = value; }
         }
+
+        private TextBox _textInput;
+        private Frame _container;
+        private readonly string _baseTX;
         public InputInfoArea(string largeTX)
         {
             _baseTX = largeTX;

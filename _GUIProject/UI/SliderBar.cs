@@ -22,7 +22,7 @@ namespace _GUIProject.UI
         public byte PalleteValue { get; set; }
         public float PalleteFloatValue { get; set; }
 
-        private Button _sliderButton;
+        private Button _slider;
         private ToolTip _toolTip;
         private PalleteMode _valueMode;
         public SliderBar() : base("DefaultSliderBarTX", DrawPriority.NORMAL)
@@ -31,11 +31,11 @@ namespace _GUIProject.UI
         public override void Initialize()
         {
             base.Initialize();
-            _sliderButton = new Button("DefaultSliderBarSliderTX", OverlayOption.NORMAL, DrawPriority.LOW);
-            _sliderButton.Initialize();
+            _slider = new Button("DefaultSliderBarSliderTX", OverlayOption.NORMAL, DrawPriority.LOW);
+            _slider.Initialize();
 
-            _sliderButton.Text = "";
-            _toolTip = new ToolTip(_sliderButton);
+            _slider.Text = "";
+            _toolTip = new ToolTip(_slider);
             _toolTip.Initialize();
             _toolTip.Text = "";
 
@@ -56,21 +56,21 @@ namespace _GUIProject.UI
         public override void Setup()
         {
             base.Setup();
-            _sliderButton.Setup();
+            _slider.Setup();
             _toolTip.Setup();
-            _sliderButton.Position = new Point(Rect.Center.X - _sliderButton.Width / 2, Rect.Center.Y - _sliderButton.Height / 2);
+            _slider.Position = new Point(Rect.Center.X - _slider.Width / 2, Rect.Center.Y - _slider.Height / 2);
 
-            _sliderButton.Show();
+            _slider.Show();
         }
         public override void AddSpriteRenderer(SpriteBatch batch)
         {
-            _sliderButton.AddSpriteRenderer(batch);
+            _slider.AddSpriteRenderer(batch);
             _toolTip.AddSpriteRenderer(batch);
             base.AddSpriteRenderer(batch);
         }
         public override void AddStringRenderer(SpriteBatch batch)
         {
-            _sliderButton.AddStringRenderer(batch);
+            _slider.AddStringRenderer(batch);
             _toolTip.AddStringRenderer(batch);
             base.AddStringRenderer(batch);
         }
@@ -83,7 +83,7 @@ namespace _GUIProject.UI
             UIObject result = null;
             if (Active)
             {
-                result = _sliderButton.HitTest(mousePosition);
+                result = _slider.HitTest(mousePosition);
 
 
                 if (result == null)
@@ -102,7 +102,7 @@ namespace _GUIProject.UI
         }
         public bool IsOutOfBounds(int x)
         {
-            if (x + _sliderButton.Width > Right || x < Left)
+            if (x + _slider.Width > Right || x < Left)
             {
                 return true;
             }
@@ -114,8 +114,8 @@ namespace _GUIProject.UI
             {
                 if (!Editable && _valueMode == PalleteMode.FLOAT)
                 {
-                    int pos = _sliderButton.Center.X > Center.X ? _sliderButton.Right - Center.X :
-                              _sliderButton.Center.X < Center.X ? Center.X - _sliderButton.Left : 0;
+                    int pos = _slider.Center.X > Center.X ? _slider.Right - Center.X :
+                              _slider.Center.X < Center.X ? Center.X - _slider.Left : 0;
                     PalleteFloatValue = (float)Math.Round(pos / ((float)Width / 2), 2);
                     _toolTip.Text = PalleteFloatValue.ToString();
                 }
@@ -123,26 +123,26 @@ namespace _GUIProject.UI
                 _toolTip.Update(gameTime);
                 if (Locked)
                 {
-                    if (MouseGUI.Focus == _sliderButton)
+                    if (MouseGUI.Focus == _slider)
                     {
                         _toolTip.Show();
-                        Point newPosition = new Point(MouseGUI.DragOffset.X + MouseGUI.Position.X, _sliderButton.Top);
+                        Point newPosition = new Point(MouseGUI.DragOffset.X + MouseGUI.Position.X, _slider.Top);
 
                         if (!IsOutOfBounds(newPosition.X))
                         {
-                            _sliderButton.Position = newPosition;
+                            _slider.Position = newPosition;
                         }
                         else
                         {
-                            int right = newPosition.X + _sliderButton.Width;
+                            int right = newPosition.X + _slider.Width;
                             if (right > Right)
                             {
 
-                                _sliderButton.Position = new Point(Right - _sliderButton.Width, _sliderButton.Top);
+                                _slider.Position = new Point(Right - _slider.Width, _slider.Top);
                             }
-                            if (_sliderButton.Left < Left)
+                            if (_slider.Left < Left)
                             {
-                                _sliderButton.Position = new Point(Left, _sliderButton.Top);
+                                _slider.Position = new Point(Left, _slider.Top);
                             }
                         }
                     }
@@ -151,13 +151,13 @@ namespace _GUIProject.UI
                 {
                     _toolTip.Hide();
 
-                    _sliderButton.Position = new Point(Center.X - _sliderButton.Width / 2, Center.Y - _sliderButton.Height / 2);
+                    _slider.Position = new Point(Center.X - _slider.Width / 2, Center.Y - _slider.Height / 2);
                     _toolTip.Text = "";
 
 
                 }
 
-                _sliderButton.Update(gameTime);
+                _slider.Update(gameTime);
                 _toolTip.Update(gameTime);
                 base.Update(gameTime);
             }
@@ -171,8 +171,8 @@ namespace _GUIProject.UI
             if (Active)
             {
                 base.Draw();
-                _sliderButton.Alpha = Alpha;
-                _sliderButton.Draw();
+                _slider.Alpha = Alpha;
+                _slider.Draw();
                 _toolTip.Draw();
             }
             if (Property != null)
@@ -183,12 +183,12 @@ namespace _GUIProject.UI
         public override void Show()
         {
             Active = true;
-            _sliderButton.Active = true;
+            _slider.Active = true;
         }
         public override void Hide()
         {
             Active = false;
-            _sliderButton.Active = false;
+            _slider.Active = false;
         }
 
     }

@@ -153,8 +153,7 @@ namespace _GUIProject.UI
 
         
         public void Update(GameTime gameTime)
-        {
-            //ItemList.UpdateLayout();
+        {          
             FrameBackground.Update(gameTime);
         
             for (int i = 0; i < Slots.Count; i++)
@@ -168,7 +167,6 @@ namespace _GUIProject.UI
                     slot.Item.Update(gameTime);
 
                 }
-
             }
           
         }
