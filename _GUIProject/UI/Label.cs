@@ -25,7 +25,7 @@ namespace _GUIProject.UI
         public override Point Size
         {
             get { return Rect.Size ; }
-            set { Rect = new Rectangle(Position.X, Position.Y, value.X, value.Y); }
+            set { Rect = new Rectangle(Position, value); }
         }
         public virtual Point TextSize
         {

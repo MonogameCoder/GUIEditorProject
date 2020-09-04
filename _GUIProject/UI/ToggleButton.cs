@@ -21,8 +21,7 @@ namespace _GUIProject.UI
                 _toggle = value;
                 IsClicked = _toggle;
             }
-        }        
-
+        } 
         public ToggleButton(): base("DefaultToggleTX", OverlayOption.TOGGLE, DrawPriority.NORMAL)
         {
 
