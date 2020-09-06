@@ -61,7 +61,7 @@ namespace _GUIProject.UI
             _textLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _txtColorLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _name.TextFont = Singleton.Font.GetFont(FontManager.FontType.ARIAL_BOLD);
-            _name.TextColor.Color = Color.Black;
+            _name.TextColor = Color.Black;
 
 
 
@@ -72,7 +72,7 @@ namespace _GUIProject.UI
             if (owner != PropertyOwner.MULTITEXTBOX && owner != PropertyOwner.SLIDER && owner != PropertyOwner.TOGGLE)
             {
                 _text.FieldWidth = 150;
-                _text.TextColor.Color = Color.White;
+                _text.TextColor = Color.White;
 
                 lbWidth = (int)_textLb.TextSize.X;
                 Properties.Add(_textLb, new Point(168 - lbWidth, 271));

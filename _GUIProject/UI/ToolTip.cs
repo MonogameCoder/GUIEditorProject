@@ -32,8 +32,7 @@ namespace _GUIProject.UI
         public override void Initialize()
         {
             base.Initialize();
-            TextColor = TextColor = new ColorObject();
-            TextColor.Color = Color.Black;           
+            TextColor = Color.Black;                 
             Hide();
           
         }

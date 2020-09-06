@@ -121,7 +121,7 @@ namespace _GUIProject.UI
             _search.StickSampleText = true;          
    
          
-            _search.TextColor.Color = Color.White;
+            _search.TextColor = Color.White;
 
 
             foreach (var item in _textProperties.Properties)

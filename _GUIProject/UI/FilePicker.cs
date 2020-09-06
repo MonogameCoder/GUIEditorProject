@@ -54,7 +54,7 @@ namespace _GUIProject.UI
             TextureField = new TextBox("PropertyPanelTextboxTX", "PropertyPanelTextboxPointerTX", TextBoxType.TEXT, DrawPriority.HIGHEST);
             TextureField.Initialize();
             TextureField.FieldWidth = 150;
-            TextureField.TextColor.Color = Color.White;
+            TextureField.TextColor = Color.White;
 
             PickButton.MouseEvent.onMouseClick += MouseEvent_onMouseClick;
             MouseEvent = PickButton.MouseEvent;

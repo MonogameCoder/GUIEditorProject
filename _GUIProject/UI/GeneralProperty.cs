@@ -125,10 +125,10 @@ namespace _GUIProject.UI
             Properties.Add(_expandX, new Point(171, 310));
             Properties.Add(_expandY, new Point(250, 310));
 
-            _posX.TextColor.Color = Color.White;
-            _posY.TextColor.Color = Color.White;
-            _scaleX.TextColor.Color = Color.White;
-            _scaleY.TextColor.Color = Color.White;
+            _posX.TextColor = Color.White;
+            _posY.TextColor = Color.White;
+            _scaleX.TextColor = Color.White;
+            _scaleY.TextColor = Color.White;
 
             PopulateEvents(owner);
         }

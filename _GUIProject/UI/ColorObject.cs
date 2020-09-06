@@ -40,5 +40,21 @@ namespace _GUIProject.UI
             get { return _color; }
             set { _color = value; }
         }
+        public static implicit operator Color(ColorObject rhs)
+        {
+            return rhs.Color;
+        }
+        public static implicit operator ColorObject(Color rhs)
+        {
+            ColorObject color = new ColorObject
+            {
+                Color = rhs
+            };
+            return color;
+        }
+        public static Color operator* (ColorObject color, float rhs)
+        {
+            return rhs * color.Color ;
+        }
     }
 }

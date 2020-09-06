@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using _GUIProject.Events;
 using Microsoft.Xna.Framework.Content;
+using ExtensionMethods;
 
 namespace _GUIProject
 {
@@ -148,7 +149,7 @@ namespace _GUIProject
 
             _toolShelfLabel = new Label();
             _toolShelfLabel.Initialize();
-            _toolShelfLabel.TextColor.Color = Color.White;
+            _toolShelfLabel.TextColor = Color.White;
             _toolShelfLabel.Editable = true; ;
 
             _toolShelfTextbox = new TextBox();
@@ -159,7 +160,7 @@ namespace _GUIProject
             _toolShelfButton = new Button();
             _toolShelfButton.Initialize();
             _toolShelfButton.Editable = true; ;
-            _toolShelfButton.TextColor.Color = Color.Black;
+            _toolShelfButton.TextColor = Color.Black;
 
             _toolShelfToggle = new ToggleButton();
             _toolShelfToggle.Initialize();
@@ -225,7 +226,7 @@ namespace _GUIProject
                 _guiList[i].Setup();
             }
 
-            Vector2 textSize = ((SpriteFont)_mainFrameCaption.TextFont).MeasureString(_mainFrameCaption.Text);
+            Vector2 textSize = _mainFrameCaption.Text.Size(_mainFrameCaption.TextFont);
             Vector2 textPosition = new Vector2(RootContainer.Rect.Center.X - textSize.X / 2, RootContainer.Rect.Top - textSize.Y);
             _mainFrameCaption.AddPosition(textPosition);
 

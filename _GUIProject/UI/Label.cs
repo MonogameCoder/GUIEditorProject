@@ -1,4 +1,5 @@
 ﻿using _GUIProject.Events;
+using ExtensionMethods;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -29,7 +30,7 @@ namespace _GUIProject.UI
         }
         public virtual Point TextSize
         {
-            get { return ((SpriteFont)TextFont).MeasureString(Text).ToPoint(); }
+            get { return Text.Size(TextFont).ToPoint(); }
         }
 
         private Vector2 _labelPosition;
@@ -71,7 +72,7 @@ namespace _GUIProject.UI
         {
             Singleton.Content.LoadResources();
          
-            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
+            Rect = new Rectangle(Position,TextSize);
             DefaultSize = Rect.Size;
         }
         public void AddFontPack()
@@ -109,7 +110,7 @@ namespace _GUIProject.UI
         public override void ResetSize()
         {
             _labelScale = Vector2.One;
-            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
+            Rect = new Rectangle(Position, TextSize);
         }
 
         public override bool Contains(Point position)
@@ -156,7 +157,7 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                _stringRenderer.DrawString(TextFont, Text, Position.ToVector2(), TextColor.Color * Alpha, 0f, Vector2.Zero, _labelScale, SpriteEffects.None, 1.0f);
+                _stringRenderer.DrawString(TextFont, Text, Position.ToVector2(), TextColor * Alpha, 0f, Vector2.Zero, _labelScale, SpriteEffects.None, 1.0f);
               
             }
             if (Property != null)

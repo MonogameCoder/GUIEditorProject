@@ -13,6 +13,7 @@ using static _GUIProject.InputManager;
 using static _GUIProject.FontManager;
 using static _GUIProject.AssetManager;
 using _GUIProject.Events;
+using ExtensionMethods;
 
 namespace _GUIProject.UI
 {
@@ -265,7 +266,7 @@ namespace _GUIProject.UI
         {
             get
             {
-                return ((SpriteFont)TextFont).MeasureString(_keyboardString);
+                return _keyboardString.Size(TextFont);
             }
         }
         protected bool _isShift;
@@ -338,12 +339,12 @@ namespace _GUIProject.UI
 
             Pointer = new BasicSprite("DefaultTextboxPointerTX", DrawPriority.LOW);
             Pointer.Initialize();
-            Pointer.ColorValue.Color = Color.White;
+            Pointer.ColorValue = Color.White;
             Pointer.FadeCapable = true;
 
             TextOffset = new Point(4, 4);
             TextFont = Singleton.Font.GetFont(FontType.STANDARD);
-            TextColor.Color = Color.Black;
+            TextColor = Color.Black;
            
 
             FieldWidth = 0;
@@ -770,7 +771,7 @@ namespace _GUIProject.UI
                         {
                             string extraChar = _keyboardString.Substring(startIndex, 1);
                             string tmp = DisplayText.Insert(0, newChar);
-                            float newSize = TextFont.Font.MeasureString(tmp).X - TextFont.Font.MeasureString(extraChar).X;
+                            float newSize = tmp.Size(TextFont).X - extraChar.Size(TextFont).X;
                             if (!IsOutOfBounds(newSize))
                             {
                                 DisplayText = tmp;
@@ -796,7 +797,7 @@ namespace _GUIProject.UI
         {           
             ApplyTextOffset();
             //Point characterDimensions = TextFont.Font.MeasureString(LastChar).ToPoint();
-            Point currCharDim = TextFont.Font.MeasureString(DisplayText).ToPoint();
+            Point currCharDim = DisplayText.Size(TextFont).ToPoint();
             int x = currCharDim.X;
             int y = currCharDim.Y;
 
@@ -807,22 +808,22 @@ namespace _GUIProject.UI
         {
             int offset = (_keyboardString.Length - DisplayText.Length);
             int length = _keyboardString.Length - offset;
-            int lastCharSize = (int)((SpriteFont)TextFont).MeasureString(LastChar).X;
+            int lastCharSize = (int)LastChar.Size(TextFont).X;
             DisplayText = _keyboardString.Substring(offset, _keyboardString.Length - offset);
-            float currentDisplayTextSize = ((SpriteFont)TextFont).MeasureString(DisplayText).X - lastCharSize;
+            float currentDisplayTextSize = DisplayText.Size(TextFont).X - lastCharSize;
 
             while (IsOutOfBounds(currentDisplayTextSize) && length > 0)
             {
                 DisplayText = _keyboardString.Substring(offset, length);
                 offset++;
                 length = _keyboardString.Length - offset;
-                currentDisplayTextSize = ((SpriteFont)TextFont).MeasureString(DisplayText).X - lastCharSize;
+                currentDisplayTextSize = DisplayText.Size(TextFont).X - lastCharSize;
             }
 
         }
         protected virtual void ApplyTextOffset()
         {
-            float currentDisplayTextSize = ((SpriteFont)TextFont).MeasureString(DisplayText).X;
+            float currentDisplayTextSize = DisplayText.Size(TextFont).X;
             
 
             if (_keyboardString.Length > 0 && IsOutOfBounds(currentDisplayTextSize))
@@ -874,7 +875,7 @@ namespace _GUIProject.UI
 
         protected virtual bool IsOutOfBounds(float size)
         {
-            Point lastCharSize = ((SpriteFont)TextFont).MeasureString(LastChar).ToPoint();
+            Point lastCharSize = LastChar.Size(TextFont).ToPoint();
             return size + lastCharSize.X >= Width;
         }
         public override UIObject HitTest(Point mousePosition)
@@ -897,7 +898,7 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                Vector2 textSize = SampleText.Length > 0 ? ((SpriteFont)TextFont).MeasureString(SampleText) : TextSize;
+                Vector2 textSize = SampleText.Length > 0 ? SampleText.Size(TextFont) : TextSize;
                 TextPosition = new Vector2(Left + TextOffset.X, Top + TextOffset.Y);
 
 
@@ -923,7 +924,7 @@ namespace _GUIProject.UI
 
         protected virtual void RenderText()
         {
-            _stringRenderer.DrawString(TextFont, IsClicked ? DisplayText : (StickSampleText ? SampleText : DisplayText), TextPosition, TextColor.Color);           
+            _stringRenderer.DrawString(TextFont, IsClicked ? DisplayText : (StickSampleText ? SampleText : DisplayText), TextPosition, TextColor);           
         }
 
         public override void Draw()
@@ -934,7 +935,7 @@ namespace _GUIProject.UI
                 base.Draw();
                 if (IsClicked)
                 {
-                    _spriteRenderer.Draw(Pointer.DefaultSprite.Texture, Pointer.Rect, TextColor.Color * Pointer.Alpha);
+                    _spriteRenderer.Draw(Pointer.DefaultSprite.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
                 }
                 RenderText();
             }

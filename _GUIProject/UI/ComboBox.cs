@@ -133,10 +133,10 @@ namespace _GUIProject.UI
             }
            
         }
-        public UIObject this[int index]
-        {
-            get { return _buttonsContainer.Slots.ElementAt(index).Item; }
-        }
+        //public UIObject this[int index]
+        //{
+        //    get { return _buttonsContainer.Slots.ElementAt(index).Item; }
+        //}
         public UIObject this[string name]
         {
             get { return _buttonsContainer.Slots.Where(s => s.Item.Text == name).Single().Item; }
@@ -169,7 +169,7 @@ namespace _GUIProject.UI
             Caption = new Label(name);
             Caption.Initialize();
             Caption.TextFont = font;
-            Caption.TextColor.Color = color;
+            Caption.TextColor = color;
             Caption.Position = Position;
         }
         void SelectItem(Button item)
@@ -206,7 +206,7 @@ namespace _GUIProject.UI
             Button newButton = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOW);            
             newButton.Initialize();
             newButton.Setup();
-            newButton.TextColor.Color = Color.SlateGray;
+            newButton.TextColor = Color.SlateGray;
             newButton.Active = true;
             newButton.Name = "ComboBoxButton";
             newButton.Text = text;      
@@ -236,14 +236,14 @@ namespace _GUIProject.UI
             int delIndex = Array.FindIndex(slotsArray, a => a.Item == item); 
 
             _buttonsContainer.RemoveSlot(item);
-            RearrangeContainer(_buttonsContainer.Slots.Count, delIndex);     
+            RearrangeContainer(_buttonsContainer.Length, delIndex);     
         }
         void RearrangeContainer(int end, int start)
         {
             int bottom = _buttonsContainer.Slots.Where(s => s.Item != _footTX).Sum(s => s.Item.Height);
             for (int i = end -1; i >= start; i--)
             {
-                var curItem = _buttonsContainer.Slots.ElementAt(i).Item;
+                var curItem = _buttonsContainer[i].Item;
                 int delta = end - i;
                 _buttonsContainer.UpdateSlot(curItem, new Point(_offset.X, (bottom - curItem.Height * delta)));
             }
@@ -270,34 +270,34 @@ namespace _GUIProject.UI
         {
 
             base.ResetSize();
-            for (int i = 0; i < _buttonsContainer.Slots.Count; i++)
+            for (int i = 0; i < _buttonsContainer.Length; i++)
             {
-                Slot<UIObject> current = _buttonsContainer.Slots.ElementAt(i);
+                Slot<UIObject> current = _buttonsContainer[i];
                 current.Item.ResetSize();
             }
-            RearrangeContainer(_buttonsContainer.Slots.Count, 0);
+            RearrangeContainer(_buttonsContainer.Length, 0);
 
         }
         public override void Resize(Point amount)
         {
             base.Resize(amount);
 
-            for (int i = _buttonsContainer.Slots.Count - 1; i > 0; i--)
+            for (int i = _buttonsContainer.Length - 1; i > 0; i--)
             {
-                var current = _buttonsContainer.Slots.ElementAt(i).Item;              
+                var current = _buttonsContainer[i].Item;              
                 current.Resize(amount);
             }
 
             _footTX.Resize(new Point(amount.X, 0));
-            RearrangeContainer(_buttonsContainer.Slots.Count, 0);  
+            RearrangeContainer(_buttonsContainer.Length, 0);  
         }
 
 
         public bool Contains(string text)
         {
-            for (int i = 0; i < _buttonsContainer.Slots.Count; i++)
+            for (int i = 0; i < _buttonsContainer.Length; i++)
             {
-                Slot<UIObject> slot = _buttonsContainer.Slots.ElementAt(i);
+                Slot<UIObject> slot = _buttonsContainer[i];
                 if (slot.Item.Text == text)
                 {
                     return true;
@@ -340,9 +340,9 @@ namespace _GUIProject.UI
 
                 if (_buttonsContainer.Active)
                 {
-                    for (int i = _buttonsContainer.Slots.Count - 1; i >= 0; i--)
+                    for (int i = _buttonsContainer.Length - 1; i >= 0; i--)
                     {
-                        Slot<UIObject> slot = _buttonsContainer.Slots.ElementAt(i);
+                        Slot<UIObject> slot = _buttonsContainer[i];
                         slot.Item.Alpha = Alpha;
                         slot.Item.Draw();
                     }

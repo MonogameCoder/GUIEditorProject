@@ -75,7 +75,7 @@ namespace _GUIProject.UI
                     Properties.Add(_txPicker, new Point(171, 240));
                 }               
             }
-            _alpha.TextColor.Color = Color.White;
+            _alpha.TextColor = Color.White;
             AddEvents();
 
         }

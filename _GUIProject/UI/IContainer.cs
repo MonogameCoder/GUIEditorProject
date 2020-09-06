@@ -12,10 +12,20 @@ namespace _GUIProject.UI
    
     public interface IContainer :IObject
     {
+
         SortedSet<Slot<UIObject>> Slots { get; set; }
         Rectangle Rect { get; }
         Point Position { get; set; }       
         BasicSprite FrameBackground { get; set; }
+
+        public Slot<UIObject> this[int index]
+        {
+            get { return Slots.ElementAt(index); }
+        }
+        public int Length
+        {
+            get { return Slots.Count; }
+        }
         public static IContainer operator +(IContainer a, UIObject b)
         {
             for (int i = 0; i < a.Slots.Count; i++)

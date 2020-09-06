@@ -1,9 +1,5 @@
-﻿
-using System;
-
+﻿using System;
 using Microsoft.Xna.Framework;
-
-
 using System.Xml.Serialization;
 using static _GUIProject.UI.MouseGUI;
 using System.Runtime.Serialization;
@@ -87,11 +83,9 @@ namespace _GUIProject.UI
 
         }
         public override void Initialize()
-        {
-            ColorValue = new ColorObject();
-            TextColor = new ColorObject();
-            ColorValue.Color = Color.White;
-            TextColor.Color = Color.White;
+        {           
+            ColorValue = Color.White;
+            TextColor = Color.White;
             MouseEvent = new MouseEvents(this);
 
             Active = true;
@@ -235,7 +229,7 @@ namespace _GUIProject.UI
 
                     if (Focus == this || IsClicked)
                     {
-                        _spriteRenderer.Draw(SpriteClicked, Rect, ColorValue.Color * Alpha);
+                        _spriteRenderer.Draw(SpriteClicked, Rect, ColorValue * Alpha);
 
                     }
                     else
@@ -246,23 +240,23 @@ namespace _GUIProject.UI
                             {
                                 if (IsClicked)
                                 {
-                                    _spriteRenderer.Draw(SpriteClicked, Rect, ColorValue.Color * Alpha);
-                                    _spriteRenderer.Draw(SpriteOver, Rect, ColorValue.Color * Alpha);
+                                    _spriteRenderer.Draw(SpriteClicked, Rect, ColorValue * Alpha);
+                                    _spriteRenderer.Draw(SpriteOver, Rect, ColorValue * Alpha);
                                 }
                                 else
                                 {
-                                    _spriteRenderer.Draw(SpriteOver, Rect, ColorValue.Color * Alpha);
+                                    _spriteRenderer.Draw(SpriteOver, Rect, ColorValue * Alpha);
                                 }
                             }
                             else
                             {
 
-                                _spriteRenderer.Draw(SpriteOver, Rect, ColorValue.Color * Alpha);
+                                _spriteRenderer.Draw(SpriteOver, Rect, ColorValue * Alpha);
                             }
                         }
                         else
                         {
-                            _spriteRenderer.Draw(DefaultSprite, Rect, ColorValue.Color * Alpha);
+                            _spriteRenderer.Draw(DefaultSprite, Rect, ColorValue * Alpha);
                         }
                     }
                 }

@@ -17,6 +17,14 @@ namespace _GUIProject.UI
         {
             get { return FrameBackground.Rect; }
         }
+        public Slot<UIObject> this[int index]
+        {
+            get { return Slots.ElementAt(index); }
+        }
+        public int Length
+        {
+            get { return Slots.Count; }
+        }
         public BasicSprite FrameBackground { get; set; }
 
         private HorizontalStackLL ItemList { get; set; }
@@ -38,10 +46,10 @@ namespace _GUIProject.UI
 
             ItemList.Rect = FrameBackground.Rect;
 
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                Slots.ElementAt(i).Item.AddSpriteRenderer(MainWindow._mainBatch);
-                Slots.ElementAt(i).Item.AddStringRenderer(MainWindow._mainBatch);
+                this[i].Item.AddSpriteRenderer(MainWindow._mainBatch);
+                this[i].Item.AddStringRenderer(MainWindow._mainBatch);
             }
             ///_itemsDLL.PrintList();
 
@@ -50,9 +58,9 @@ namespace _GUIProject.UI
         {
 
             FrameBackground.AddSpriteRenderer(batch);
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                UIObject item = Slots.ElementAt(i).Item;
+                UIObject item = this[i].Item;
                 if (item != null)
                 {
                     item.AddSpriteRenderer(batch);
@@ -63,9 +71,9 @@ namespace _GUIProject.UI
         {
 
             FrameBackground.AddStringRenderer(batch);
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                UIObject item = Slots.ElementAt(i).Item;
+                UIObject item = this[i].Item;
                 if (item != null)
                 {
                     item.AddStringRenderer(batch);
@@ -82,9 +90,9 @@ namespace _GUIProject.UI
         }
         public void RemoveItem(UIObject item)
         {
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                Slot<UIObject> slot = Slots.ElementAt(i);
+                Slot<UIObject> slot = this[i];
 
                 if (slot.Item == item)
                 {
@@ -95,9 +103,9 @@ namespace _GUIProject.UI
         }
         public void RemoveSlot(UIObject item)
         {
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                Slot<UIObject> slot = Slots.ElementAt(i);
+                Slot<UIObject> slot = this[i];
 
                 if (slot.Item == item)
                 {
@@ -108,9 +116,9 @@ namespace _GUIProject.UI
         }
         public bool Contains(UIObject item)
         {
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                if (Slots.ElementAt(i).Item == item)
+                if (this[i].Item == item)
                 {
                     return true;
                 }
@@ -127,9 +135,9 @@ namespace _GUIProject.UI
             if (FrameBackground.Active)
             {
                 // Test children first.
-                for (int i = Slots.Count - 1; i >= 0; i--)
+                for (int i = Length - 1; i >= 0; i--)
                 {
-                    Slot<UIObject> slot = Slots.ElementAt(i);
+                    Slot<UIObject> slot = this[i];
 
                     if (slot.Item != null)
                     {
@@ -149,9 +157,9 @@ namespace _GUIProject.UI
         {
             FrameBackground.Update(gameTime);
 
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                Slot<UIObject> slot = Slots.ElementAt(i);
+                Slot<UIObject> slot = this[i];
 
                 if (slot.Item != null)
                 {
@@ -173,9 +181,9 @@ namespace _GUIProject.UI
         public void Draw()
         {
             FrameBackground.Draw();
-            for (int i = Slots.Count - 1; i >= 0; i--)
+            for (int i = Length - 1; i >= 0; i--)
             {
-                Slot<UIObject> slot = Slots.ElementAt(i);
+                Slot<UIObject> slot = this[i];
 
                 if (slot.Item != null)
                 {
@@ -194,9 +202,9 @@ namespace _GUIProject.UI
 
         public void Show()
         {
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                Slot<UIObject> slot = Slots.ElementAt(i);
+                Slot<UIObject> slot = this[i];
 
                 if (slot.Item != null)
                 {
@@ -207,9 +215,9 @@ namespace _GUIProject.UI
         }
         public void Hide()
         {
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Length; i++)
             {
-                Slot<UIObject> slot = Slots.ElementAt(i);
+                Slot<UIObject> slot = this[i];
 
                 if (slot.Item != null)
                 {
