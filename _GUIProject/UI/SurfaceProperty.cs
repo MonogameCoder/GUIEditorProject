@@ -135,7 +135,7 @@ namespace _GUIProject.UI
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Image Load Error", "Image could not be loaded: " + ex.Message, MessageBoxButtons.OK);
+                        MessageBox.Show("Image could not be loaded: " + ex.Message, "Image Load Error", MessageBoxButtons.OK);
                     }
                 }
 

@@ -37,7 +37,7 @@ namespace _GUIProject.UI
         }
         public Vector2 LastLineSize
         {
-            get { return TextFont.Font.MeasureString(LastLine.Replace('\n', ' ')); }
+            get { return ((SpriteFont)TextFont).MeasureString(LastLine.Replace('\n', ' ')); }
         }
 
         private ScrollBar _scrollBar;
@@ -76,14 +76,11 @@ namespace _GUIProject.UI
             base.Setup();
 
             _scrollBar.Setup();
-            _scrollBar.Position = new Point(Right - _scrollBar.Width - 4, Top + TextOffset.Y);
-         
-                    
+            _scrollBar.Position = new Point(Right - _scrollBar.Width - 4, Top + TextOffset.Y);  
 
             Pointer += new Point(Left, Top);
             CurrItemRect = Pointer.Rect;
             MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
-
            
             _scrollBar.Show();
         }
@@ -497,7 +494,7 @@ namespace _GUIProject.UI
         {           
             ApplyTextOffset();
 
-            Point textDimensions = TextFont.Font.MeasureString(DisplayText).ToPoint();
+            Point textDimensions = ((SpriteFont)TextFont).MeasureString(DisplayText).ToPoint();
             //Point characterDimensions = TextFont.Font.MeasureString(LastChar).ToPoint();
 
             int x = (int)textDimensions.X;
@@ -634,8 +631,8 @@ namespace _GUIProject.UI
                 {
                     tmpStr += fullText[i];
                     _keyboardString += fullText[i];
-                    Vector2 dimensions = TextFont.Font.MeasureString(tmpStr);
-                    Vector2 charDim = TextFont.Font.MeasureString(fullText[i].ToString());
+                    Vector2 dimensions = ((SpriteFont)TextFont).MeasureString(tmpStr);
+                    Vector2 charDim = ((SpriteFont)TextFont).MeasureString(fullText[i].ToString());
 
                     float x = (float)Math.Ceiling(dimensions.X);
 
@@ -691,8 +688,8 @@ namespace _GUIProject.UI
                     string subStr = copyLines.Substring(0, j + 1);
                     string character = lines[i][j].ToString();
 
-                    Vector2 dim = TextFont.Font.MeasureString(subStr.Replace("\n", ""));
-                    Vector2 charSize = TextFont.Font.MeasureString(character);
+                    Vector2 dim = ((SpriteFont)TextFont).MeasureString(subStr.Replace("\n", ""));
+                    Vector2 charSize = ((SpriteFont)TextFont).MeasureString(character);
 
                     height = (int)(dim.Y * (i + 1)) + 2;
                     width = (int)dim.X + 2;
@@ -712,7 +709,7 @@ namespace _GUIProject.UI
             int i = _keyboardString.Length - 1;
             if (LastChar == "\n")
             {
-                x = Left + (int)TextFont.Font.MeasureString(TextLines[NumberOfLines - 2]).X;
+                x = Left + (int)((SpriteFont)TextFont).MeasureString(TextLines[NumberOfLines - 2]).X;
                 y = Top + CharBucket[i].Y - Pointer.Height;
             }
             else
@@ -793,7 +790,7 @@ namespace _GUIProject.UI
 
         protected override void RenderText()
         {
-            _stringRenderer.DrawString(TextFont.Font, DisplayText, TextPosition, TextColor.Color);
+            _stringRenderer.DrawString(TextFont, DisplayText, TextPosition, TextColor.Color);
         }
         public override void Draw()
         {

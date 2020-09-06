@@ -225,7 +225,7 @@ namespace _GUIProject
                 _guiList[i].Setup();
             }
 
-            Vector2 textSize = _mainFrameCaption.TextFont.Font.MeasureString(_mainFrameCaption.Text);
+            Vector2 textSize = ((SpriteFont)_mainFrameCaption.TextFont).MeasureString(_mainFrameCaption.Text);
             Vector2 textPosition = new Vector2(RootContainer.Rect.Center.X - textSize.X / 2, RootContainer.Rect.Top - textSize.Y);
             _mainFrameCaption.AddPosition(textPosition);
 

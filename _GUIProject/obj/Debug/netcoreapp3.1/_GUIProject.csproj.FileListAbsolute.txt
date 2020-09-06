@@ -530,4 +530,3 @@ C:\Users\ForbiddenArea\source\repos\GUIEditorProject\_GUIProject\obj\Debug\netco
 C:\Users\ForbiddenArea\source\repos\GUIEditorProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.csproj.CopyComplete
 C:\Users\ForbiddenArea\source\repos\GUIEditorProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.dll
 C:\Users\ForbiddenArea\source\repos\GUIEditorProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.pdb
-C:\Users\ForbiddenArea\source\repos\GUIEditorProject\_GUIProject\obj\Debug\netcoreapp3.1\_GUIProject.csprojAssemblyReference.cache

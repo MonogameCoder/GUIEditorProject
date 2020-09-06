@@ -71,7 +71,7 @@ namespace _GUIProject.UI
                         }
                         else
                         {
-                            MessageBox.Show("Message", "Item " + _comboAddConfirm.Text + " already exists: ", MessageBoxButtons.OK);
+                            MessageBox.Show("Item " + _comboAddConfirm.Text + " already exists: ", "Message",  MessageBoxButtons.OK);
                         }
 
                     }
@@ -90,7 +90,7 @@ namespace _GUIProject.UI
                         }
                         else
                         {
-                            MessageBox.Show("Message", "Item does not exist. ", MessageBoxButtons.OK);
+                            MessageBox.Show("Item does not exist. ", "Message", MessageBoxButtons.OK);
                         }
 
                     }

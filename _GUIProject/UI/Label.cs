@@ -29,7 +29,7 @@ namespace _GUIProject.UI
         }
         public virtual Point TextSize
         {
-            get { return TextFont.Font.MeasureString(Text).ToPoint(); }
+            get { return ((SpriteFont)TextFont).MeasureString(Text).ToPoint(); }
         }
 
         private Vector2 _labelPosition;
@@ -156,7 +156,7 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                _stringRenderer.DrawString(TextFont.Font, Text, Position.ToVector2(), TextColor.Color * Alpha, 0f, Vector2.Zero, _labelScale, SpriteEffects.None, 1.0f);
+                _stringRenderer.DrawString(TextFont, Text, Position.ToVector2(), TextColor.Color * Alpha, 0f, Vector2.Zero, _labelScale, SpriteEffects.None, 1.0f);
               
             }
             if (Property != null)
