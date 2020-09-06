@@ -235,7 +235,7 @@ namespace _GUIProject.UI
 
                     if (Focus == this || IsClicked)
                     {
-                        _spriteRenderer.Draw(SpriteClicked.Texture, Rect, ColorValue.Color * Alpha);
+                        _spriteRenderer.Draw(SpriteClicked, Rect, ColorValue.Color * Alpha);
 
                     }
                     else
@@ -246,23 +246,23 @@ namespace _GUIProject.UI
                             {
                                 if (IsClicked)
                                 {
-                                    _spriteRenderer.Draw(SpriteClicked.Texture, Rect, ColorValue.Color * Alpha);
-                                    _spriteRenderer.Draw(SpriteOver.Texture, Rect, ColorValue.Color * Alpha);
+                                    _spriteRenderer.Draw(SpriteClicked, Rect, ColorValue.Color * Alpha);
+                                    _spriteRenderer.Draw(SpriteOver, Rect, ColorValue.Color * Alpha);
                                 }
                                 else
                                 {
-                                    _spriteRenderer.Draw(SpriteOver.Texture, Rect, ColorValue.Color * Alpha);
+                                    _spriteRenderer.Draw(SpriteOver, Rect, ColorValue.Color * Alpha);
                                 }
                             }
                             else
                             {
 
-                                _spriteRenderer.Draw(SpriteOver.Texture, Rect, ColorValue.Color * Alpha);
+                                _spriteRenderer.Draw(SpriteOver, Rect, ColorValue.Color * Alpha);
                             }
                         }
                         else
                         {
-                            _spriteRenderer.Draw(DefaultSprite.Texture, Rect, ColorValue.Color * Alpha);
+                            _spriteRenderer.Draw(DefaultSprite, Rect, ColorValue.Color * Alpha);
                         }
                     }
                 }
