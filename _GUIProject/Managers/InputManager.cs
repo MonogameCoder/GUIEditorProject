@@ -1,6 +1,5 @@
 ﻿
 using Microsoft.Xna.Framework.Input;
-using _GUIProject.UI;
 using System;
 using _GUIProject.Events;
 

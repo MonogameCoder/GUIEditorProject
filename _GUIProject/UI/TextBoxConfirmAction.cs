@@ -10,7 +10,7 @@ using _GUIProject.Events;
 
 namespace _GUIProject.UI
 {
-    public class TextBoxConfirmAction : BasicSprite
+    public class TextBoxConfirmAction : Sprite
     {    
         public override string Text 
         {

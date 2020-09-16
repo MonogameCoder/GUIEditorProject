@@ -7,11 +7,12 @@ namespace _GUIProject.UI
 {
    
     public class CheckBox : Button
-    {      
-        
+    {       
+      
         public Point Offset { get; set; }
 
         private bool _selected;
+        [XmlIgnore]
         public bool Selected
         {
             get { return _selected; }
@@ -21,14 +22,25 @@ namespace _GUIProject.UI
                 IsClicked = value;
             }
         }
+        [XmlAttribute]
+        public override string Text
+        {
+            get { return Caption.Text; }
+            set { Caption.Text = value; }
+        }
 
         public CheckBox() : base("DefaultCheckboxTX", OverlayOption.CHECKBOX, DrawPriority.HIGH)
         {
-            
+            LoadAttributes();
         }
         public CheckBox(string textureName, OverlayOption layerOption, DrawPriority priority) : base(textureName, layerOption, priority)
         {
-           
+            LoadAttributes();
+        }
+        void LoadAttributes()
+        {
+            Offset = new Point(4, 8);
+            Text = "";
         }
         public override void Initialize()
         {
@@ -37,9 +49,8 @@ namespace _GUIProject.UI
             YPolicy = SizePolicy.FIXED;
             MoveState = MoveOption.DYNAMIC;
 
-            Offset = new Point(4, 8);
-            Caption.Position = Position + Offset;
-            Text = "";                
+          
+            Caption.Position = Position + Offset;                   
 
             Active = true;
         }

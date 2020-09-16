@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using static _GUIProject.AssetManager;
 
@@ -15,9 +16,8 @@ namespace _GUIProject
             LUCIDA_CONSOLE,
             GEORGIA
         }
-        Dictionary<FontType, FontContent> _fonts;
-    
 
+        private readonly Dictionary<FontType, FontContent> _fonts;   
 
         public FontManager()
         {
@@ -36,7 +36,17 @@ namespace _GUIProject
         public FontContent GetFont(FontType type)
         {
             return _fonts[type];
-        }      
-       
+        }
+        public FontType GetType(FontContent content)
+        {
+            foreach (var item in _fonts)
+            {
+                if(item.Value == content)
+                {
+                    return item.Key;
+                }
+            }
+            return  FontType.STANDARD;
+        }
     }
 }

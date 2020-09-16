@@ -13,9 +13,22 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using _GUIProject;
 
+
+namespace ExtensionMethods
+{
+    public static class MyExtensions
+    {
+        public static Vector2 Size(this String str, AssetManager.FontContent font)
+        {
+            return ((SpriteFont)font).MeasureString(str);
+        }
+    }
+}
 namespace _GUIProject
 {
+    
     public class AssetManager
     {
 
@@ -31,31 +44,34 @@ namespace _GUIProject
         static int currentSoundCount = 0;
         static int currentSoundBGCount = 0;
 
+
+        [DataContractAttribute]
         public class TextureContent : IEquatable<TextureContent>
         {
-
-            Texture2D _texture;
-            string _name;
+           
+           Texture2D _texture;
+            string _name;         
             public TextureContent()
             {
 
             }
             public TextureContent(string name)
-            {
-                _name = name;
-
-            }
+            {              
+                _name = name;              
+            }       
+            [XmlIgnore]            
             public Texture2D Texture
             {
                 get { return _texture; }
                 set { _texture = value; }
             }
-
+           
+            [XmlAttribute]
             public string Name
             {
-                get { return _name; }
-                set { _name = value; }
-            }
+                get { return _name; }     
+                set { _name = value; }           
+            }          
             public int Height
             {
                 get { return _texture.Height; }
@@ -72,11 +88,14 @@ namespace _GUIProject
             {
                 return rhs.Texture;
             }
+
             public bool Equals([AllowNull] TextureContent other)
             {
-                return this.Name.Equals(other.Name);
-            }
+                return Name.Equals(other.Name);
+            }           
+           
         }
+        [DataContractAttribute]
         public class FontContent : IEquatable<FontContent>
         {
             SpriteFont _font;
@@ -89,11 +108,13 @@ namespace _GUIProject
             {
                 _name = name;
             }
+            [XmlIgnore]
             public SpriteFont Font
             {
                 get { return _font; }
                 set { _font = value; }
             }
+            [XmlIgnore]
             public string Name
             {
                 get { return _name; }
@@ -103,77 +124,78 @@ namespace _GUIProject
             {
                 return rhs.Font;
             }
+
             public bool Equals([AllowNull] FontContent other)
             {
-                return this.Name.Equals(other.Name);
+                return Name.Equals(other.Name);
             }
         }
         public class SoundContent : IEquatable<SoundContent>
         {
             SoundEffect _sound;
-            string _name;
+            string _name;    
             public SoundContent()
             {
 
             }
             public SoundContent(string name)
-            {
+            {             
                 _name = name;
+              
             }
-
+          
             public SoundEffect Sound
             {
                 get { return _sound; }
                 set { _sound = value; }
-            }
+            }           
             public string Name
             {
                 get { return _name; }
                 set { _name = value; }
-            }
-           
+            }          
+       
             public bool Equals([AllowNull] SoundContent other)
             {
                 return this.Name.Equals(other.Name);
             }
         }
-
-        public class SoundBGContent : IEquatable<SoundBGContent>
+      
+        public class SoundBGContent :IEquatable<SoundBGContent>
         {
             Song _sound;
-            string _name;
+            string _name;           
             public SoundBGContent()
             {
 
             }
             public SoundBGContent(string name)
-            {
-                _name = name;
+            {               
+                _name = name;             
             }
             public Song Sound
             {
                 get { return _sound; }
                 set { _sound = value; }
-            }
+            }        
             public string Name
             {
                 get { return _name; }
                 set { _name = value; }
-            }
+            }                    
+        
             public bool Equals([AllowNull] SoundBGContent other)
             {
                 return this.Name.Equals(other.Name);
             }
         }
 
-      
+        private readonly List<TextureContent> _textures;
+        private readonly List<FontContent> _fonts;
+        private readonly List<SoundContent> _sounds;
+        private readonly List<SoundBGContent> _bgSounds;
 
-        readonly List<TextureContent> _textures;
-        readonly List<FontContent> _fonts;
-        readonly List<SoundContent> _sounds;
-        readonly List<SoundBGContent> _bgSounds;
-
-
+   
         public AssetManager()
         {
             _textures = new List<TextureContent>();
@@ -200,11 +222,11 @@ namespace _GUIProject
         public TextureContent AddTexture(string name)
         {
             TextureContent tex = new TextureContent(name);
-            if (!_textures.Contains(tex))
+            if(!_textures.Contains(tex))
             {
                 _textures.Add(tex);
                 return tex;
-
+                   
             }
             int index = _textures.IndexOf(tex);
             return _textures[index];
@@ -212,7 +234,7 @@ namespace _GUIProject
         public FontContent AddFont(string name)
         {
             FontContent font = new FontContent(name);
-            if (!_fonts.Contains(font))
+            if(!_fonts.Contains(font))
             {
                 _fonts.Add(font);
                 return font;
@@ -246,7 +268,7 @@ namespace _GUIProject
             _bgSounds.Add(sound);
 
             int index = _bgSounds.IndexOf(sound);
-            return _bgSounds[index];
+            return _bgSounds[index];          
         }
 
         public void LoadResources()
@@ -261,21 +283,22 @@ namespace _GUIProject
             for (int i = currentImageCount; i < _textures.Count; i++)
             {
 
-                if (_textures[i] != null)
+                if (_textures[i] != null )
                 {
-
+                    
                     try
-                    {
-                        _textures[i].Texture = content.Load<Texture2D>(_textures[i].Name);
+                    {                      
+                        _textures[i].Texture = content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(_textures[i].Name);
+
 
                     }
                     catch (ContentLoadException e)
                     {
-
+                        
                         //Debug.WriteLine("Texture: " + textures[i].Name + " could not be loaded.\n" + e.Message);
                     }
-
-
+                  
+                   
                 }
                 currentImageCount++;
             }
@@ -285,6 +308,7 @@ namespace _GUIProject
         {
             for (int i = currentFontCount; i < _fonts.Count; i++)
             {
+
                 if (_fonts[i] != null)
                 {
                     try
@@ -296,14 +320,15 @@ namespace _GUIProject
 
                     }
                 }
-
                 currentFontCount++;
+
             }
         }
         void LoadSoundEffects(ContentManager content)
         {
             for (int i = currentSoundCount; i < _sounds.Count; i++)
             {
+
                 if (_sounds[i] != null)
                 {
                     SoundContent sound = _sounds[i];
@@ -317,7 +342,6 @@ namespace _GUIProject
                     }
 
                 }
-
                 currentSoundCount++;
             }
 
@@ -342,11 +366,10 @@ namespace _GUIProject
 
 
                 }
-
                 currentSoundBGCount++;
             }
+
         }
-    
 
         public void Setup()
         {
@@ -357,56 +380,38 @@ namespace _GUIProject
         {
             ReleaseTextures();
             ReleaseFonts();
-            ReleaseSounds();            
+            ReleaseSounds();           
         }
         void ReleaseTextures()
         {
-            for (int i = 0; i < _textures.Count; i++)
-            {
-                if(_textures[i].Texture != null)
-                {
-                    _textures[i].Texture.Dispose();
-                    _textures[i].Texture = null;                   
-                }              
-                _textures[i] = null;
-            }
+            //for (int i = 0; i < _textures.Count; i++)
+            //{
+            //    if(_textures[i].Texture != null && _textures[i].Loaded)
+            //    {
+            //        _textures[i].Texture.Dispose();
+            //        _textures[i].Texture = null;
+            //        _textures[i].Loaded = false;
+            //    }              
+            //    _textures[i] = null;
+            //}
         }
         void ReleaseFonts()
         {
-            for (int i = 0; i < _fonts.Count; i++)
-            {
-                if(_fonts[i].Font != null)
-                {
-                    _fonts[i].Font.Texture.Dispose();
-                    _fonts[i].Font = null;                    
-                }
-                _fonts[i] = null;
-            }
+            //for (int i = 0; i < _fonts.Count; i++)
+            //{
+            //    if(_fonts[i].Font != null && _fonts[i].Loaded)
+            //    {
+            //        _fonts[i].Font.Texture.Dispose();
+            //        _fonts[i].Font = null;
+            //        _fonts[i].Loaded = false;
+            //    }
+            //    _fonts[i] = null;
+            //}
         }
         void ReleaseSounds()
         {
 
-            for (int i = 0; i < _sounds.Count; i++)
-            {
-                if (_sounds[i].Sound != null)
-                {
-                    _sounds[i].Sound.Dispose();
-                    _sounds[i].Sound = null;                
-                }              
-             
-                _sounds[i] = null;
-            }
-
-            for (int i = 0; i < _bgSounds.Count; i++)
-            {
-                if (_bgSounds[i].Sound != null)
-                {
-                    _bgSounds[i].Sound.Dispose();
-                    _bgSounds[i].Sound = null;                    
-                }                
-               
-                _bgSounds[i] = null;
-            }
+            
         }
     
 

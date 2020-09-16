@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using System.Runtime.Serialization;
 using static _GUIProject.UI.IObject;
+using System.Xml.Serialization;
 
 namespace _GUIProject.UI
 {
@@ -13,6 +14,7 @@ namespace _GUIProject.UI
     public class ToggleButton : Button
     {
         private bool _toggle;
+        [XmlIgnore]
         public bool Toggle
         {
             get { return _toggle; }
@@ -24,14 +26,18 @@ namespace _GUIProject.UI
         } 
         public ToggleButton(): base("DefaultToggleTX", OverlayOption.TOGGLE, DrawPriority.NORMAL)
         {
-
+            LoadAttributes();
+        }
+        void LoadAttributes()
+        {
             Active = true;
             IsClicked = false;
+            Text = "";
         }
         public override void Initialize()
         {
             base.Initialize();
-            Text = "";
+          
             MoveState = MoveOption.DYNAMIC;
             XPolicy = SizePolicy.FIXED;
             YPolicy = SizePolicy.FIXED;

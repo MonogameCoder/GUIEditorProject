@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Grid>
+  <Child Position="638:464">
+    <ComboBox Name="cb1" Priority="LOW" XPolicy="EXPAND" YPolicy="EXPAND" Height="40" Width="161" Text="Button" Font="LUCIDA_CONSOLE" FontSize="21">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <TextColor R="0" G="0" B="0" A="255" />
+      <Texture Name="DefaultComboBoxTX" />
+      <Container Priority="LOWEST" XPolicy="FIXED" YPolicy="FIXED" Height="40" Width="165">
+        <Child Position="2:0">
+          <Button Priority="LOWEST" XPolicy="EXPAND" YPolicy="EXPAND" Height="2" Width="154" Text="" Font="STANDARD" FontSize="21">
+            <SpriteColor R="255" G="255" B="255" A="255" />
+            <TextColor R="0" G="0" B="0" A="255" />
+            <Texture Name="DefaultComboBoxFootTX" />
+          </Button>
+        </Child>
+      </Container>
+    </ComboBox>
+  </Child>
+  <Child Position="934:464">
+    <Button Name="btn1" Priority="NORMAL" XPolicy="EXPAND" YPolicy="EXPAND" Height="40" Width="71" Text="Button" Font="STANDARD" FontSize="21">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <TextColor R="0" G="0" B="0" A="255" />
+      <Texture Name="DefaultButtonTX" />
+    </Button>
+  </Child>
+  <Child Position="806:464">
+    <Label Name="lb1" Priority="NORMAL" XPolicy="EXPAND" YPolicy="FIXED" Text="Hello World" Font="LUCIDA_CONSOLE" FontSize="21">
+      <TextColor R="255" G="255" B="255" A="255" />
+    </Label>
+  </Child>
+  <Child Position="255:464">
+    <SliderBar Name="sb1" Priority="NORMAL" XPolicy="FIXED" YPolicy="FIXED" Height="31" Width="376" Mode="FLOAT">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <Texture Name="DefaultSliderBarTX" />
+    </SliderBar>
+  </Child>
+  <Child Position="12:258">
+    <TextBox Name="txt1" Priority="NORMAL" XPolicy="EXPAND" YPolicy="FIXED" Height="30" Width="236" Category="TEXT" Font="STANDARD" FontSize="21" FieldWidth="0">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <TextColor R="0" G="0" B="0" A="255" />
+      <Texture Name="DefaultTextboxTX" />
+      <Text>Sample</Text>
+    </TextBox>
+  </Child>
+  <Child Position="255:418">
+    <ToggleButton Name="tb1" Priority="NORMAL" XPolicy="FIXED" YPolicy="FIXED" Height="39" Width="84" Text="" Font="STANDARD" FontSize="21">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <TextColor R="0" G="0" B="0" A="255" />
+      <Texture Name="DefaultToggleTX" />
+    </ToggleButton>
+  </Child>
+  <Child Position="12:305">
+    <MultiTextBox Name="mtb1" Priority="NORMAL" XPolicy="EXPAND" YPolicy="EXPAND" Height="106" Width="236" Category="TEXT" Font="STANDARD" FontSize="21" FieldWidth="0">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <TextColor R="0" G="0" B="0" A="255" />
+      <Texture Name="DefaultMultiTexboxTX" />
+      <Text />
+    </MultiTextBox>
+  </Child>
+  <Child Position="255:258">
+    <CheckBox Name="ckb1" Priority="HIGH" XPolicy="FIXED" YPolicy="FIXED" Height="40" Width="40" Text="Checkbox" Font="STANDARD" FontSize="21">
+      <SpriteColor R="255" G="255" B="255" A="255" />
+      <TextColor R="0" G="0" B="0" A="255" />
+      <Texture Name="DefaultCheckboxTX" />
+      <Offset X="4" Y="8" />
+    </CheckBox>
+  </Child>
+  <Position X="568" Y="100" />
+</Grid>

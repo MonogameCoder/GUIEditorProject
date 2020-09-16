@@ -9,17 +9,17 @@ using System.Xml.Serialization;
 
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using static _GUIProject.InputManager;
-using static _GUIProject.FontManager;
-using static _GUIProject.AssetManager;
+
 using _GUIProject.Events;
 using ExtensionMethods;
+using static _GUIProject.FontManager;
+using static _GUIProject.AssetManager;
 
 namespace _GUIProject.UI
 {
    
    
-    public class TextBox : BasicSprite
+    public class TextBox : Sprite
     {
 
         public enum TextBoxType
@@ -27,7 +27,7 @@ namespace _GUIProject.UI
             TEXT,
             PASSWORD
         }       
-
+        
         public class CharacterBucket
         {
             public class ItemTable
@@ -251,17 +251,29 @@ namespace _GUIProject.UI
 
         }
 
-        protected clsInput _myclsinput = new clsInput();      
+      
 
-        public List<CustomText> _textList = new List<CustomText>();      
-        public Rectangle CurrItemRect { get; set; }       
-        public BasicSprite Pointer { get; protected set;}
+
+        [XmlIgnore]
+        public List<CustomText> _textList = new List<CustomText>();
+      
+        [XmlIgnore]
+        public Rectangle CurrItemRect { get; set; }
+      
+        [XmlIgnore]
+        public Sprite Pointer { get; protected set;}
+        
+        [XmlIgnore]
         public FontContent TextFont { get; set; }
-        public CharacterBucket CharBucket { get; protected set; }        
+        
+        
+        [XmlIgnore]
+        public CharacterBucket CharBucket { get; protected set; }
 
-        protected Keys[] _mykeys;       
-        public TextBoxType Category { get; protected set; }
+        [XmlAttribute]
+        public TextBoxType Category { get; set; }
 
+        [XmlIgnore]
         public Vector2 TextSize
         {
             get
@@ -269,16 +281,28 @@ namespace _GUIProject.UI
                 return _keyboardString.Size(TextFont);
             }
         }
-        protected bool _isShift;
-        protected bool _isControl;
+    
+      
+        [XmlIgnore]
         public Point TextOffset { get; set; }
+        
+        [XmlIgnore]
         public Vector2 TextPosition { get; set; }
+       
+        [XmlIgnore]
         public bool StickSampleText { get; set; }
+       
+        [XmlIgnore]
         public bool ReceivingInput { get; set; } = false;
+
+        [XmlIgnore]
         public string SampleText { get; set; } = "";
+
+        [XmlIgnore]
         public string DisplayText { get; set; } = "";
 
         private bool _selected;
+        [XmlIgnore]
         public bool Selected
         {
             get { return _selected; }
@@ -295,59 +319,79 @@ namespace _GUIProject.UI
         }
        
 
-        protected string _keyboardString = "";
+       [XmlElement]
         public override string Text
         {
             get { return _keyboardString; }
             set
-            {
+            {                
                 _keyboardString = value;
                 DisplayText = _keyboardString;
+         
                 ApplyTextOffset();
             }
         }
+        [XmlAttribute]
+        public FontType Font
+        {
+            get { return Singleton.Font.GetType(TextFont); }
+            set { TextFont = Singleton.Font.GetFont(value); }
+        }
 
-        
+        [XmlAttribute]
+        public int FontSize
+        {
+            get { return (int)"A".Size(TextFont).Length(); }
+            set
+            {
+            }
+        }
+
+        [XmlAttribute]
         public int FieldWidth { get; set; }
 
-       
-        public TextBox() : base("DefaultTextboxTX", DrawPriority.NORMAL)
-        {
-            //Text = "White";
-            Category = TextBoxType.TEXT;           
-            XPolicy = SizePolicy.EXPAND;
-            YPolicy = SizePolicy.FIXED;
-            MoveState = MoveOption.DYNAMIC;      
+        protected bool _isShift;
+        protected bool _isControl;
+        protected Keys[] _mykeys;
+        protected clsInput _myclsinput = new clsInput();
+        protected string _keyboardString = "";
 
+        public TextBox() : base("DefaultTextboxTX", DrawPriority.NORMAL)
+        {           
+            Category = TextBoxType.TEXT;
+            LoadAttributes();
+            Active = true;
         }
 
 
         public TextBox(string textureName, string pointerTextureName, TextBoxType category, DrawPriority priority) : base(textureName, priority)
         {           
-            Category = category;                     
+            Category = category;             
+            LoadAttributes();
+            Active = true;
+        }
+        void LoadAttributes()
+        {
             XPolicy = SizePolicy.EXPAND;
             YPolicy = SizePolicy.FIXED;
-            MoveState = MoveOption.STATIC;
-
-            Active = true;
+            MoveState = MoveOption.DYNAMIC;
+            TextColor = Color.Black;
+            TextFont = Singleton.Font.GetFont(FontType.STANDARD);
+            FieldWidth = 0;
+            TextOffset = new Point(4, 4);
+            Pointer = new Sprite("DefaultTextboxPointerTX", DrawPriority.LOW);
+            Pointer.Initialize();
+            Pointer.SpriteColor = Color.White;
+            Pointer.FadeCapable = true;
+         
         }
         public override void Initialize()
         {
             base.Initialize();
             CharBucket = new CharacterBucket(Left, Top);
             KeyboardEvents = new KeyboardEvents(this);
-
-            Pointer = new BasicSprite("DefaultTextboxPointerTX", DrawPriority.LOW);
-            Pointer.Initialize();
-            Pointer.ColorValue = Color.White;
-            Pointer.FadeCapable = true;
-
-            TextOffset = new Point(4, 4);
-            TextFont = Singleton.Font.GetFont(FontType.STANDARD);
-            TextColor = Color.Black;
-           
-
-            FieldWidth = 0;
+            MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
+            
             Active = true;
         }
         public override void InitPropertyPanel()
@@ -365,11 +409,10 @@ namespace _GUIProject.UI
                 Size += new Point(Math.Abs(FieldWidth - Size.X), 0);
             }
 
-
-            Pointer.Position = new Point(TextOffset.X, (Top + Height / 2) - Pointer.DefaultSprite.Height / 2);
+            Pointer.Position = new Point(TextOffset.X, (Top + Height / 2) - Pointer.Texture.Height / 2);
             Pointer.Setup();
 
-            MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
+            
 
         }
         public void SimulateInput(string textInput)
@@ -935,7 +978,7 @@ namespace _GUIProject.UI
                 base.Draw();
                 if (IsClicked)
                 {
-                    _spriteRenderer.Draw(Pointer.DefaultSprite.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
+                    _spriteRenderer.Draw(Pointer.Texture.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
                 }
                 RenderText();
             }
@@ -945,5 +988,6 @@ namespace _GUIProject.UI
                 Property.Draw();
             }
         }
+        
     }
 }

@@ -1,66 +1,113 @@
-﻿using _GUIProject.Events;
-using ExtensionMethods;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using System;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
-
 using static _GUIProject.AssetManager;
-using static _GUIProject.Events.MouseEvents;
+using static _GUIProject.FontManager;
+using ExtensionMethods;
+using _GUIProject.Events;
 
 namespace _GUIProject.UI
-{
-   
+{ 
     public class Label : UIObject
     {        
-        public bool IsEmpty 
-        { 
-            get { return Text.Length == 0; }
-        }
-        public override string Text { get; set; }           
-        public override ColorObject ColorValue { get; set; }        
-        public FontContent TextFont { get; set; }      
+        [XmlIgnore]      
+        public bool IsEmpty { get { return Text.Length == 0; } }
+        
+        [XmlAttribute]
+        public override string Text { get; set; }       
+        public override ColorObject TextColor { get; set; }
+
+        [XmlIgnore]
+        public FontContent TextFont { get; set; }
+       
+        [XmlIgnore]
+      
         public override Point Position { get; set; }
+
+        [XmlIgnore]
+      
+        public Vector2 Scale { get; set; }
+
+        [XmlAttribute]
+        public FontType Font
+        {
+            get { return Singleton.Font.GetType(TextFont); }
+            set { TextFont = Singleton.Font.GetFont(value); }
+        }       
+       
+        [XmlIgnore]
         public override Point Size
         {
             get { return Rect.Size ; }
-            set { Rect = new Rectangle(Position, value); }
+            set
+            { 
+                Rect = new Rectangle(Position, value); 
+            }
         }
+        [XmlIgnore]
         public virtual Point TextSize
         {
             get { return Text.Size(TextFont).ToPoint(); }
-        }
+        }      
+      
 
-        private Vector2 _labelPosition;
-        private Vector2 _labelScale;
+        [XmlAttribute]
+        public int FontSize
+        {
+            get { return (int)"A".Size(TextFont).Length(); }
+            set
+            {              
+                Scale = Vector2.One;
+                Vector2 newScale = new Vector2(value / 100f);
+                if (value > FontSize)
+                {
+                    Scale += newScale;
+                }
+                else
+                {
+                    if (value == FontSize)
+                    {
+                        Scale = Vector2.One;
+                    }
+                    else
+                    {
+                        Scale = Vector2.One;
+                        newScale = new Vector2(1f / value);
+                        Scale -= newScale;
+                    }               
+                    
+                }
+               
+            }
+        }
+       
         public Label()
         {
-            Text = "This is a Sample text";           
+            Text = "This is a Sample text";
+            LoadAttributes();           
         }
         public Label(string label)
         { 
             Text = label;
+            LoadAttributes();
+          
         }
-        public override void Initialize()
+        void LoadAttributes()
         {
             MouseEvent = new MouseEvents(this);
-            ColorValue = new ColorObject();
-            TextColor = new ColorObject();
-            TextColor.Color = Color.White;
-           
+            TextFont = Singleton.Font.GetFont(FontType.LUCIDA_CONSOLE);
+            TextColor = Color.White;
+            Scale = Vector2.One;
+            Active = true;
+            Singleton.Content.LoadResources();            
+        }
+        public override void Initialize()
+        {            
             XPolicy = SizePolicy.EXPAND;
             YPolicy = SizePolicy.FIXED;
-            Priority = DrawPriority.NORMAL;
-           
-            TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
-            
-            _labelPosition = Vector2.Zero;
-            _labelScale = Vector2.One;
-
-          
-            Active = true;
+            Priority = DrawPriority.NORMAL;       
         }
         public override void InitPropertyPanel()
         {
@@ -69,20 +116,11 @@ namespace _GUIProject.UI
             Property.SetupProperties();
         }
         public override void Setup()
-        {
-            Singleton.Content.LoadResources();
-         
-            Rect = new Rectangle(Position,TextSize);
+        {        
+            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
             DefaultSize = Rect.Size;
-        }
-        public void AddFontPack()
-        {
-            Singleton.Content.AddFontContent(TextFont);
         }    
-        public void AddPosition(Vector2 position)
-        {
-            _labelPosition = position;
-        }
+       
         public override void AddStringRenderer(SpriteBatch batch)
         {
             _stringRenderer = batch;
@@ -105,24 +143,24 @@ namespace _GUIProject.UI
             float y = amount.Y / (float)TextSize.Y;
             Vector2 textSize = new Vector2(x, y);
             Size += amount;
-            _labelScale += textSize;                
+            Scale += textSize;                
         }
         public override void ResetSize()
         {
-            _labelScale = Vector2.One;
-            Rect = new Rectangle(Position, TextSize);
+            Scale = Vector2.One;
+            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
         }
 
         public override bool Contains(Point position)
         {
-            if (Rect.Contains(position))
+            if (Rect.Contains(position.ToPoint()))
             {
                 return true;
             }
             return false;
         }
         public override UIObject HitTest(Point mousePosition)
-        {
+        {            
             if (Active)
             {
                 if (Contains(mousePosition))
@@ -130,21 +168,18 @@ namespace _GUIProject.UI
                     return this;
                 }   
             }
+
             if (Property != null && MainWindow.CurrentObject == this)
             {
                 return Property.HitTest(mousePosition);
             }
-
             return null;
         }
-
-
-
         public override void Update(GameTime gameTime)
         {
             if (Active)
             {
-                Point dim = (TextSize.ToVector2() * _labelScale).ToPoint();
+                Point dim = (TextSize * Scale).ToPoint();
                 Rect = new Rectangle(Position, dim);
 
             }
@@ -157,7 +192,7 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                _stringRenderer.DrawString(TextFont, Text, Position.ToVector2(), TextColor * Alpha, 0f, Vector2.Zero, _labelScale, SpriteEffects.None, 1.0f);
+                _stringRenderer.DrawString(TextFont, Text, Position, TextColor * Alpha, 0f, Vector2.Zero, Scale, SpriteEffects.None, 1.0f);
               
             }
             if (Property != null)
@@ -175,8 +210,8 @@ namespace _GUIProject.UI
         {
             Active = false;
         }
-
-
+        public override bool ShouldSerializeWidth() { return false; }
+        public override bool ShouldSerializeHeight() { return false; }      
 
     }
 }

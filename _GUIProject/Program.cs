@@ -1,5 +1,4 @@
-﻿using _GUIProject;
-using System;
+﻿using System;
 
 namespace _GUIProject
 {

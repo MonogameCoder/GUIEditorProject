@@ -11,12 +11,6 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Content\PropertyPanelEvtCBFootTX.xnb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\PropertyPanelEvtCBFootTX.xnb" />
-  </ItemGroup>
-  <ItemGroup>
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>

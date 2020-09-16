@@ -1,92 +1,85 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
-
 using System.Xml.Serialization;
-
 using System.Runtime.Serialization;
 using static _GUIProject.AssetManager;
 using System;
-using _GUIProject.Events;
-using static _GUIProject.UI.TextBox;
+using static _GUIProject.FontManager;
+using _GUIProject.UI;
 
 namespace _GUIProject.UI
-{
-    
-    public class Button : BasicSprite
+{    
+    public class Button : Sprite
     {   
-        public Label Caption { get; set; }
-
-        private ColorObject _textColor;      
+        [XmlIgnore]      
+        public Label Caption { get; set; }      
         public override ColorObject TextColor
         {
-            get
-            {
-                if (Caption != null)
-                {
-                    return Caption.TextColor;
-                }
-                return _textColor;
-            }
-            set
-            {
-                _textColor = value;
-                if (Caption != null)
-                {
-                    Caption.TextColor = value;
-                }
-            }
+            get { return Caption.TextColor; }
+            set { Caption.TextColor = value; }
         }
 
+        [XmlAttribute]
         public override string Text
         {
             get { return Caption.Text;}
             set { Caption.Text = value; }
         }
-
         
-        public Button() : base("DefaultButtonTX", DrawPriority.NORMAL, MoveOption.STATIC)
-        {           
-          
+        [XmlAttribute]
+        public FontType Font
+        {
+            get { return Singleton.Font.GetType(Caption.TextFont); }
+            set { Caption.TextFont = Singleton.Font.GetFont(value); }
+        }
+        [XmlAttribute]
+        public int FontSize
+        {
+            get { return Caption.FontSize; }
+            set { Caption.FontSize = value; }
         }
         
        
+        public Button() : base("DefaultButtonTX", DrawPriority.NORMAL, MoveOption.DYNAMIC)
+        {
+            LoadAttributes();            
+        }
+        
         public Button(string textureName,  OverlayOption category, DrawPriority priority, MoveOption state = MoveOption.STATIC)
             : base(textureName, priority,category, state)
         {
-         
+            LoadAttributes();
         }
-
-
-
+        void LoadAttributes()
+        {
+            Caption = new Label("Button");
+            Active = true;
+            Caption.Active = true;
+            Caption.Scale = Vector2.One;
+            TextColor = Color.Black;          
+        }
         public override void Initialize()
         {
-            base.Initialize();
-            Caption = new Label("Button");
+            base.Initialize();       
             Caption.Initialize();
 
-            Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.STANDARD);
+            Caption.TextFont = Singleton.Font.GetFont(FontType.STANDARD);
             XPolicy = SizePolicy.EXPAND;
             YPolicy = SizePolicy.EXPAND;
             MoveState = MoveOption.DYNAMIC;
-
-            Active = true;
-
+          
         }
-        
         public override void InitPropertyPanel()
         {
             Property = new PropertyPanel(this);
             Property.AddProperties(PropertyPanel.PropertyOwner.BUTTON);
             Property.SetupProperties();
         }
-     
         public override void Setup()
         {
             base.Setup();
-            Caption.Setup();          
-          
+            Caption.Setup();
+            Caption.Active = true;
         }       
        
         public override void AddStringRenderer(SpriteBatch batch)
@@ -103,23 +96,7 @@ namespace _GUIProject.UI
         public override void AddPropertyRenderer(SpriteBatch batch)
         {
             Property.AddPropertyRenderer(batch);
-        }
-        //public override void Resize(Point newSize)
-        //{
-        //    // Scale Currently is not fully supported 
-        //    // Due to the fact that the font loses too much quality,
-        //    // so it will remain unchanged for the time being... as in other GUI editors
-        //    // TODO: Make only the text that fits in the button boundaries visible
-
-        //    //float labelXRatio = Caption.TextSize.X / (float)DefaultSize.X;
-        //    //float labelYRatio = Caption.TextSize.Y / (float)DefaultSize.Y;
-
-        //    //Point newLabelSize = new Point((int)Math.Round(newSize.X * labelXRatio), (int)Math.Round(newSize.Y * labelYRatio));
-        //    //Caption.Resize(newLabelSize);
-
-
-        //    base.Resize(newSize);
-        //}
+        }    
         public override void ResetSize()
         {
             Caption.ResetSize();
@@ -164,7 +141,7 @@ namespace _GUIProject.UI
             if (Active)
             {              
 
-                Caption.Position = Rect.Center;
+                Caption.Position = new  Point( Rect.Center.X, Rect.Center.Y);
                 Caption.Position -= new Point(Caption.Width/ 2, Caption.Height / 2);
                 Caption.Update(gameTime);              
             }
@@ -172,6 +149,7 @@ namespace _GUIProject.UI
             {
                 Property.Update(gameTime);
             }
+
         }
         public override void Draw()
         {
@@ -180,18 +158,15 @@ namespace _GUIProject.UI
                 base.Draw();
                 if (Caption != null)
                 {
-
                     Caption.Draw();
                 }
-               
             }
             if (Property != null)
             {
                 Property.Draw();
             }
-
-        }       
-
+        }
+        
     }   
 
 }   

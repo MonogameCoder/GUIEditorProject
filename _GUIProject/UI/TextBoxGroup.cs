@@ -4,18 +4,18 @@ namespace _GUIProject.UI
 {
     public class TextBoxGroup
     {
-        private readonly List<BasicSprite> _itemList;
+        private readonly List<Sprite> _itemList;
 
         public TextBoxGroup()
         {
-            _itemList = new List<BasicSprite>();
+            _itemList = new List<Sprite>();
         }
         public void Add(TextBox checkbox)
         {
             _itemList.Add(checkbox);
         }
        
-        public void SetSelected(BasicSprite currentBox)
+        public void SetSelected(Sprite currentBox)
         {
             foreach (TextBox item in _itemList)
             {
@@ -25,7 +25,7 @@ namespace _GUIProject.UI
                     item.Selected = false;
             }
         }
-        public List<BasicSprite> Items
+        public List<Sprite> Items
         {
             get { return _itemList; }
         }

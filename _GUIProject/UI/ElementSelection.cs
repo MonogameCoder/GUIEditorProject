@@ -1,29 +1,29 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using static _GUIProject.UI.BasicSprite;
+using static _GUIProject.UI.Sprite;
 using Microsoft.Xna.Framework;
 using System;
 
 namespace _GUIProject.UI
 {
-    public class ElementSelection : BasicSprite
+    public class ElementSelection : Sprite
     {
-        private BasicSprite _rightBar;
-        private BasicSprite _leftBar;
-        private BasicSprite _topBar;
-        private BasicSprite _bottomBar;
+        private Sprite _rightBar;
+        private Sprite _leftBar;
+        private Sprite _topBar;
+        private Sprite _bottomBar;
         public ElementSelection()
         {
            
         }
         public override void Initialize()
         {
-            _rightBar = new BasicSprite("ItemSelectionVerticalTX", DrawPriority.LOWEST);
+            _rightBar = new Sprite("ItemSelectionVerticalTX", DrawPriority.LOWEST);
             _rightBar.Initialize();
-            _leftBar = new BasicSprite("ItemSelectionVerticalTX", DrawPriority.LOWEST);
+            _leftBar = new Sprite("ItemSelectionVerticalTX", DrawPriority.LOWEST);
             _leftBar.Initialize();
-            _topBar = new BasicSprite("ItemSelectionHorizontalTX", DrawPriority.LOWEST);
+            _topBar = new Sprite("ItemSelectionHorizontalTX", DrawPriority.LOWEST);
             _topBar.Initialize();
-            _bottomBar = new BasicSprite("ItemSelectionHorizontalTX", DrawPriority.LOWEST);
+            _bottomBar = new Sprite("ItemSelectionHorizontalTX", DrawPriority.LOWEST);
             _bottomBar.Initialize();
         }
         public override void Setup()

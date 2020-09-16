@@ -12,7 +12,7 @@ using static _GUIProject.UI.TextBox;
 namespace _GUIProject.UI
 {
     // This class will be extended in future implementations
-    public class FilePicker : BasicSprite
+    public class FilePicker : Sprite
     {
         public Button PickButton { get; private set; }
         public TextBox TextureField { get; private set; }

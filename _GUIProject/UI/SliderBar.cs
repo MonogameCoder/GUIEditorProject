@@ -7,40 +7,49 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace _GUIProject.UI
 {
 
-    public class SliderBar : BasicSprite
+    public class SliderBar : Sprite
     {
-        enum PalleteMode
+        public enum PalleteMode
         {
             FLOAT,
             INT
         }     
 
+        [XmlIgnore]
         public byte PalleteValue { get; set; }
+        [XmlIgnore]
         public float PalleteFloatValue { get; set; }
+
+        [XmlAttribute]
+        public PalleteMode Mode { get; set; }
 
         private Button _slider;
         private ToolTip _toolTip;
-        private PalleteMode _valueMode;
+
         public SliderBar() : base("DefaultSliderBarTX", DrawPriority.NORMAL)
         {
+            LoadAttributes();   
+        }
+        void LoadAttributes()
+        {
+            _slider = new Button("DefaultSliderBarSliderTX", OverlayOption.NORMAL, DrawPriority.LOW);            
+            _toolTip = new ToolTip(_slider);           
+            _slider.Text = "";
+            Mode = PalleteMode.FLOAT;
         }
         public override void Initialize()
         {
             base.Initialize();
-            _slider = new Button("DefaultSliderBarSliderTX", OverlayOption.NORMAL, DrawPriority.LOW);
-            _slider.Initialize();
-
-            _slider.Text = "";
-            _toolTip = new ToolTip(_slider);
             _toolTip.Initialize();
-            _toolTip.Text = "";
-
-            _valueMode = PalleteMode.FLOAT;
+            _slider.Initialize();
+         
             MoveState = MoveOption.DYNAMIC;
+
             XPolicy = SizePolicy.FIXED;
             YPolicy = SizePolicy.FIXED;
 
@@ -112,7 +121,7 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                if (!Editable && _valueMode == PalleteMode.FLOAT)
+                if (!Editable && Mode == PalleteMode.FLOAT)
                 {
                     int pos = _slider.Center.X > Center.X ? _slider.Right - Center.X :
                               _slider.Center.X < Center.X ? Center.X - _slider.Left : 0;
@@ -190,6 +199,8 @@ namespace _GUIProject.UI
             Active = false;
             _slider.Active = false;
         }
+
+        public override bool ShouldSerializeTextColor() { return false; }
 
     }
 }

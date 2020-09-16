@@ -10,20 +10,23 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static _GUIProject.UI.ScrollBar;
-using _GUIProject.Events;
+
 using ExtensionMethods;
+using System.Xml.Serialization;
 
 namespace _GUIProject.UI
 {
 
+    // This class will be fully refactored
     public class MultiTextBox : TextBox
     {      
      
+        [XmlIgnore]
         public int NumberOfLines
         {
             get { return TextLines.Length; }
         }
+        [XmlIgnore]
         public string LastLine
         {
             get
@@ -31,14 +34,28 @@ namespace _GUIProject.UI
                 return TextLines[NumberOfLines - 1];
             }
         }
-
+        [XmlIgnore]
         public string[] TextLines
         {
             get { return _keyboardString.Split('\n'); }
         }
+        [XmlIgnore]
         public Vector2 LastLineSize
         {
             get { return LastLine.Replace('\n', ' ').Size(TextFont); }
+        }
+        [XmlElement]
+        public override string Text
+        {
+            get { return DisplayText; }
+            set 
+            {
+                foreach (char character in value)
+                {
+                    _keyboardString += character;
+                    CreateText();
+                }          
+            }
         }
 
         private ScrollBar _scrollBar;
@@ -47,22 +64,27 @@ namespace _GUIProject.UI
             MoveState = MoveOption.DYNAMIC;
             XPolicy = SizePolicy.EXPAND;
             YPolicy = SizePolicy.EXPAND;
-
+            LoadAttributes();
             
         }
+        void LoadAttributes()
+        {
+            base.Setup();
+            CharBucket = new CharacterBucket(Left, Top);            
+            _scrollBar = new ScrollBar();            
+            _scrollBar.Initialize();
+            _scrollBar.Parent = this;
+            _scrollBar.Setup();
+           
+            _scrollBar.Position = new Point(Right - _scrollBar.Width, Top);            
 
+            TextColor = Color.Black;          
+
+        }
         public override void Initialize()
         {
             base.Initialize();
-            CharBucket = new CharacterBucket(Left, Top);
-
-            _scrollBar = new ScrollBar();
-            _scrollBar.Initialize();
-            _scrollBar.Parent = this;
-
-            TextColor.Color = Color.Black;
             MouseEvent.onMouseClick += (sender, args) => Selected = true;
-
             Active = true;
 
         }
@@ -75,10 +97,7 @@ namespace _GUIProject.UI
         public override void Setup()
         {
             base.Setup();
-
-            _scrollBar.Setup();
-            _scrollBar.Position = new Point(Right - _scrollBar.Width - 4, Top + TextOffset.Y);  
-
+          
             Pointer += new Point(Left, Top);
             CurrItemRect = Pointer.Rect;
             MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
@@ -502,18 +521,17 @@ namespace _GUIProject.UI
             int y = (int)textDimensions.Y;
             //y = y <= Top + 2 ? Pointer.Height : y;
 
-            Point newPosition = new Point(x, y);
+            Point newPosition = new Point(x, y);          
             CharBucket.AddCharacter(LastChar, newPosition, textDimensions);
-
             ProcessString();
 
         }
         bool IsOutOfBounds()
         {
-            float x = Left + _scrollBar.Width + LastLineSize.X + 2;
+            float x = Left + LastLineSize.X + "H|".Size(TextFont).X;
             float y = Top + LastLineSize.Y;
             Vector2 curTextPosition = new Vector2(x, y);
-            return curTextPosition.X >= _scrollBar.Left;
+            return curTextPosition.X > _scrollBar.Left;
         }
         void ProcessString()
         {
@@ -767,7 +785,7 @@ namespace _GUIProject.UI
                 }
 
 
-                _scrollBar.Position = new Point(Right - _scrollBar.Width - 4, Top + 4);
+                _scrollBar.Position = new Point(Right - _scrollBar.Width, Top);
                 _scrollBar.Update(gameTime);               
             }
             if (Property != null)
@@ -797,10 +815,10 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                _spriteRenderer.Draw(DefaultSprite.Texture, Rect, ColorValue * Alpha);
+                _spriteRenderer.Draw(Texture.Texture, Rect, SpriteColor * Alpha);
                 if (IsClicked && !Editable)
                 {
-                    _spriteRenderer.Draw(Pointer.DefaultSprite.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
+                    _spriteRenderer.Draw(Pointer.Texture.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
                 }
                 RenderText();
                 _scrollBar.Draw();
@@ -811,5 +829,6 @@ namespace _GUIProject.UI
                 Property.Draw();
             }
         }
+        
     }
 }

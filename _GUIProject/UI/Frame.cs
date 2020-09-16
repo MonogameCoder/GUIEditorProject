@@ -5,36 +5,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace _GUIProject.UI
-{
-    class Frame : BasicSprite, IContainer
-    {     
-        public SortedSet<Slot<UIObject>> Slots { get; set; }
-        public BasicSprite FrameBackground { get; set; }
+{   
+    [XmlRoot(ElementName = "Frame")]
+    public class Frame : Sprite, IContainer
+    {
+        [XmlElement("Child")]
+        public List<Slot<UIObject>> Children { get; set; }
+
+        private SortedSet<Slot<UIObject>> _slots;
+        [XmlIgnore]
+        public SortedSet<Slot<UIObject>> Slots
+        {
+            get { return _slots; }
+            set
+            {
+                if (Children == null)
+                {
+                    Children = value.ToList();
+                }
+                _slots = new SortedSet<Slot<UIObject>>(Children);
+            }
+        }
+
+        [XmlIgnore]
+        public Sprite FrameBackground { get; set; }
+
+        [XmlIgnore]
         public Slot<UIObject> this[UIObject item]
         {
             get { return Slots.Where(s => s.Item == item).Single(); }
         }
+        [XmlIgnore]
         public Slot<UIObject> this[int index]
         {
             get { return Slots.ElementAt(index); }
         }
+        [XmlIgnore]
         public int Length
         {
             get { return Slots.Count; }
         }
         public Frame()
         {
-
+            Children = new List<Slot<UIObject>>();
+            Slots = new SortedSet<Slot<UIObject>>();
+          
         }
         public Frame(string textureName, DrawPriority priority, MoveOption moveOption = MoveOption.STATIC) : base(textureName, priority, moveOption)
-        {           
+        {
+            Slots = new SortedSet<Slot<UIObject>>();
+            Children = new List<Slot<UIObject>>();
         }
 
         public override void Initialize()
         {
-            base.Initialize();
+            base.Initialize();          
             Slots = new SortedSet<Slot<UIObject>>();
         }
         public override void Setup()
@@ -79,6 +107,7 @@ namespace _GUIProject.UI
         public void AddItem(Point dropLocation, UIObject item, DrawPriority priority = DrawPriority.LOWEST)
         {
             Slots.Add(new Slot<UIObject>(dropLocation, item, priority));
+            Children = Slots.ToList();
         }
         public void RemoveSlot(UIObject item)
         {
@@ -232,6 +261,9 @@ namespace _GUIProject.UI
             Active = false;
         }
 
-
+        public override bool ShouldSerializeTexture() { return false; }
+        public override bool ShouldSerializeSpriteColor() { return false; }
+        public override bool ShouldSerializeTextColor() { return false; }
+        
     }
 }

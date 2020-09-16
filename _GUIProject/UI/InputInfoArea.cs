@@ -1,14 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
-using static _GUIProject.UI.BasicSprite;
+using static _GUIProject.UI.Sprite;
 using static _GUIProject.UI.TextBox;
 using Microsoft.Xna.Framework.Graphics;
 
 
 namespace _GUIProject.UI
 {
-    public class InputInfoArea : BasicSprite
+    public class InputInfoArea : Sprite
     {     
 
         public Button Up { get; private set; }

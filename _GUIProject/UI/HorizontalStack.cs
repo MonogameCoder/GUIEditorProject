@@ -3,15 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using static _GUIProject.UI.UIObject;
 
 namespace _GUIProject.UI
 {
+    [XmlRoot(ElementName = "VerticalStack")]
     public class HorizontalStack : IContainer
-    {        
-        public SortedSet<Slot<UIObject>> Slots { get; set; }
+    {
+        [XmlElement("Child")]
+        public List<Slot<UIObject>> Children { get; set; }
+
+        private SortedSet<Slot<UIObject>> slots;
+        [XmlIgnore]
+        public SortedSet<Slot<UIObject>> Slots
+        {
+            get { return slots; }
+            set
+            {
+                if (Children == null)
+                {
+                    Children = value.ToList();
+                }
+                slots = new SortedSet<Slot<UIObject>>(Children);
+            }
+        }
         public Point Position { get; set; }
         public Rectangle Rect
         {
@@ -25,7 +43,7 @@ namespace _GUIProject.UI
         {
             get { return Slots.Count; }
         }
-        public BasicSprite FrameBackground { get; set; }
+        public Sprite FrameBackground { get; set; }
 
         private HorizontalStackLL ItemList { get; set; }
         public HorizontalStack()
@@ -35,7 +53,7 @@ namespace _GUIProject.UI
         {
             Slots = new SortedSet<Slot<UIObject>>();
             ItemList = new HorizontalStackLL();
-            FrameBackground = new BasicSprite("FrameEditorTX", DrawPriority.NORMAL, MoveOption.STATIC);
+            FrameBackground = new Sprite("FrameEditorTX", DrawPriority.NORMAL, MoveOption.STATIC);
             FrameBackground.Initialize();
             FrameBackground.Show();
         }
@@ -127,7 +145,7 @@ namespace _GUIProject.UI
         }
         public bool Contains(Point position)
         {
-            return Rect.Contains(position);
+            return Rect.Contains(position.ToPoint());
         }
         public UIObject HitTest(Point mousePosition)
         {

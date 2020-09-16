@@ -1,42 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using _GUIProject.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using static _GUIProject.UI.UIObject;
 
 namespace _GUIProject.UI
-{
+{  
+  
+    [XmlRoot(ElementName = "Grid")]
     public class Grid : IContainer
-    {       
-        public SortedSet<Slot<UIObject>> Slots { get; set; }
+    {
+
+
+        [XmlElement("Child")]        
+        public List<Slot<UIObject>> Children { get; set; }
+
+        private SortedSet<Slot<UIObject>> _slots;
+        [XmlIgnore]
+        public SortedSet<Slot<UIObject>> Slots 
+        {
+            get { return _slots; }
+            set 
+            {               
+                if(Children == null)
+                {
+                    Children = value.ToList();
+                }
+                _slots = new SortedSet<Slot<UIObject>>(Children);
+            }
+        }          
         public Point Position { get; set; }
+       
+        [XmlIgnore]
         public Rectangle Rect 
         {
             get { return FrameBackground.Rect; }           
         }
+       
+        [XmlIgnore]
         public Slot<UIObject> this[int index]
         {
             get { return Slots.ElementAt(index); }
         }
+       
+        [XmlIgnore]
         public int Length
         {
             get { return Slots.Count; }
         }
-        public BasicSprite FrameBackground { get; set; }
+       
+        [XmlIgnore]
+        public Sprite FrameBackground { get; set; }
 
         private GridLL ItemList { get; set; }
+        public Grid()
+        {             
+        }
         public Grid(DrawPriority priority = DrawPriority.NORMAL)
-        {           
+        {                   
         }
         public void Initialize()
         {
+           
+            ItemList = new GridLL();           
             Slots = new SortedSet<Slot<UIObject>>();
-            ItemList = new GridLL();
-            
-            FrameBackground = new BasicSprite("FrameEditorTX", DrawPriority.NORMAL, MoveOption.STATIC);
+
+            FrameBackground = new Sprite("FrameEditorTX", DrawPriority.NORMAL, MoveOption.STATIC);
             FrameBackground.Initialize();
             FrameBackground.Show();
         }
@@ -87,6 +122,9 @@ namespace _GUIProject.UI
             Slot<UIObject> _newSlot = new Slot<UIObject>(position, item, priority);   
             ItemList.Insert(_newSlot);
             Slots.Add(_newSlot);
+            Children = Slots.ToList();
+
+            
         }
         public Point SimulateInsert(Point position, UIObject item, DrawPriority priority)
         {

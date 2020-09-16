@@ -8,8 +8,11 @@ using System;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
 using System.Reflection;
-using static _GUIProject.AssetManager;
+
 using System.Diagnostics;
+using _GUIProject.UI;
+using _GUIProject;
+using static _GUIProject.AssetManager;
 
 namespace _GUIProject.UI
 {
@@ -20,11 +23,46 @@ namespace _GUIProject.UI
             UP,
             DOWN
         }
+        
+        [XmlIgnore]
+        public Point DefaultOffset { get; set; } = new Point(2, 3);
+        
+        [XmlIgnore]
+        public Point _offset;
 
         // This will be used in future implementations
+        private Sprite _auxiliaryInfo;
+        [XmlIgnore]
+        public ColorObject AuxilaryColor
+        {
+            get { return _auxiliaryInfo.SpriteColor; }
+            set
+            {
+
+                if (_auxiliaryInfo != null)
+                {
+                    _auxiliaryInfo.SpriteColor = value;
+
+                }
+                Caption.Text = Text;
+            }
+        }
+        Frame container;
+        [XmlElement]
+        public Frame Container 
+        {
+            get { return container; }
+            set
+            {
+                container = value;
+                container.Slots = new SortedSet<Slot<UIObject>>(container.Children);
+            }
+        }
+
+
         private GrowDirection _direction;
 
-        private Frame _buttonsContainer;
+        
         private Button _footTX;
         private Button _defaultItem;
         private ElementSelection _buttonSelection;
@@ -32,33 +70,15 @@ namespace _GUIProject.UI
         readonly string _defaultTXName;
         readonly string _footTXName;
       
-        public Point DefaultOffset { get; set; } = new Point(2, 3);
-        public Point _offset;
-        
-        private BasicSprite _auxiliaryInfo;
-        public ColorObject AuxilaryColor
-        {
-            get { return _auxiliaryInfo.ColorValue; }
-            set
-            {
-
-                if (_auxiliaryInfo != null)
-                {
-                    _auxiliaryInfo.ColorValue = value;
-
-                }
-                Caption.Text = Text;
-            }
-        }
-        
+      
         public ComboBox() : base("DefaultComboBoxTX", OverlayOption.NORMAL, DrawPriority.LOW)
         {
-            Parent = this;         
+            Parent = this;        
 
             _defaultTXName = "DefaultComboBoxBGTX";
-            _footTXName = "DefaultComboBoxFootTX";      
+            _footTXName = "DefaultComboBoxFootTX";
 
-            Active = true;         
+            LoadAttributes();
 
         }
         public ComboBox(string baseTX, string itemTX, string footTX, DrawPriority priority) : base(baseTX, OverlayOption.NORMAL, priority)
@@ -68,7 +88,14 @@ namespace _GUIProject.UI
             _defaultTXName = itemTX;
             _footTXName = footTX;
 
-            Active = true;
+            LoadAttributes();
+          
+        }
+        void LoadAttributes()
+        {
+
+            _buttonSelection = new ElementSelection();
+            _buttonSelection.Initialize();
         }
         public override void InitPropertyPanel()
         {
@@ -86,29 +113,24 @@ namespace _GUIProject.UI
             MoveState = MoveOption.DYNAMIC;
             _direction = GrowDirection.DOWN;
 
-            _buttonSelection = new ElementSelection();
-            _buttonSelection.Initialize();
-
-
-            Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);       
-
-            _buttonsContainer = new Frame("DefaultComboBoxTX", DrawPriority.LOWEST, MoveOption.STATIC);
-            _buttonsContainer.Initialize();
+            Container = new Frame("DefaultComboBoxTX", DrawPriority.LOWEST, MoveOption.STATIC);
+            Container.Initialize();
 
             _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
             _defaultItem.Initialize();
-           
             _defaultItem.Text = "";
+
+
+            Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);            
 
             _footTX = new Button(_footTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);          
             _footTX.Initialize();
             _footTX.Text = "";
             _footTX.Editable = false;
 
-            _buttonsContainer.AddItem(DefaultOffset, _footTX, DrawPriority.LOWEST);
-
-            _buttonsContainer.Active = false;
-
+            Container.AddItem(DefaultOffset, _footTX, DrawPriority.LOWEST);
+            Container.Active = false;
+            Active = true;
         }
         public override void Setup()
         {
@@ -120,9 +142,9 @@ namespace _GUIProject.UI
                 _auxiliaryInfo.Setup();               
             }
             
-            _buttonsContainer.Position = new Point(Left, Bottom);
+            Container.Position = new Point(Left, Bottom);
             _buttonSelection.Setup();
-            _buttonsContainer.Setup();
+            Container.Setup();
             
             if(MouseEvent.IsOnClickNull)
             {
@@ -139,13 +161,13 @@ namespace _GUIProject.UI
         //}
         public UIObject this[string name]
         {
-            get { return _buttonsContainer.Slots.Where(s => s.Item.Text == name).Single().Item; }
+            get { return Container.Slots.Where(s => s.Item.Text == name).Single().Item; }
         }
        
         public override void AddSpriteRenderer(SpriteBatch batch)
         {
             base.AddSpriteRenderer(batch);         
-            _buttonsContainer.AddSpriteRenderer(batch);
+            Container.AddSpriteRenderer(batch);
             _buttonSelection.AddSpriteRenderer(batch);
            
 
@@ -157,7 +179,7 @@ namespace _GUIProject.UI
         public override void AddStringRenderer(SpriteBatch batch)
         {
             base.AddStringRenderer(batch);
-            _buttonsContainer.AddStringRenderer(batch);
+            Container.AddStringRenderer(batch);
             _buttonSelection.AddStringRenderer(batch);
         }
         public override void AddPropertyRenderer(SpriteBatch batch)
@@ -194,7 +216,7 @@ namespace _GUIProject.UI
        
         public void AddAuxiliaryInfo()
         {
-            _auxiliaryInfo = new BasicSprite("ComboBoxAuxiliaryTX", DrawPriority.LOWEST);
+            _auxiliaryInfo = new Sprite("ComboBoxAuxiliaryTX", DrawPriority.LOWEST);
             _auxiliaryInfo.Initialize();          
             _auxiliaryInfo.Active = true;
            
@@ -211,43 +233,43 @@ namespace _GUIProject.UI
             newButton.Name = "ComboBoxButton";
             newButton.Text = text;      
 
-            int bottom = _buttonsContainer.Slots.Where(s => s.Item != _footTX && s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
+            int bottom = Container.Slots.Where(s => s.Item != _footTX && s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
            
             newButton.MouseEvent.onMouseClick += (sender, args) => { buttonClickEvent(); };
             newButton.MouseEvent.onMouseOut += (sender, args) => { };
             newButton.MouseEvent.onMouseOver += (sender, args) => { };
 
             _offset = new Point(DefaultOffset.X, bottom);
-            _buttonsContainer.AddItem(_offset, newButton, DrawPriority.LOW);
+            Container.AddItem(_offset, newButton, DrawPriority.LOW);
       
-            _buttonsContainer.UpdateSlot(_footTX, new Point(DefaultOffset.X, bottom + newButton.Height));
+            Container.UpdateSlot(_footTX, new Point(DefaultOffset.X, bottom + newButton.Height));
 
-            _buttonsContainer.AddDefaultRenderers(newButton);
+            Container.AddDefaultRenderers(newButton);
 
             ResetSize();
 
-            _buttonsContainer.UpdateLayout();
+            Container.UpdateLayout();
 
         }
 
         public void RemoveItem(UIObject item)
         {       
-            var slotsArray = _buttonsContainer.Slots.ToArray();
+            var slotsArray = Container.Slots.ToArray();
             int delIndex = Array.FindIndex(slotsArray, a => a.Item == item); 
 
-            _buttonsContainer.RemoveSlot(item);
-            RearrangeContainer(_buttonsContainer.Length, delIndex);     
+            Container.RemoveSlot(item);
+            RearrangeContainer(Container.Length, delIndex);     
         }
         void RearrangeContainer(int end, int start)
         {
-            int bottom = _buttonsContainer.Slots.Where(s => s.Item != _footTX).Sum(s => s.Item.Height);
+            int bottom = Container.Slots.Where(s => s.Item != _footTX).Sum(s => s.Item.Height);
             for (int i = end -1; i >= start; i--)
             {
-                var curItem = _buttonsContainer[i].Item;
+                var curItem = Container[i].Item;
                 int delta = end - i;
-                _buttonsContainer.UpdateSlot(curItem, new Point(_offset.X, (bottom - curItem.Height * delta)));
+                Container.UpdateSlot(curItem, new Point(_offset.X, (bottom - curItem.Height * delta)));
             }
-            _buttonsContainer.UpdateSlot(_footTX, new Point(DefaultOffset.X, bottom));
+            Container.UpdateSlot(_footTX, new Point(DefaultOffset.X, bottom));
         }
 
         public override UIObject HitTest(Point mousePosition)
@@ -257,7 +279,7 @@ namespace _GUIProject.UI
             {
                 if (result == null)
                 {
-                    result = _buttonsContainer.HitTest(mousePosition);
+                    result = Container.HitTest(mousePosition);
                 }                
             }
             if (result == null)
@@ -270,34 +292,34 @@ namespace _GUIProject.UI
         {
 
             base.ResetSize();
-            for (int i = 0; i < _buttonsContainer.Length; i++)
+            for (int i = 0; i < Container.Length; i++)
             {
-                Slot<UIObject> current = _buttonsContainer[i];
+                Slot<UIObject> current = Container[i];
                 current.Item.ResetSize();
             }
-            RearrangeContainer(_buttonsContainer.Length, 0);
+            RearrangeContainer(Container.Length, 0);
 
         }
         public override void Resize(Point amount)
         {
             base.Resize(amount);
 
-            for (int i = _buttonsContainer.Length - 1; i > 0; i--)
+            for (int i = Container.Length - 1; i > 0; i--)
             {
-                var current = _buttonsContainer[i].Item;              
+                var current = Container[i].Item;              
                 current.Resize(amount);
             }
 
             _footTX.Resize(new Point(amount.X, 0));
-            RearrangeContainer(_buttonsContainer.Length, 0);  
+            RearrangeContainer(Container.Length, 0);  
         }
 
 
         public bool Contains(string text)
         {
-            for (int i = 0; i < _buttonsContainer.Length; i++)
+            for (int i = 0; i < Container.Length; i++)
             {
-                Slot<UIObject> slot = _buttonsContainer[i];
+                Slot<UIObject> slot = Container[i];
                 if (slot.Item.Text == text)
                 {
                     return true;
@@ -313,10 +335,10 @@ namespace _GUIProject.UI
             if (Active)
             {
 
-                _buttonsContainer.Position = new Point(Left, Bottom);
-                _buttonsContainer.Update(gameTime);
+                Container.Position = new Point(Left, Bottom);
+                Container.Update(gameTime);
 
-                if (_buttonsContainer.Contains(MouseGUI.Focus))
+                if (Container.Contains(MouseGUI.Focus))
                 {
                     Button btn = MouseGUI.Focus as Button;
                     if (Contains(btn.Text) && Editable)
@@ -338,11 +360,11 @@ namespace _GUIProject.UI
             if (Active)
             {              
 
-                if (_buttonsContainer.Active)
+                if (Container.Active)
                 {
-                    for (int i = _buttonsContainer.Length - 1; i >= 0; i--)
+                    for (int i = Container.Length - 1; i >= 0; i--)
                     {
-                        Slot<UIObject> slot = _buttonsContainer[i];
+                        Slot<UIObject> slot = Container[i];
                         slot.Item.Alpha = Alpha;
                         slot.Item.Draw();
                     }
@@ -360,13 +382,13 @@ namespace _GUIProject.UI
         {
             if (!Editable)
             {
-                if (_buttonsContainer.Active)
+                if (Container.Active)
                 {
-                    _buttonsContainer.Hide();
+                    Container.Hide();
                 }
                 else
                 {
-                    _buttonsContainer.Show();
+                    Container.Show();
                 }
             }         
             IsClicked = !IsClicked;
@@ -375,7 +397,7 @@ namespace _GUIProject.UI
         {
             if (!Editable)
             {
-                _buttonsContainer.Hide();
+                Container.Hide();
             }
             _buttonSelection.Hide();      
             

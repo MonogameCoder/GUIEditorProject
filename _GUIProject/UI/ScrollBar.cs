@@ -14,7 +14,7 @@ namespace _GUIProject.UI
 {
 
 
-    public class ScrollBar : BasicSprite
+    public class ScrollBar : Sprite
     {        
         public enum ScrollDirection
         {
@@ -69,12 +69,13 @@ namespace _GUIProject.UI
         public override void Setup()
         {
             base.Setup();
+            Size = new Point(Size.X, Parent.Size.Y);
             _itemsContainer.Position = Position;
 
             UpButton.Setup();
             DownButton.Setup();
             SliderButton.Setup();
-
+            
             UpButton.Position = new Point(Left, Top);
             DownButton.Position = new Point(Left, Bottom - DownButton.Height);
             SliderButton.Position = new Point(Left, UpButton.Bottom + CurrentScrollValue);

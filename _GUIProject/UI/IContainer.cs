@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using _GUIProject.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
-
 using static _GUIProject.UI.UIObject;
 
 namespace _GUIProject.UI
@@ -12,11 +12,11 @@ namespace _GUIProject.UI
    
     public interface IContainer :IObject
     {
-
         SortedSet<Slot<UIObject>> Slots { get; set; }
+        List<Slot<UIObject>> Children { get; set; }
         Rectangle Rect { get; }
         Point Position { get; set; }       
-        BasicSprite FrameBackground { get; set; }
+        Sprite FrameBackground { get; set; }
 
         public Slot<UIObject> this[int index]
         {
