@@ -76,8 +76,7 @@ namespace _GUIProject
        
         protected override void Initialize()
         {
-            _guiList = new List<IObject>();
-
+            _guiList = new List<IObject>();           
             MainInstance = this;
 
             // This is necessary for performance, it caches the resources before first use
@@ -335,6 +334,7 @@ namespace _GUIProject
             UIToolShelf.Size += new Point(0, 256);
 
             MouseGUI.AddSpriteRenderer(_spriteBatch);
+            MouseGUI.Setup();
 
             for (int i = 0; i < _guiList.Count; i++)
             {
@@ -394,6 +394,8 @@ namespace _GUIProject
                                 var slot = backup[i];
                                 slot.Item.Editable = true;
                                 slot.Item.Locked = false;
+                                slot.Item.InitPropertyPanel();
+                                slot.Item.AddPropertyRenderer(_spriteBatch);
                                 RootContainer.AddItem(slot.Position, slot.Item, slot.Priority);
                             }
 
@@ -401,6 +403,7 @@ namespace _GUIProject
                             RootContainer.AddStringRenderer(_spriteBatch);
                             RootContainer.Update(gameTime);
                             RootContainer.UpdateLayout();
+                           
                             AddContainer();
                             
                         }
@@ -428,9 +431,8 @@ namespace _GUIProject
                 RootContainer.Update(gameTime);
                 RootContainer.UpdateLayout();
             }
-            MouseGUI.Update();
-
-
+           
+           
 
             for (int i = _guiList.Count - 1; i >= 0; i--)
             {
@@ -440,6 +442,7 @@ namespace _GUIProject
             _fileMenu.Update(gameTime);
 
             Singleton.Input.Update();
+            MouseGUI.Update();
 
             MouseGUI.HitObject = null;
 
@@ -452,7 +455,7 @@ namespace _GUIProject
                     break;
                 }
             }
-
+          
             if (MouseGUI.HitObject != null)
             {
 

@@ -6,6 +6,7 @@ using static _GUIProject.AssetManager;
 using System;
 using static _GUIProject.FontManager;
 using _GUIProject.UI;
+using System.Diagnostics;
 
 namespace _GUIProject.UI
 {    
@@ -110,28 +111,16 @@ namespace _GUIProject.UI
             {
                 result = Property.HitTest(mousePosition);
             }
+         
             if (Active)
-            {               
-                if (result == null)
+            {              
+                result = base.HitTest(mousePosition);
+                if (result != null)
                 {
-                    result = base.HitTest(mousePosition);
-
-                    if (result == null)
-                    {
-                        if (IsMouseOver)
-                        {
-                            MouseEvent.Out();
-                        }
-                        IsMouseOver = false;
-                    }
-                    else
-                    {
-                        IsMouseOver = true;
-                        MouseEvent.Over();
-
-                    }
-                }
-            }
+                    IsMouseOver = true;                  
+                    MouseEvent.Over();
+                }         
+            }        
             return result;
         }
 
@@ -140,7 +129,11 @@ namespace _GUIProject.UI
             base.Update(gameTime);
             if (Active)
             {              
-
+                if(!Contains(MouseGUI.Position))
+                {
+                    IsMouseOver = false;
+                    MouseEvent.Out();
+                }
                 Caption.Position = new  Point( Rect.Center.X, Rect.Center.Y);
                 Caption.Position -= new Point(Caption.Width/ 2, Caption.Height / 2);
                 Caption.Update(gameTime);              

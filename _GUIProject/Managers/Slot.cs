@@ -67,7 +67,7 @@ namespace _GUIProject.UI
                     var obj = Reflection.CreateObject(reader.Name);
                     Item = (T)XmlTool.Deserialize(obj.GetType(), reader, root);
                     (Item as UIObject).Initialize();
-                    (Item as UIObject).Setup();
+                    (Item as UIObject).Setup();                  
                     reader.ReadEndElement();
                 }
              

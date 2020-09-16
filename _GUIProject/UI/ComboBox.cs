@@ -93,7 +93,12 @@ namespace _GUIProject.UI
         }
         void LoadAttributes()
         {
-
+            Container = new Frame(_defaultTXName, DrawPriority.LOWEST, MoveOption.STATIC);
+            Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
+            _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
+            _footTX = new Button(_footTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
+            _defaultItem.Text = "";
+            _footTX.Text = "";
             _buttonSelection = new ElementSelection();
             _buttonSelection.Initialize();
         }
@@ -112,22 +117,12 @@ namespace _GUIProject.UI
             YPolicy = SizePolicy.EXPAND;
             MoveState = MoveOption.DYNAMIC;
             _direction = GrowDirection.DOWN;
-
-            Container = new Frame("DefaultComboBoxTX", DrawPriority.LOWEST, MoveOption.STATIC);
-            Container.Initialize();
-
-            _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
+           
+            Container.Initialize();            
             _defaultItem.Initialize();
-            _defaultItem.Text = "";
-
-
-            Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);            
-
-            _footTX = new Button(_footTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);          
             _footTX.Initialize();
-            _footTX.Text = "";
+           
             _footTX.Editable = false;
-
             Container.AddItem(DefaultOffset, _footTX, DrawPriority.LOWEST);
             Container.Active = false;
             Active = true;
@@ -143,8 +138,7 @@ namespace _GUIProject.UI
             }
             
             Container.Position = new Point(Left, Bottom);
-            _buttonSelection.Setup();
-            Container.Setup();
+            _buttonSelection.Setup();          
             
             if(MouseEvent.IsOnClickNull)
             {
@@ -155,10 +149,7 @@ namespace _GUIProject.UI
             }
            
         }
-        //public UIObject this[int index]
-        //{
-        //    get { return _buttonsContainer.Slots.ElementAt(index).Item; }
-        //}
+      
         public UIObject this[string name]
         {
             get { return Container.Slots.Where(s => s.Item.Text == name).Single().Item; }
@@ -277,16 +268,13 @@ namespace _GUIProject.UI
             UIObject result = null;
             if (Active)
             {
-                if (result == null)
-                {
-                    result = Container.HitTest(mousePosition);
-                }                
+                result = Container.HitTest(mousePosition);
+                if (result != null)
+                {                    
+                    return result;
+                }
             }
-            if (result == null)
-            {
-                result = base.HitTest(mousePosition);
-            }
-            return result;
+            return base.HitTest(mousePosition);
         }
         public override void ResetSize()
         {
@@ -358,25 +346,14 @@ namespace _GUIProject.UI
         {
             base.Draw();
             if (Active)
-            {              
-
-                if (Container.Active)
-                {
-                    for (int i = Container.Length - 1; i >= 0; i--)
-                    {
-                        Slot<UIObject> slot = Container[i];
-                        slot.Item.Alpha = Alpha;
-                        slot.Item.Draw();
-                    }
-                }
-
+            {
+                Container.Draw();
                 if (_auxiliaryInfo != null)
                 {
                     _auxiliaryInfo.Draw();
                 }
                 _buttonSelection.Draw();
             }
-
         }
         public override void Show()
         {

@@ -45,7 +45,10 @@ namespace _GUIProject
         {
             return new Microsoft.Xna.Framework.Point(X, Y);
         }
-
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
         public override int GetHashCode()
         {
             return HashCode.Combine(X, Y);

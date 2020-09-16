@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
@@ -145,26 +146,25 @@ namespace _GUIProject.UI
         }
         public override UIObject HitTest(Point mousePosition)
         {
-            UIObject result = base.HitTest(mousePosition);
+            UIObject result = null;
+
             if (Active)
             {
                 // Test children first.
                 for (int i = Length - 1; i >= 0; i--)
                 {
                     Slot<UIObject> slot = this[i];
-
-                    if (slot.Item != null)
+                    if (slot.Item != null && slot.Item.Active)
                     {
-                        if (slot.Item.HitTest(mousePosition) != null)
-                        {
-                            result = slot.Item.HitTest(mousePosition);
-                            continue;
-                        }
+                        result = slot.Item.HitTest(mousePosition);
+                        if(result != null)
+                        {                          
+                            return result;
+                        }                        
                     }
-                }              
-            }
-
-            return result;
+                }
+            }                  
+            return base.HitTest(mousePosition);
         }
         public Point SimulateInsert(Point dropLocation, UIObject item, DrawPriority priority = DrawPriority.HIGH)
         {

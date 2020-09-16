@@ -175,7 +175,7 @@ namespace _GUIProject.UI
 
         public UIObject HitTest(Point mousePosition)
         {
-            UIObject result = FrameBackground.HitTest(mousePosition); 
+            UIObject result = null;
             if (FrameBackground.Active)
             {
                 // Test children first.
@@ -183,18 +183,18 @@ namespace _GUIProject.UI
                 {
                     Slot<UIObject> slot = this[i];
 
-                    if (slot.Item != null)
+                    if (slot.Item != null && slot.Item.Active)
                     {
-                        if (slot.Item.HitTest(mousePosition) != null)
+                        result = slot.Item.HitTest(mousePosition);     
+                        if(result != null)
                         {
-                            result = slot.Item.HitTest(mousePosition);
-                            continue;
+                            return result;
                         }
                     }
                 }              
             }
 
-            return result;
+            return FrameBackground.HitTest(mousePosition); 
         }
 
         

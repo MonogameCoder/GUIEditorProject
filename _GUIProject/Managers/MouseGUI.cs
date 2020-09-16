@@ -63,7 +63,7 @@ namespace _GUIProject.UI
         public static void Load()
         {
             _mouseScale = new Sprite("MouseScaleCursorSmallTX", DrawPriority.HIGHEST);
-            _mouseScale.Initialize();
+            _mouseScale.Initialize();           
         }
 
         public static void Setup()
@@ -80,8 +80,8 @@ namespace _GUIProject.UI
             _prevState = _curState;
             _curState = Mouse.GetState();
 
-            Position = (Point)_curState.Position;
-            _GUIProject.Point CenterPosition = new _GUIProject.Point(Position.X - _mouseScale.Width / 2, Position.Y - _mouseScale.Height / 2);
+            Position = _curState.Position;
+            Point CenterPosition = new Point(Position.X - _mouseScale.Width / 2, Position.Y - _mouseScale.Height / 2);
             _mouseScale.Position = CenterPosition;
 
             LeftIsPressed = _curState.LeftButton == ButtonState.Pressed;
@@ -127,16 +127,8 @@ namespace _GUIProject.UI
             {
                 if (isScaleMode && HitObject.Locked)
                 {
-                   
                     _mouseScale.Draw();
-                   
                 }
-                else
-                {
-                    _mouseScale.Active = false;
-                 
-                }
-
             }
 
         }
