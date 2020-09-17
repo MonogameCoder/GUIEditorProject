@@ -93,6 +93,7 @@ namespace _GUIProject.UI
             MoveState = MoveOption.DYNAMIC;
             Priority = DrawPriority.NORMAL;
             SpriteColor = Color.White;
+            MouseEvent = new MouseEvents(this);
         }
         
         public Sprite(string baseTX, DrawPriority priority, MoveOption moveState = MoveOption.STATIC) 
@@ -105,6 +106,7 @@ namespace _GUIProject.UI
             Priority = priority;
             MoveState = moveState;
             SpriteColor = Color.White;
+            MouseEvent = new MouseEvents(this);
         }
 
         public Sprite(string baseTX, DrawPriority priority, OverlayOption overlay, MoveOption state = MoveOption.STATIC)
@@ -119,11 +121,10 @@ namespace _GUIProject.UI
             MoveState = state;
             Overlay = overlay;
             SpriteColor = Color.White;
-
+            MouseEvent = new MouseEvents(this);
         }
         public override void Initialize()
-        {              
-            MouseEvent = new MouseEvents(this);
+        { 
             Active = true;
         }
        
@@ -142,7 +143,7 @@ namespace _GUIProject.UI
                 TextureDisabled = Texture;
 
             Rect = new Rectangle(Position.X, Position.Y, Texture.Width, Texture.Height);
-            DefaultSize = (Point)Rect.Size;
+            DefaultSize = Rect.Size;
 
         }
         public void AddTexture(string txName)

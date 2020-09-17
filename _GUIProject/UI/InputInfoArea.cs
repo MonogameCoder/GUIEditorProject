@@ -30,30 +30,29 @@ namespace _GUIProject.UI
         public InputInfoArea(string largeTX)
         {
             _baseTX = largeTX;
-        }
+            LoadAttributes();
+        }          
         public InputInfoArea()
         {
             _baseTX = "CombinedArrowsTX";
+            LoadAttributes();
+           
         }
-        public override void Initialize()
+        void LoadAttributes()
         {
-            _container = new Frame(_baseTX, DrawPriority.NORMAL, MoveOption.STATIC);
-            _textInput = new TextBox(_baseTX, "DefaultPropertiesPanelTextBoxPointerTextureName", TextBoxType.TEXT, DrawPriority.HIGH);
-
-            TextColor = new ColorObject();
-
             Up = new Button("CombinedArrowsUpTX", OverlayOption.NORMAL, DrawPriority.NORMAL);
             Down = new Button("CombinedArrowsDownTX", OverlayOption.NORMAL, DrawPriority.NORMAL);
-
-
-            _textInput.Initialize();
-            _container.Initialize();
-            Up.Initialize();
-            Down.Initialize();
-
-
+            _container = new Frame(_baseTX, DrawPriority.NORMAL, MoveOption.STATIC);
+            _textInput = new TextBox(_baseTX, "DefaultPropertiesPanelTextBoxPointerTextureName", TextBoxType.TEXT, DrawPriority.NORMAL);
+        }
+        public override void Initialize()
+        { 
+            TextColor = Color.White;
+           
             Up.Text = "";
             Down.Text = "";
+
+            _container.Initialize();    
 
             _container.Show();
             Active = true;
@@ -64,8 +63,9 @@ namespace _GUIProject.UI
             Up.Setup();
             Down.Setup();
 
-            _container.AddItem(new Point(_textInput.Right - Up.Width, _textInput.Top), Up, DrawPriority.NORMAL);
-            _container.AddItem(new Point(_textInput.Right - Down.Width, _textInput.Height - Down.Height), Down, DrawPriority.NORMAL);
+           
+            _container.AddItem(new Point(_textInput.Right - Up.Width, _textInput.Top), Up, DrawPriority.HIGH);
+            _container.AddItem(new Point(_textInput.Right - Down.Width, _textInput.Height - Down.Height), Down, DrawPriority.HIGH);
             _container.AddItem(Point.Zero, _textInput, DrawPriority.NORMAL);
 
             Point halfTextSize = (_textInput.TextSize / 2).ToPoint();

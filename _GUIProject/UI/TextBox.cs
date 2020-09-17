@@ -399,6 +399,7 @@ namespace _GUIProject.UI
             Property = new PropertyPanel(this);
             Property.AddProperties(PropertyPanel.PropertyOwner.TEXTBOX);
             Property.SetupProperties();
+          
         }
         public override void Setup()
         {            
@@ -926,16 +927,19 @@ namespace _GUIProject.UI
             UIObject result = null;
             if (Property != null && MainWindow.CurrentObject == this)
             {
-                result = Property.HitTest(mousePosition);
+                result = Property.HitTest(mousePosition); 
+                if(result != null)
+                {
+                    return result;
+                }
             }
             if (Active)
             {
-                if (result == null)
-                {
-                    result = base.HitTest(mousePosition);
-                }
-            }
-            return result;
+                return base.HitTest(mousePosition);             
+            }           
+
+            return null;
+          
         }
         public override void Update(GameTime gameTime)
         {

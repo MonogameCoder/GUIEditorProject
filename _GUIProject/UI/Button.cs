@@ -73,8 +73,9 @@ namespace _GUIProject.UI
         public override void InitPropertyPanel()
         {
             Property = new PropertyPanel(this);
-            Property.AddProperties(PropertyPanel.PropertyOwner.BUTTON);
+            Property.AddProperties(PropertyPanel.PropertyOwner.BUTTON);           
             Property.SetupProperties();
+          
         }
         public override void Setup()
         {
@@ -107,20 +108,27 @@ namespace _GUIProject.UI
         public override UIObject HitTest(Point mousePosition)
         {
             UIObject result = null;
+
             if (Property != null && MainWindow.CurrentObject == this)
             {
                 result = Property.HitTest(mousePosition);
+              
+                if(result != null)
+                {                   
+                    return result;
+                }
             }
-         
             if (Active)
-            {              
+            {
                 result = base.HitTest(mousePosition);
                 if (result != null)
                 {
-                    IsMouseOver = true;                  
+                    IsMouseOver = true;
                     MouseEvent.Over();
-                }         
-            }        
+                   
+                }             
+            }         
+
             return result;
         }
 
@@ -138,8 +146,9 @@ namespace _GUIProject.UI
                 Caption.Position -= new Point(Caption.Width/ 2, Caption.Height / 2);
                 Caption.Update(gameTime);              
             }
+           
             if (Property != null)
-            {
+            {              
                 Property.Update(gameTime);
             }
 

@@ -81,7 +81,7 @@ namespace _GUIProject.UI
             AddEvents();
 
         }
-        void AddEvents()
+        public void AddEvents()
         {
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             _color.AddNewItem("Black", () =>

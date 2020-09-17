@@ -94,7 +94,7 @@ namespace _GUIProject.UI
         {            
             foreach (var item in _properties)
             {
-                item.Key.Initialize();
+                item.Key.Initialize();                
                 item.Key.Active = true;
                 item.Key.Editable = false;
             }
@@ -105,17 +105,21 @@ namespace _GUIProject.UI
             BGImage.Position = new Point(1590, 100);
             BGImage.Initialize();
 
-            if(owner != PropertyOwner.SLIDER && owner != PropertyOwner.TOGGLE)
+          
+
+            AddPanelProperties();
+
+            if (owner != PropertyOwner.SLIDER && owner != PropertyOwner.TOGGLE)
             {
-                _textProperties = new TextProperty(this);               
+                _textProperties = new TextProperty(this);
                 _textProperties.AddProperties(owner);
                 foreach (var item in _textProperties.Properties)
                 {
                     _properties.Add(item.Key, item.Value);
                 }
             }
-        
-            if(owner !=  PropertyOwner.LABEL)
+
+            if (owner != PropertyOwner.LABEL)
             {
                 _surfaceProperties = new SurfaceProperty(this);
                 _surfaceProperties.AddProperties(owner);
@@ -123,10 +127,10 @@ namespace _GUIProject.UI
                 {
                     _properties.Add(item.Key, item.Value);
                 }
-            }           
-            
-            if(owner == PropertyOwner.COMBOBOX)
-            {                
+            }
+
+            if (owner == PropertyOwner.COMBOBOX)
+            {
                 _advancedProperties = new AdvancedProperty(this);
                 _advancedProperties.AddProperties(owner);
                 foreach (var item in _advancedProperties.Properties)
@@ -136,14 +140,12 @@ namespace _GUIProject.UI
             }
             _generalProperties = new GeneralProperty(this);
             _generalProperties.AddProperties(owner);
-            
+
             foreach (var item in _generalProperties.Properties)
             {
                 _properties.Add(item.Key, item.Value);
             }
 
-            AddPanelProperties();        
-         
             _search.FieldWidth = 320;
             _search.SampleText = "Search for an item here...";
             _search.StickSampleText = true;  
@@ -485,26 +487,26 @@ namespace _GUIProject.UI
             UIObject result = null;
 
             if (MainWindow.CurrentObject == Owner)
-            {
-                result = BGImage.HitTest(mousePosition);
+            {               
                 if (BGImage.Active)
                 {
-                    for (int i = _properties.Count - 1; i >= 0; i--)
+                    for (int i = 0; i < _properties.Count; i++)
                     {
                         var item = _properties.ElementAt(i).Key;
 
                         if (item != null)
                         {
-                            if (item.HitTest(mousePosition) != null)
+                            result = item.HitTest(mousePosition);                           
+                            if(result != null)
                             {
-                                result = item.HitTest(mousePosition);
-                                continue;
-                            }
+                                break;
+                            }                            
                         }
                     }
 
                 }
             }       
+         
          
             return result;
         }
@@ -538,7 +540,6 @@ namespace _GUIProject.UI
                 }
                 _generalProperties.Update(gameTime);
 
-
                 _showhide.Selected = Owner.Active;
                 _locker.Selected = Owner.Locked;
 
@@ -570,7 +571,7 @@ namespace _GUIProject.UI
                 BGImage.Draw();
 
                 for (int i = _properties.Count - 1; i >= 0; i--)
-                {
+                {                    
                     _properties.ElementAt(i).Key.Draw();
                 }
                 // Temporary

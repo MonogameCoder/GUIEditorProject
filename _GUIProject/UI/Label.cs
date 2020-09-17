@@ -76,10 +76,8 @@ namespace _GUIProject.UI
                         Scale = Vector2.One;
                         newScale = new Vector2(1f / value);
                         Scale -= newScale;
-                    }               
-                    
-                }
-               
+                    }  
+                }               
             }
         }
        
@@ -112,8 +110,8 @@ namespace _GUIProject.UI
         public override void InitPropertyPanel()
         {
             Property = new PropertyPanel(this);
-            Property.AddProperties(PropertyPanel.PropertyOwner.LABEL);
-            Property.SetupProperties();
+            Property.AddProperties(PropertyPanel.PropertyOwner.LABEL);           
+            Property.SetupProperties();           
         }
         public override void Setup()
         {        
@@ -138,17 +136,18 @@ namespace _GUIProject.UI
             Property.AddPropertyRenderer(batch);
         }
         public override void Resize(Point amount)
-        {            
+        {
+            ResetSize();
             float x = amount.X / (float)TextSize.X;
             float y = amount.Y / (float)TextSize.Y;
-            Vector2 textSize = new Vector2(x, y);
-            Size += amount;
-            Scale += textSize;                
+            Vector2 textSize = new Vector2(x, y);        
+            Scale += textSize;
+
         }
         public override void ResetSize()
         {
             Scale = Vector2.One;
-            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
+            Rect = new Rectangle(Position, TextSize);
         }
 
         public override bool Contains(Point position)
@@ -160,7 +159,17 @@ namespace _GUIProject.UI
             return false;
         }
         public override UIObject HitTest(Point mousePosition)
-        {            
+        {
+            UIObject result = null;
+            if (Property != null && MainWindow.CurrentObject == this)
+            {
+                result= Property.HitTest(mousePosition);
+                if (result != null)
+                {
+                    return result;
+                }
+                 
+            }
             if (Active)
             {
                 if (Contains(mousePosition))
@@ -169,10 +178,7 @@ namespace _GUIProject.UI
                 }   
             }
 
-            if (Property != null && MainWindow.CurrentObject == this)
-            {
-                return Property.HitTest(mousePosition);
-            }
+           
             return null;
         }
         public override void Update(GameTime gameTime)

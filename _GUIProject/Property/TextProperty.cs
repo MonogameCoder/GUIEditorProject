@@ -93,26 +93,23 @@ namespace _GUIProject.UI
            
             _nameLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
 
-            PopulateEvents(owner);
+            AddEvents();
         }
-        void PopulateEvents(PropertyOwner owner)
+        public void AddEvents()
         {
-
-            if (owner != PropertyOwner.MULTITEXTBOX && owner != PropertyOwner.SLIDER && owner != PropertyOwner.TOGGLE)
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            _text.MouseEvent.onMouseClick += (sender, args) =>
             {
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                _text.MouseEvent.onMouseClick += (sender, args) =>
-                {
                 _text.Selected = true;
                 _text.Clear();
                 _text.SimulateInput(Owner.Text);
-                };
-                _text.KeyboardEvents.onKeyReleased += (sender, args) =>
-                {
-                    Owner.Text = _text.Text;
-                };
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            }
+            };
+            _text.KeyboardEvents.onKeyReleased += (sender, args) =>
+            {
+                Owner.Text = _text.Text;
+            };
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             _textColor.AddNewItem("Black", () =>
             {
                 _textColor.Text = "Black";

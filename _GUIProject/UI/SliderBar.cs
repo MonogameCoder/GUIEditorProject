@@ -60,7 +60,7 @@ namespace _GUIProject.UI
         {
             Property = new PropertyPanel(this);
             Property.AddProperties(PropertyPanel.PropertyOwner.SLIDER);
-            Property.SetupProperties();
+            Property.SetupProperties();           
         }
         public override void Setup()
         {
@@ -90,24 +90,25 @@ namespace _GUIProject.UI
         public override UIObject HitTest(Point mousePosition)
         {
             UIObject result = null;
+            if (Property != null && MainWindow.CurrentObject == this)
+            {
+                result = Property.HitTest(mousePosition);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
             if (Active)
             {
                 result = _slider.HitTest(mousePosition);
 
-
-                if (result == null)
+                if (result != null)
                 {
-                    result = base.HitTest(mousePosition);
+                    return result; 
                 }
             }
-            if (result == null)
-            {
-                if (Property != null && MainWindow.CurrentObject == this)
-                {
-                    result = Property.HitTest(mousePosition);
-                }
-            }
-            return result;
+            return base.HitTest(mousePosition); 
+           
         }
         public bool IsOutOfBounds(int x)
         {

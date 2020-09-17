@@ -48,22 +48,33 @@ namespace _GUIProject.UI
         public override void Initialize()
         {
             base.Initialize();
-            _itemsContainer = new Frame("DefaultScrollbarTX", DrawPriority.NORMAL);
-            _itemsContainer.Initialize();
+            _itemsContainer = new Frame("DefaultScrollbarTX", DrawPriority.NORMAL);          
 
-            UpButton = new Button("DefaultScrollBarUpTX", OverlayOption.NORMAL, DrawPriority.LOW);        
-            UpButton.Initialize();
+            UpButton = new Button("DefaultScrollBarUpTX", OverlayOption.NORMAL, DrawPriority.LOW); 
             UpButton.Text = "";
 
-            DownButton = new Button("DefaultScrollBarDownTX", OverlayOption.NORMAL, DrawPriority.LOW);          
-            DownButton.Initialize();
+            DownButton = new Button("DefaultScrollBarDownTX", OverlayOption.NORMAL, DrawPriority.LOW);  
             DownButton.Text = "";
 
-            SliderButton = new Button("DefaultScrollBarBARTX", OverlayOption.NORMAL, DrawPriority.LOW);           
-            SliderButton.Initialize();
+            SliderButton = new Button("DefaultScrollBarBARTX", OverlayOption.NORMAL, DrawPriority.LOW);  
             SliderButton.Text = "";
             _scrollEvent = new ScrollEvents();
-           
+
+            // Exception to the rule, I need to think this through and change it later on
+            UpButton.Setup();
+            DownButton.Setup();
+            SliderButton.Setup();
+
+            UpButton.Position = new Point(Left, Top);
+            DownButton.Position = new Point(Left, Bottom - DownButton.Height);
+            SliderButton.Position = new Point(Left, UpButton.Bottom + CurrentScrollValue);
+
+            _itemsContainer.AddItem(UpButton.Position, UpButton);
+            _itemsContainer.AddItem(DownButton.Position, DownButton);
+            _itemsContainer.AddItem(SliderButton.Position, SliderButton);
+
+            _itemsContainer.Initialize();
+
         }
    
         public override void Setup()
@@ -71,22 +82,7 @@ namespace _GUIProject.UI
             base.Setup();
             Size = new Point(Size.X, Parent.Size.Y);
             _itemsContainer.Position = Position;
-
-            UpButton.Setup();
-            DownButton.Setup();
-            SliderButton.Setup();
             
-            UpButton.Position = new Point(Left, Top);
-            DownButton.Position = new Point(Left, Bottom - DownButton.Height);
-            SliderButton.Position = new Point(Left, UpButton.Bottom + CurrentScrollValue);
-
-            UpButton.Show();
-            DownButton.Show();
-            SliderButton.Show();
-
-            _itemsContainer.AddItem(UpButton.Position, UpButton);
-            _itemsContainer.AddItem(DownButton.Position, DownButton);
-            _itemsContainer.AddItem(SliderButton.Position, SliderButton);
 
             _scrollEvent.onScroll += ScrollBar_onScrollEvent;
 

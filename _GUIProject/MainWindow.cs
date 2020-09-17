@@ -371,7 +371,7 @@ namespace _GUIProject
                         using (XmlReader xmlReader = XmlTool.OpenXmlReader("Text2.XRML"))
                         {
                             RemoveContainer();
-                            RootContainer = (Grid)XmlTool.Deserialize(typeof(Grid), xmlReader);
+                            RootContainer = (IContainer)XmlTool.Deserialize(typeof(Grid), xmlReader);
                             RootContainer.Position = new Point(568, 100);
                             RootContainer.Initialize();
                             RootContainer.Setup();
@@ -442,20 +442,19 @@ namespace _GUIProject
             _fileMenu.Update(gameTime);
 
             Singleton.Input.Update();
-            MouseGUI.Update();
+           
 
             MouseGUI.HitObject = null;
-
+            MouseGUI.Update();
             for (int i = 0; i < _guiList.Count; i++)
             {
-                MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);
-
+                MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);              
                 if (MouseGUI.HitObject != null)
                 {                    
                     break;
                 }
             }
-          
+           
             if (MouseGUI.HitObject != null)
             {
 

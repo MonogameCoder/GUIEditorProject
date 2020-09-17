@@ -150,22 +150,26 @@ namespace _GUIProject.UI
         public UIObject HitTest(Point mousePosition)
         {
             UIObject result = null;
+
             if (FrameBackground.Active)
             {
                 // Test children first.
                 for (int i = Length - 1; i >= 0; i--)
                 {
                     Slot<UIObject> slot = this[i];
-
-                    if (slot.Item != null && slot.Item.Active)
+                    if (slot.Item != null)
                     {
                         result = slot.Item.HitTest(mousePosition);
                         if (result != null)
                         {
-                            return result;
+                            break;
                         }
                     }
                 }
+            }
+            if (result != null)
+            {
+                return result;
             }
 
             return FrameBackground.HitTest(mousePosition);
@@ -199,7 +203,7 @@ namespace _GUIProject.UI
         public void Draw()
         {
             FrameBackground.Draw();
-            for (int i = Length - 1; i >= 0; i--)
+            for (int i = 0; i < Length; i++)
             {
                 Slot<UIObject> slot = this[i];
 

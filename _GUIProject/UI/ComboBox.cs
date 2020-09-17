@@ -47,7 +47,7 @@ namespace _GUIProject.UI
                 Caption.Text = Text;
             }
         }
-        Frame container;
+        private Frame container;
         [XmlElement]
         public Frame Container 
         {
@@ -59,9 +59,7 @@ namespace _GUIProject.UI
             }
         }
 
-
         private GrowDirection _direction;
-
         
         private Button _footTX;
         private Button _defaultItem;
@@ -93,20 +91,20 @@ namespace _GUIProject.UI
         }
         void LoadAttributes()
         {
+            _buttonSelection = new ElementSelection();
             Container = new Frame(_defaultTXName, DrawPriority.LOWEST, MoveOption.STATIC);
             Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
-            _footTX = new Button(_footTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
+            _footTX = new Button(_footTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);          
             _defaultItem.Text = "";
             _footTX.Text = "";
-            _buttonSelection = new ElementSelection();
-            _buttonSelection.Initialize();
+
         }
         public override void InitPropertyPanel()
         {
             Property = new PropertyPanel(this);
             Property.AddProperties(PropertyPanel.PropertyOwner.COMBOBOX);
-            Property.SetupProperties();
+            Property.SetupProperties();            
         }
 
         public override void Initialize()
@@ -117,13 +115,13 @@ namespace _GUIProject.UI
             YPolicy = SizePolicy.EXPAND;
             MoveState = MoveOption.DYNAMIC;
             _direction = GrowDirection.DOWN;
-           
-            Container.Initialize();            
-            _defaultItem.Initialize();
-            _footTX.Initialize();
-           
-            _footTX.Editable = false;
+
+
             Container.AddItem(DefaultOffset, _footTX, DrawPriority.LOWEST);
+            Container.Initialize();
+            _buttonSelection.Initialize();
+
+
             Container.Active = false;
             Active = true;
         }
@@ -138,9 +136,11 @@ namespace _GUIProject.UI
             }
             
             Container.Position = new Point(Left, Bottom);
-            _buttonSelection.Setup();          
-            
-            if(MouseEvent.IsOnClickNull)
+           
+            _buttonSelection.Setup();
+         
+
+            if (MouseEvent.IsOnClickNull)
             {
                 MouseEvent.onMouseClick += (sender, args) =>
                 {
@@ -209,11 +209,8 @@ namespace _GUIProject.UI
         {
             _auxiliaryInfo = new Sprite("ComboBoxAuxiliaryTX", DrawPriority.LOWEST);
             _auxiliaryInfo.Initialize();          
-            _auxiliaryInfo.Active = true;
-           
+            _auxiliaryInfo.Active = true;           
         }
-     
-
         public void AddNewItem(string text, Action buttonClickEvent)       
         {
             Button newButton = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOW);            
@@ -224,7 +221,7 @@ namespace _GUIProject.UI
             newButton.Name = "ComboBoxButton";
             newButton.Text = text;      
 
-            int bottom = Container.Slots.Where(s => s.Item != _footTX && s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
+            int bottom = Container.Slots.Where(s => s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
            
             newButton.MouseEvent.onMouseClick += (sender, args) => { buttonClickEvent(); };
             newButton.MouseEvent.onMouseOut += (sender, args) => { };

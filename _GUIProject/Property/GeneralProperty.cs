@@ -132,9 +132,9 @@ namespace _GUIProject
             _scaleX.TextColor = Color.White;
             _scaleY.TextColor = Color.White;
 
-            PopulateEvents(owner);
+            AddEvents();
         }
-        void PopulateEvents(PropertyOwner owner)
+        public void AddEvents()
         {
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             _expandX.MouseEvent.onMouseClick += (sender, args) =>

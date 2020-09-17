@@ -92,7 +92,8 @@ namespace _GUIProject.UI
         {
             Property = new PropertyPanel(this);
             Property.AddProperties(PropertyPanel.PropertyOwner.MULTITEXTBOX);
-            Property.SetupProperties();
+            //Property.InitializeProperty();
+            Property.SetupProperties();          
         }
         public override void Setup()
         {
@@ -548,16 +549,20 @@ namespace _GUIProject.UI
             if (Property != null && MainWindow.CurrentObject == this)
             {
                 result = Property.HitTest(mousePosition);
+                if (result != null)
+                {
+                    return result;
+                }
             }
             if (Active)
             {
                 result = _scrollBar.HitTest(mousePosition);
-                if (result == null)
+                if (result != null)
                 {
-                    return base.HitTest(mousePosition);
+                    return result;
                 }                    
             }
-            return result;
+            return base.HitTest(mousePosition); 
         }
       
         public void ApplyScrollOffset()

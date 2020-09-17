@@ -43,14 +43,14 @@ namespace _GUIProject.UI
             _comboAddConfirm.AddButton(_remButton, 4);
             _comboAddConfirm.Show();
 
-            AddEvents(owner);
+            AddEvents();
 
 
         }
-        public void AddEvents(PropertyOwner owner)
+        public void AddEvents()
         {
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (owner == PropertyOwner.COMBOBOX)
+            if (Owner is ComboBox)
             {
 
                 _addButton.MouseEvent.onMouseClick += (sender, args) =>

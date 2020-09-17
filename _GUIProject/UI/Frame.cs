@@ -65,6 +65,10 @@ namespace _GUIProject.UI
         {
             base.Initialize();          
             Slots = new SortedSet<Slot<UIObject>>();
+            foreach (Slot<UIObject> slot in Slots)
+            {
+                slot.Item.Initialize();
+            }
         }
         public override void Setup()
         {
@@ -147,23 +151,28 @@ namespace _GUIProject.UI
         public override UIObject HitTest(Point mousePosition)
         {
             UIObject result = null;
-
+            
             if (Active)
             {
                 // Test children first.
-                for (int i = Length - 1; i >= 0; i--)
+                for (int i = Length -1; i >= 0; i--)
                 {
                     Slot<UIObject> slot = this[i];
-                    if (slot.Item != null && slot.Item.Active)
+                    if (slot.Item != null)
                     {
-                        result = slot.Item.HitTest(mousePosition);
+                        result = slot.Item.HitTest(mousePosition);   
                         if(result != null)
-                        {                          
-                            return result;
-                        }                        
+                        {
+                            Debug.WriteLine("Index: {0} Object: {1} Type: {2}", i, result.Text, result);
+                            break;
+                        }
                     }
                 }
-            }                  
+            }
+            if (result != null)
+            {               
+                return result;
+            }
             return base.HitTest(mousePosition);
         }
         public Point SimulateInsert(Point dropLocation, UIObject item, DrawPriority priority = DrawPriority.HIGH)
@@ -222,7 +231,7 @@ namespace _GUIProject.UI
             if (Active)
             {
                 base.Draw();
-                for (int i = Length - 1; i >= 0; i--)
+                for (int i = 0; i < Length; i++)
                 {
                     Slot<UIObject> slot = this[i];
 
@@ -232,7 +241,6 @@ namespace _GUIProject.UI
                     }
                 }
             }
-
         }
         
         public override void Show()
@@ -254,7 +262,7 @@ namespace _GUIProject.UI
 
                 if (slot.Item != null)
                 {
-                    slot.Item.Hide();
+                    slot.Item.Active = false;
                 }
 
             }

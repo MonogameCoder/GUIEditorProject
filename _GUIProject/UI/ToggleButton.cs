@@ -46,10 +46,20 @@ namespace _GUIProject.UI
         {
             Property = new PropertyPanel(this);
             Property.AddProperties(PropertyPanel.PropertyOwner.TOGGLE);
-            Property.SetupProperties();
+            Property.SetupProperties();           
         }
         public override UIObject HitTest(Point mousePosition)
         {
+            UIObject result = null;
+            if (Property != null && MainWindow.CurrentObject == this)
+            {
+                result = Property.HitTest(mousePosition); ;
+                if(result != null)
+                {
+                    return result;
+                }
+                 
+            }
             if (Active)
             {
                 if (Contains(mousePosition))
@@ -57,10 +67,7 @@ namespace _GUIProject.UI
                     return this;
                 }
             }
-            if (Property != null && MainWindow.CurrentObject == this)
-            {
-                return Property.HitTest(mousePosition);
-            }
+           
 
             return null;
         }

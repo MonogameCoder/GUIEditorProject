@@ -251,7 +251,7 @@ namespace _GUIProject
             while (tmp != null)
             {
                 subSize = (int)Math.Ceiling(tmp._data.Item.DefaultSize.X * 0.01f);
-                tmp._data.Item.Size -= new Point(subSize,0);
+                tmp._data.Item.Resize(new Point(-subSize, 0));
                 tmp = tmp._next;
 
             }

@@ -57,8 +57,8 @@ namespace _GUIProject.UI
         public override void InitPropertyPanel()
         {
             Property = new PropertyPanel(this);
-            Property.AddProperties(PropertyPanel.PropertyOwner.CHECKBOX);
-            Property.SetupProperties();
+            Property.AddProperties(PropertyPanel.PropertyOwner.CHECKBOX);           
+            Property.SetupProperties();           
         }
         public override void Setup()
         {           
@@ -72,20 +72,7 @@ namespace _GUIProject.UI
             Offset = offset;
             caption.Position = Position + offset;
         }
-        public override UIObject HitTest(Point mousePosition)
-        {
-            
-            if (Active)
-            {
-                return base.HitTest(mousePosition);
-            }
-            if (Property != null && MainWindow.CurrentObject == this)
-            {
-                return Property.HitTest(mousePosition);
-            }
-
-            return null;
-        }
+      
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
@@ -103,7 +90,6 @@ namespace _GUIProject.UI
                 Caption.Position = new Point((Right + Offset.X), Top + Offset.Y);
             }
 
-        }
-     
+        }    
     }
 }
