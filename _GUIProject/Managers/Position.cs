@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace _GUIProject
 {
-    public class Position : IXmlSerializable
+    public class Position 
     {
         [XmlAttribute("Position")]
         public Point Location { get; set; }
@@ -27,14 +27,10 @@ namespace _GUIProject
 
         public void ReadXml(XmlReader reader)
         {
-            string data = null;
-
-            reader.MoveToAttribute("Pos");
-            if (reader.ReadAttributeValue())
-            {
-                data = reader.Value;
-            }
-
+            reader.MoveToAttribute("Position");
+            string data = reader.Value;
+            var split = data.Split(':');
+            Location = new Point(int.Parse(split[0]), int.Parse(split[1]));
             reader.MoveToElement();
         }
 

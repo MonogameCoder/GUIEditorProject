@@ -46,13 +46,9 @@ namespace _GUIProject.UI
             return null;
         }
         public void ReadXml(XmlReader reader)
-        {            
-            reader.MoveToAttribute("Position");
-            string data = reader.Value;            
-
-            var split = data.Split(':');
-            Position = new Point(int.Parse(split[0]), int.Parse(split[1]));
-            reader.MoveToElement();         
+        {
+            Position = new Position();
+            Position.ReadXml(reader);
 
             if (reader.Read())
             {
