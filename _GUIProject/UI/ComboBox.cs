@@ -286,7 +286,7 @@ namespace _GUIProject.UI
 
         }
         public override void Resize(Point amount)
-        {
+        {           
             base.Resize(amount);
 
             for (int i = Container.Length - 1; i > 0; i--)

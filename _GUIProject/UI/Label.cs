@@ -115,7 +115,7 @@ namespace _GUIProject.UI
         }
         public override void Setup()
         {        
-            Rect = new Rectangle(Position.X, Position.Y, TextSize.X, TextSize.Y);
+            Rect = new Rectangle(Position, TextSize);
             DefaultSize = Rect.Size;
         }    
        
@@ -185,9 +185,9 @@ namespace _GUIProject.UI
         {
             if (Active)
             {
-                Point dim = (TextSize * Scale).ToPoint();
-                Rect = new Rectangle(Position, dim);
-
+                Point size = (TextSize * Scale).ToPoint();
+                Rect = new Rectangle(Position, size);
+                DefaultSize = TextSize.ToPoint();
             }
             if (Property != null)
             {

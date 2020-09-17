@@ -221,7 +221,7 @@ namespace _GUIProject
                 {                    
                     
                     int delta = GetYMax() - temp._data.Item.Height;
-                    //temp._data.Item.ResetSize();
+                    temp._data.Item.ResetSize();
                     
                     if (delta > 0)
                     {

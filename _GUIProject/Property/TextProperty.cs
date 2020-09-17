@@ -102,7 +102,7 @@ namespace _GUIProject.UI
             {
                 _text.Selected = true;
                 _text.Clear();
-                _text.SimulateInput(Owner.Text);
+                _text.SimulateInput(Owner.Text);             
             };
             _text.KeyboardEvents.onKeyReleased += (sender, args) =>
             {

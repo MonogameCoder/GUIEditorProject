@@ -204,7 +204,7 @@ namespace _GUIProject
                 if (temp._data.Item.XPolicy == UIObject.SizePolicy.EXPAND)
                 {                   
                     int delta = GetXMax() - temp._data.Item.Width;
-                    //temp._data.Item.ResetSize();
+                    temp._data.Item.ResetSize();
                     if (delta > 0)
                     {
                         temp._data.Item.Resize(new Point(delta, 0));
@@ -232,7 +232,7 @@ namespace _GUIProject
 
             int subSize = 0;
             while (tmp != null)
-            {
+            {                
                 subSize = (int)Math.Ceiling(tmp._data.Item.DefaultSize.Y * 0.01f);
                 tmp._data.Item.Resize(new Point(0, -subSize));
                 tmp = tmp._next;
