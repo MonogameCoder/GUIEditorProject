@@ -40,6 +40,7 @@ namespace _GUIProject.UI
             return a;
         }
         Point SimulateInsert(Point dropLocation, UIObject item, DrawPriority priority = DrawPriority.HIGH);
+        void Insert(Slot<UIObject> slot);
         void AddItem(Point dropLocation, UIObject item, DrawPriority priority = DrawPriority.HIGH);
         void RemoveItem(UIObject item);
         void RemoveSlot(UIObject item);       

@@ -114,6 +114,10 @@ namespace _GUIProject.UI
             Slots.Add(new Slot<UIObject>(dropLocation, item, priority));
             Children = Slots.ToList();
         }
+        public void Insert(Slot<UIObject> slot)
+        {
+            // Nothing
+        }
         public void RemoveSlot(UIObject item)
         {
             for (int i = 0; i < Length; i++)

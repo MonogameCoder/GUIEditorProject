@@ -100,7 +100,8 @@ namespace _GUIProject.UI
             {
                
                 Point quarter = new Point(HitObject.Right - HitObject.Center.X, HitObject.Bottom - HitObject.Center.Y);
-                Rectangle corner = new Rectangle(HitObject.Center + quarter * 0.5f, quarter * 0.5f);
+                quarter *= 0.5f;
+                Rectangle corner = new Rectangle(HitObject.Center + quarter, quarter);
                 isScaleMode = corner.Contains(Position.ToPoint());
                
             }

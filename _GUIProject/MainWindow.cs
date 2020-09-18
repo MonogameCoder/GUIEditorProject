@@ -275,26 +275,24 @@ namespace _GUIProject
                 RootContainer.Setup();
 
                 RootContainer.Position = new Point(568, 100);
-
                 List<Slot<UIObject>> backup = new List<Slot<UIObject>>();
                 backup = RootContainer.Slots.ToList();
+                
                 // Temporary workaround to add items in the same order as it was saved
                 // However it is not perfect yet               
-                backup = backup.OrderBy(s => s, Comparer<Slot<UIObject>>.Create((x, y) => 
-                x.Position.Location.ToVector2().Length() > y.Position.Location.ToVector2().Length() ? 1 :
-                x.Position.Location.ToVector2().Length() < y.Position.Location.ToVector2().Length() ? -1 :
+                backup = backup.OrderBy(s => s, Comparer<Slot<UIObject>>.Create((x, y) =>
+                (Point)x.Position > y.Position? 1 :
+                (Point)x.Position < y.Position ? -1 :
                 0)).ToList();
-                RootContainer.Children.Clear();
-                RootContainer.Slots.Clear();
-                
-                for (int i = backup.Count -1; i >= 0;i--)
+              
+                for (int i = backup.Count -1; i >= 0; i-- )
                 {
-                    var slot = backup[i];
-                    slot.Item.Editable = true;
-                    slot.Item.Locked = false;
-                    RootContainer.AddItem(slot.Position, slot.Item, slot.Priority);
+                    backup[i].Item.Editable = true;
+                    backup[i].Item.Locked = false;
+                    RootContainer.Insert(backup[i]);
+                    
                 }
-
+                RootContainer.UpdateLayout();
                 RootContainer.Show();
 
             }
@@ -380,24 +378,19 @@ namespace _GUIProject
                             backup = RootContainer.Slots.ToList();
 
                             // Temporary workaround to add items in the same order as it was saved
-                            // However it is not perfect yet
+                            // However it is not perfect yet               
                             backup = backup.OrderBy(s => s, Comparer<Slot<UIObject>>.Create((x, y) =>
-                            x.Position.Location.ToVector2().Length() > y.Position.Location.ToVector2().Length() ? 1 :
-                            x.Position.Location.ToVector2().Length() < y.Position.Location.ToVector2().Length() ? -1 :
-                            0)).ToList(); ;
-
-                            RootContainer.Children.Clear();
-                            RootContainer.Slots.Clear();
+                            (Point)x.Position > y.Position ? 1 :
+                            (Point)x.Position < y.Position ? -1 :
+                            0)).ToList();
 
                             for (int i = backup.Count - 1; i >= 0; i--)
                             {
-                                var slot = backup[i];
-                                slot.Item.Editable = true;
-                                slot.Item.Locked = false;
-                                slot.Item.InitPropertyPanel();
-                                slot.Item.AddPropertyRenderer(_spriteBatch);
-                                RootContainer.AddItem(slot.Position, slot.Item, slot.Priority);
-                            }
+                                backup[i].Item.Editable = true;
+                                backup[i].Item.Locked = false;
+                                RootContainer.Insert(backup[i]);
+
+                            }                         
 
                             RootContainer.AddSpriteRenderer(_spriteBatch);
                             RootContainer.AddStringRenderer(_spriteBatch);

@@ -53,6 +53,14 @@ namespace _GUIProject
         {
             return HashCode.Combine(X, Y);
         }
+        public static bool operator >(Point value1, Point value2)
+        {
+            return (value1.X >= value2.X && value1.Y > value2.Y || value1.Y >= value2.Y && value1.X > value2.X);
+        }
+        public static bool operator <(Point value1, Point value2)
+        {
+            return (value1.X <= value2.X && value1.Y < value2.Y || value1.Y <= value2.Y && value1.X < value2.X);
+        }
         public static Point operator +(Point value1, Point value2)
         {
             return new Point(value1.X + value2.X, value1.Y + value2.Y);

@@ -240,7 +240,6 @@ namespace _GUIProject
             _scaleX.Text = Owner.Size.X.ToString();
             _scaleY.Text = Owner.Size.Y.ToString();
 
-
             _expandX.Selected = Convert.ToBoolean(Owner.XPolicy);
             _expandY.Selected = Convert.ToBoolean(Owner.YPolicy);
         }

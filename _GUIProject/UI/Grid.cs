@@ -119,12 +119,16 @@ namespace _GUIProject.UI
         }
         public void AddItem(Point position, UIObject item, DrawPriority priority)
         {
-            Slot<UIObject> _newSlot = new Slot<UIObject>(position, item, priority);   
-            ItemList.Insert(_newSlot);
-            Slots.Add(_newSlot);
+            Slot<UIObject> slot = new Slot<UIObject>(position, item, priority);
+            Insert(slot);
+            Slots.Add(slot);
             Children = Slots.ToList();
 
             
+        }
+        public void Insert(Slot<UIObject> slot)
+        {
+            ItemList.Insert(slot);
         }
         public Point SimulateInsert(Point position, UIObject item, DrawPriority priority)
         {

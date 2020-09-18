@@ -239,7 +239,7 @@ namespace _GUIProject
             Node temp = _head;
             while(temp != null)
             {
-                temp._data.Item.Size = temp._data.Item.DefaultSize;
+                temp._data.Item.ResetSize();
                 temp = temp._next;
             }
         }

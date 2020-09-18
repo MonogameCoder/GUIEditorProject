@@ -100,11 +100,19 @@ namespace _GUIProject.UI
         }
         public void AddItem(Point position, UIObject item, DrawPriority priority)
         {
+            Slot<UIObject> slot = new Slot<UIObject>(position, item, priority);
+            Insert(slot);
+            Slots.Add(slot);
+        }
+        public void Insert(Slot<UIObject> slot)
+        {
+            ItemList.Insert(slot);
+        }
+        public Point SimulateInsert(Point position, UIObject item, DrawPriority priority = DrawPriority.HIGH)
+        {
             Slot<UIObject> _newSlot = new Slot<UIObject>(position, item, priority);
             item.Active = true;
-
-            ItemList.Insert(_newSlot);
-            Slots.Add(_newSlot);
+            return ItemList.SimulateInsert(_newSlot);
         }
         public void RemoveItem(UIObject item)
         {
@@ -212,15 +220,7 @@ namespace _GUIProject.UI
                     slot.Item.Draw();
                 }
             }
-        }
-    
-       
-        public Point SimulateInsert(Point position, UIObject item, DrawPriority priority = DrawPriority.HIGH)
-        {
-            Slot<UIObject> _newSlot = new Slot<UIObject>(position, item, priority);
-            item.Active = true;
-            return ItemList.SimulateInsert(_newSlot);
-        }
+        }    
 
         public void Show()
         {

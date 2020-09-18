@@ -202,7 +202,8 @@ namespace _GUIProject
             {
 
                 if (temp._data.Item.XPolicy == UIObject.SizePolicy.EXPAND)
-                {                   
+                {              
+                   
                     int delta = GetXMax() - temp._data.Item.Width;
                     temp._data.Item.ResetSize();
                     if (delta > 0)
@@ -218,13 +219,12 @@ namespace _GUIProject
         }
         void ResetSizes()
         {
-            
-                Node temp = _head;
-                while (temp != null)
-                {
-                    temp._data.Item.Size = temp._data.Item.DefaultSize;
-                    temp = temp._next;
-                }           
+            Node temp = _head;
+            while (temp != null)
+            {
+                temp._data.Item.ResetSize();
+                temp = temp._next;
+            }
         }
         void Resize()
         {
