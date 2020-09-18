@@ -98,13 +98,11 @@ namespace _GUIProject.UI
 
             if (HitObject != null && Focus == null)
             {
-                UIObject sprite = HitObject;
-                float radiusX = sprite.Size.X * 0.3f;
-                float radiusY = sprite.Size.Y * 0.3f;
-                Point cornerPosition = new Point(sprite.Rect.Right, sprite.Rect.Bottom);
-                bool xHit = Position.X >= cornerPosition.X - radiusX && Position.X <= cornerPosition.X;
-                bool yHit = Position.Y >= cornerPosition.Y - radiusY && Position.Y <= cornerPosition.Y;
-                isScaleMode = yHit && xHit;
+               
+                Point quarter = new Point(HitObject.Right - HitObject.Center.X, HitObject.Bottom - HitObject.Center.Y);
+                Rectangle corner = new Rectangle(HitObject.Center + quarter * 0.5f, quarter * 0.5f);
+                isScaleMode = corner.Contains(Position.ToPoint());
+               
             }
             if(isScaleMode)
             {
