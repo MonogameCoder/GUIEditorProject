@@ -1,4 +1,5 @@
 ﻿using _GUIProject.Events;
+using ExtensionMethods;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -196,6 +197,7 @@ namespace _GUIProject.UI
             _lockerTooltip = new ToolTip(_locker);           
             _lockerTooltip.Initialize();
             _lockerTooltip.Text = "Tick this option\nTo lock the Item in place,\nAnd enable live actions\n(scale, show/hide etc)!";
+            
 
             _properties.Add(_grid, new Point(141, 38));
             _properties.Add(_free, new Point(182, 38));

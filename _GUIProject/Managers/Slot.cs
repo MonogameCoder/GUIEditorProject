@@ -65,8 +65,7 @@ namespace _GUIProject.UI
                     (Item as UIObject).Initialize();
                     (Item as UIObject).Setup();                  
                     reader.ReadEndElement();
-                }
-             
+                }            
                
             }
             

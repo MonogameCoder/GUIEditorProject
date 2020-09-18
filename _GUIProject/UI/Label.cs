@@ -136,8 +136,7 @@ namespace _GUIProject.UI
             Property.AddPropertyRenderer(batch);
         }
         public override void Resize(Point amount)
-        {
-            ResetSize();
+        {           
             float x = amount.X / (float)TextSize.X;
             float y = amount.Y / (float)TextSize.Y;
             Vector2 textSize = new Vector2(x, y);        

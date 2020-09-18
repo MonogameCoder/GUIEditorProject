@@ -68,7 +68,7 @@ namespace _GUIProject.UI
         [XmlIgnore]      
         public override Point Size
         {
-            get { return (Point)Rect.Size; }
+            get { return Rect.Size; }
             set { Rect = new Rectangle(Position, value); }
         }
         protected Point _position;

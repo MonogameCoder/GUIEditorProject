@@ -22,8 +22,7 @@ namespace _GUIProject.UI
         }
         public override void Update(GameTime gameTime)
         {
-            Position = new Point(_parent.Rect.Center.X - Width / 2, _parent.Top - Height - 4);
-           
+            Position = new Point(_parent.Rect.Center.X - Width / 2, _parent.Top - Height - 4);           
             base.Update(gameTime);          
            
         }
@@ -33,11 +32,14 @@ namespace _GUIProject.UI
             TextColor = Color.Black;                 
             Hide();
           
-        }
+        }        
         public override void Setup()
         {
-            base.Setup();
-            Resize(Caption.TextSize);
+            base.Setup();    
+            if(Vector2.Max(Caption.TextSize, Size) == Caption.TextSize)
+            {
+                Resize(Caption.TextSize);
+            }
         }
     }
 }

@@ -445,7 +445,7 @@ namespace _GUIProject
            
 
             MouseGUI.HitObject = null;
-            MouseGUI.Update();
+           
             for (int i = 0; i < _guiList.Count; i++)
             {
                 MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);              
@@ -575,7 +575,7 @@ namespace _GUIProject
                 }
             }
 
-           
+            MouseGUI.Update();
             base.Update(gameTime);
         }
 

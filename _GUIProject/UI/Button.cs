@@ -122,10 +122,9 @@ namespace _GUIProject.UI
             {
                 result = base.HitTest(mousePosition);
                 if (result != null)
-                {
+                {                 
                     IsMouseOver = true;
-                    MouseEvent.Over();
-                   
+                    MouseEvent.Over();                   
                 }             
             }         
 

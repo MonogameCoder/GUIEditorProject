@@ -50,11 +50,7 @@ namespace _GUIProject.UI
         }
 
         [XmlIgnore]
-        public Point DefaultSize
-        {
-            get;
-            set;
-        }
+        public virtual Point DefaultSize { get; set; }
 
         [XmlIgnore]
         public float Alpha { get; set; } = 1.0f;
@@ -116,7 +112,7 @@ namespace _GUIProject.UI
         public Rectangle Rect { get; set; }
 
         [XmlAttribute]
-        public int Height
+        public virtual int Height
         {
             get { return Rect.Height; }
             set { Rect = new Rectangle(Position, new Point(Size.X, value)); }
