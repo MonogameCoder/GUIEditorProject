@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace _GUIProject.UI
+{
+    interface IScrollable
+    {
+        int MaxLinesLength { get; set; }
+        int NumberOfLines { get; }
+        void ApplyScrollOffset();
+    }
+}

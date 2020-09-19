@@ -167,7 +167,7 @@ namespace _GUIProject.UI
                         result = slot.Item.HitTest(mousePosition);   
                         if(result != null)
                         {
-                            Debug.WriteLine("Index: {0} Object: {1} Type: {2}", i, result.Text, result);
+                            //Debug.WriteLine("Index: {0} Object: {1} Type: {2}", i, result.Text, result);
                             break;
                         }
                     }

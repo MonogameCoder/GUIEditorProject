@@ -13,8 +13,7 @@ namespace _GUIProject.UI
     {
         TextBoxConfirmAction _comboAddConfirm;
         Button _addButton;
-        Button _remButton;
-
+        Button _remButton;        
         public UIObject Owner { get; private set; }
         public PropertyPanel Parent { get; private set; }
         public SortedDictionary<UIObject, Point> Properties { get; private set; }

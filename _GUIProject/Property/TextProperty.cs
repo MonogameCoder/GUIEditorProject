@@ -19,7 +19,7 @@ namespace _GUIProject.UI
         public SortedDictionary<UIObject, Point> Properties { get; private set; }
 
         private Label _name;
-        private ComboBox _textColor;
+        private ComboMulti _textColor;
         private TextBox _text;
 
         private Label _nameLb;
@@ -36,10 +36,10 @@ namespace _GUIProject.UI
         public void AddProperties(PropertyOwner owner)
         {
             _text = new TextBox("PropertyPanelTextboxTX", "PropertyPanelTextboxPointerTX", TextBoxType.TEXT, DrawPriority.NORMAL);            
-            _textColor = new ComboBox("PropertyPanelCBTX", "PropertyPanelCBBGTX", "PropertyPanelCBFootTX", DrawPriority.LOW);
+            _textColor = new ComboMulti("PropertyPanelCBTX", "PropertyPanelCBBGTX", DrawPriority.LOWEST);
             _name = new Label("");
 
-            _textColor.AddName(Owner.TextColor.Text, Color.White, Singleton.Font.GetFont(FontManager.FontType.ARIAL));
+            _textColor.AddName("Text Color", Color.White, Singleton.Font.GetFont(FontManager.FontType.STANDARD));
             _textColor.AddAuxiliaryInfo();
 
 
@@ -109,47 +109,18 @@ namespace _GUIProject.UI
                 Owner.Text = _text.Text;
             };
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            _textColor.AddNewItem("Black", () =>
+            var colorObj = Reflection.CreateObject(typeof(Color).Name);
+            var colors = colorObj.GetType().GetProperties().Where(p => p.PropertyType == typeof(Color)).ToArray();
+            foreach (var col in colors)
             {
-                _textColor.Text = "Black";
-                _textColor.AuxilaryColor = Color.Black;
-
-                if (Owner == MainWindow.CurrentObject && Owner.Editable)
+                Color color = (Color)col.GetValue(col, null);
+                _textColor.AddNewItem(color, () =>
                 {
+                    _textColor.AuxilaryColor = color;
                     Owner.TextColor = _textColor.AuxilaryColor;
-                }
-
-                _textColor.Hide();
-            });
-
-            _textColor.AddNewItem("White", () =>
-            {
-                _textColor.Text = "White";
-                _textColor.AuxilaryColor = Color.White;
-
-                if (Owner == MainWindow.CurrentObject && Owner.Editable)
-                {
-                    Owner.TextColor = _textColor.AuxilaryColor;
-
-                }
-
-                _textColor.Hide();
-
-            });
-            _textColor.AddNewItem("Green", () =>
-            {
-                _textColor.AuxilaryColor = Color.Green;
-                _textColor.Text = "Green";
-
-                if (Owner.Editable)
-                {
-                    Owner.TextColor = _textColor.AuxilaryColor;
-                }
-
-                _textColor.Hide();
-
-            });
+                    _textColor.Hide();
+                });
+            }      
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
         public void Update(GameTime gameTime)
@@ -157,8 +128,7 @@ namespace _GUIProject.UI
 
             if (Properties.Count > 0)
             {
-                _textColor.AuxilaryColor = Owner.TextColor;
-                _textColor.Text = Owner.TextColor.Text;
+                _textColor.AuxilaryColor = Owner.TextColor;               
 
                 _name.Text = Owner.Name;
                 _text.Text = Owner.Text;

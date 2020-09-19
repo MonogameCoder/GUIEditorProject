@@ -31,7 +31,7 @@ namespace _GUIProject.UI
         public Point _offset;
 
         // This will be used in future implementations
-        private Sprite _auxiliaryInfo;
+       
         [XmlIgnore]
         public ColorObject AuxilaryColor
         {
@@ -59,32 +59,27 @@ namespace _GUIProject.UI
             }
         }
 
-        private GrowDirection _direction;
-        
-        private Button _footTX;
+        private Sprite _auxiliaryInfo;
+        private GrowDirection _direction;        
+       
         private Button _defaultItem;
         private ElementSelection _buttonSelection;
       
-        readonly string _defaultTXName;
-        readonly string _footTXName;
-      
+        readonly string _defaultTXName;    
       
         public ComboBox() : base("DefaultComboBoxTX", OverlayOption.NORMAL, DrawPriority.LOW)
         {
             Parent = this;        
-
             _defaultTXName = "DefaultComboBoxBGTX";
-            _footTXName = "DefaultComboBoxFootTX";
+           
 
             LoadAttributes();
 
         }
-        public ComboBox(string baseTX, string itemTX, string footTX, DrawPriority priority) : base(baseTX, OverlayOption.NORMAL, priority)
+        public ComboBox(string baseTX, string itemTX, DrawPriority priority) : base(baseTX, OverlayOption.NORMAL, priority)
         {
-            Parent = this;
-      
-            _defaultTXName = itemTX;
-            _footTXName = footTX;
+            Parent = this;      
+            _defaultTXName = itemTX;          
 
             LoadAttributes();
           
@@ -94,10 +89,8 @@ namespace _GUIProject.UI
             _buttonSelection = new ElementSelection();
             Container = new Frame(_defaultTXName, DrawPriority.LOWEST, MoveOption.STATIC);
             Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
-            _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
-            _footTX = new Button(_footTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);          
+            _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);              
             _defaultItem.Text = "";
-            _footTX.Text = "";
 
         }
         public override void InitPropertyPanel()
@@ -115,9 +108,7 @@ namespace _GUIProject.UI
             YPolicy = SizePolicy.EXPAND;
             MoveState = MoveOption.DYNAMIC;
             _direction = GrowDirection.DOWN;
-
-
-            Container.AddItem(DefaultOffset, _footTX, DrawPriority.LOWEST);
+         
             Container.Initialize();
             _buttonSelection.Initialize();
 
@@ -228,9 +219,8 @@ namespace _GUIProject.UI
             newButton.MouseEvent.onMouseOver += (sender, args) => { };
 
             _offset = new Point(DefaultOffset.X, bottom);
-            Container.AddItem(_offset, newButton, DrawPriority.LOW);
-      
-            Container.UpdateSlot(_footTX, new Point(DefaultOffset.X, bottom + newButton.Height));
+            Container.AddItem(_offset, newButton, DrawPriority.LOW);     
+            
 
             Container.AddDefaultRenderers(newButton);
 
@@ -250,14 +240,13 @@ namespace _GUIProject.UI
         }
         void RearrangeContainer(int end, int start)
         {
-            int bottom = Container.Slots.Where(s => s.Item != _footTX).Sum(s => s.Item.Height);
+            int bottom = Container.Slots.Where(s => s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
             for (int i = end -1; i >= start; i--)
             {
                 var curItem = Container[i].Item;
                 int delta = end - i;
                 Container.UpdateSlot(curItem, new Point(_offset.X, (bottom - curItem.Height * delta)));
-            }
-            Container.UpdateSlot(_footTX, new Point(DefaultOffset.X, bottom));
+            }           
         }
 
         public override UIObject HitTest(Point mousePosition)
@@ -294,8 +283,7 @@ namespace _GUIProject.UI
                 var current = Container[i].Item;              
                 current.Resize(amount);
             }
-
-            _footTX.Resize(new Point(amount.X, 0));
+        
             RearrangeContainer(Container.Length, 0);  
         }
 
@@ -319,7 +307,6 @@ namespace _GUIProject.UI
             base.Update(gameTime);
             if (Active)
             {
-
                 Container.Position = new Point(Left, Bottom);
                 Container.Update(gameTime);
 

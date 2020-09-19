@@ -165,7 +165,7 @@ namespace _GUIProject.UI
             _horizontal = new CheckBox("PropertyPanelCheckboxTX", OverlayOption.CHECKBOX, DrawPriority.LOW);
 
             _search = new TextBox("PropertyPanelTextboxTX", "PropertyPanelTextboxPointerTX", TextBoxType.TEXT, DrawPriority.HIGHEST);       
-            _events = new ComboBox("PropertyPanelEvtCBTX", "PropertyPanelEvtCBBGTX", "PropertyPanelEvtCBFootTX", DrawPriority.LOWEST);        
+            _events = new ComboBox("PropertyPanelEvtCBTX", "PropertyPanelEvtCBBGTX", DrawPriority.LOWEST);        
 
             _showhide = new CheckBox("PropertyPanelCheckboxTX", OverlayOption.CHECKBOX, DrawPriority.HIGHEST);
             _locker = new CheckBox("PropertyPanelCheckboxTX", OverlayOption.CHECKBOX, DrawPriority.HIGHEST);       

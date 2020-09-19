@@ -18,9 +18,11 @@ namespace _GUIProject.UI
 {
 
     // This class will be fully refactored
-    public class MultiTextBox : TextBox
-    {      
-     
+    public class MultiTextBox : TextBox, IScrollable
+    {
+        [XmlIgnore]
+        public int MaxLinesLength { get; set; }
+
         [XmlIgnore]
         public int NumberOfLines
         {
@@ -71,9 +73,10 @@ namespace _GUIProject.UI
         {
             base.Setup();
             CharBucket = new CharacterBucket(Left, Top);            
-            _scrollBar = new ScrollBar();            
-            _scrollBar.Initialize();
+            _scrollBar = new ScrollBar();
             _scrollBar.Parent = this;
+            _scrollBar.Initialize();
+           
             _scrollBar.Setup();
            
             _scrollBar.Position = new Point(Right - _scrollBar.Width, Top);            
@@ -91,8 +94,7 @@ namespace _GUIProject.UI
         public override void InitPropertyPanel()
         {
             Property = new PropertyPanel(this);
-            Property.AddProperties(PropertyPanel.PropertyOwner.MULTITEXTBOX);
-            //Property.InitializeProperty();
+            Property.AddProperties(PropertyPanel.PropertyOwner.MULTITEXTBOX);         
             Property.SetupProperties();          
         }
         public override void Setup()
@@ -482,7 +484,7 @@ namespace _GUIProject.UI
 
 
                     bool isNewLine = LastChar == "\n";
-                   int maxSize = Height / (Pointer.Height - 3);
+                    MaxLinesLength = Height / (Pointer.Height - 3);
 
                     if (isNewLine)
                     {
@@ -490,10 +492,10 @@ namespace _GUIProject.UI
                         CharBucket.RemoveCharacter();
                         _keyboardString = _keyboardString.Remove(_keyboardString.Length - 2, 2);
 
-                        if (NumberOfLines > maxSize && (NumberOfLines - (maxSize + 1)) < _scrollBar.CurrentScrollValue / 2)
+                        if (NumberOfLines > MaxLinesLength && (NumberOfLines - (MaxLinesLength + 1)) < _scrollBar.CurrentScrollValue / 2)
                         {
 
-                            _scrollBar.CurrentScrollValue = (NumberOfLines - (maxSize + 1));
+                            _scrollBar.CurrentScrollValue = (NumberOfLines - (MaxLinesLength + 1));
                         }
 
 
@@ -572,15 +574,15 @@ namespace _GUIProject.UI
             {
                 return;
             }
-            int maxLinesLength = Height / (Pointer.Height -3);
+            MaxLinesLength = Height / (Pointer.Height -3);
 
-            if (NumberOfLines > maxLinesLength && maxLinesLength + _scrollBar.CurrentScrollValue + 1 <= NumberOfLines)
+            if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue + 1 <= NumberOfLines)
             {
                 DisplayText = "";
                 int start, end;
 
-                start = NumberOfLines > maxLinesLength  ? _scrollBar.CurrentScrollValue : 0;
-                end = maxLinesLength + _scrollBar.CurrentScrollValue + 1;
+                start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
+                end = MaxLinesLength + _scrollBar.CurrentScrollValue + 1;
           
                 for (int i = start; i < end; i++)
                 {
@@ -595,15 +597,15 @@ namespace _GUIProject.UI
             if(string.IsNullOrEmpty(DisplayText))
             {
                 return;
-            }       
-      
-            int maxLinesLength = Height / (Pointer.Height - 3);
+            }
+
+            MaxLinesLength = Height / (Pointer.Height - 3);
             if (NumberOfLines > 1)
             {
                 DisplayText = "";
                 int start, end;
 
-                start = NumberOfLines > maxLinesLength ? (NumberOfLines - 1) - maxLinesLength : 0;
+                start = NumberOfLines > MaxLinesLength ? (NumberOfLines - 1) - MaxLinesLength : 0;
                 end = NumberOfLines;
 
                 for (int i = start; i < end; i++)
@@ -611,9 +613,9 @@ namespace _GUIProject.UI
                     DisplayText += TextLines[i] + "\n";
                 }
 
-                if (end > (maxLinesLength + 1) && _scrollBar.SliderButton.Bottom < _scrollBar.Bottom - _scrollBar.SliderButton.Height)
+                if (end > (MaxLinesLength + 1) && _scrollBar.SliderButton.Bottom < _scrollBar.Bottom - _scrollBar.SliderButton.Height)
                 {
-                    _scrollBar.CurrentScrollValue = (end - (maxLinesLength + 1));
+                    _scrollBar.CurrentScrollValue = (end - (MaxLinesLength + 1));
                 }
             }
         }
@@ -758,7 +760,7 @@ namespace _GUIProject.UI
             {
                 UpdateResize();
 
-                int maxLines = Height / (Pointer.Height - 3);
+                MaxLinesLength = Height / (Pointer.Height - 3);
 
 
                 TextPosition = new Vector2(Left + TextOffset.X, Top);
@@ -780,7 +782,7 @@ namespace _GUIProject.UI
                     ReceivingInput = false;
                     MouseEvent.Out();
                 }
-                if (NumberOfLines > maxLines + 1)
+                if (NumberOfLines > MaxLinesLength + 1)
                 {
                     _scrollBar.Show();
                 }

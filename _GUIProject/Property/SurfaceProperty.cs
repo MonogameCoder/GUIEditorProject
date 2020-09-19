@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using static _GUIProject.UI.PropertyPanel;
@@ -22,7 +24,8 @@ namespace _GUIProject.UI
 
         private FilePicker _txPicker;
         private InputInfoArea _alpha;
-        private ComboBox _color;
+        //private ComboBox _color;
+        private ComboMulti _color;
 
         private readonly PngToXnb _converter;
 
@@ -35,8 +38,7 @@ namespace _GUIProject.UI
         }
         public void AddProperties(PropertyOwner owner)
         {
-
-            _color = new ComboBox("PropertyPanelCBTX", "PropertyPanelCBBGTX", "PropertyPanelCBFootTX", DrawPriority.LOW);
+            _color = new ComboMulti("PropertyPanelCBTX", "PropertyPanelCBBGTX", DrawPriority.LOWEST);
             _txPicker = new FilePicker();
             _alpha = new InputInfoArea("PropertyPanelCombinedArrowsTX");
 
@@ -44,7 +46,7 @@ namespace _GUIProject.UI
             _colorLb = new Label("Color:");
             _alphaLb = new Label("Alpha:");
            
-            _color.Initialize();
+            _color.Initialize();         
             _txPicker.Initialize();
             _alpha.Initialize();          
 
@@ -52,8 +54,10 @@ namespace _GUIProject.UI
             _colorLb.Initialize();
             _alphaLb.Initialize();
           
-            _color.AddAuxiliaryInfo();
-            
+            _color.AddAuxiliaryInfo();     
+           
+            _color.AddName("Sprite Color", Color.White, Singleton.Font.GetFont(FontManager.FontType.STANDARD));
+
             _txPickLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _colorLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _alphaLb.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);         
@@ -67,8 +71,7 @@ namespace _GUIProject.UI
             {
                 lbWidth = (int)_colorLb.TextSize.X;
                 Properties.Add(_colorLb, new Point(168 - lbWidth, 181));
-                Properties.Add(_color, new Point(171, 181));
-                _color.AddName(Owner.SpriteColor.Text, Color.White, Singleton.Font.GetFont(FontManager.FontType.ARIAL));
+                Properties.Add(_color, new Point(171, 181));                
 
                 if(owner != PropertyOwner.SLIDER)
                 {
@@ -77,52 +80,30 @@ namespace _GUIProject.UI
                     Properties.Add(_txPicker, new Point(171, 240));
                 }               
             }
-            _alpha.TextColor = Color.White;
+            _alpha.TextColor = Color.White;            
+          
+
             AddEvents();
 
         }
         public void AddEvents()
         {
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            _color.AddNewItem("Black", () =>
+
+            var colorObj = Reflection.CreateObject(typeof(Color).Name);
+            var colors = colorObj.GetType().GetProperties().Where(p => p.PropertyType == typeof(Color)).ToArray();
+            foreach (var col in colors)
             {
-                _color.Text = "Black";
-                _color.AuxilaryColor = Color.Black;
-
-                if (Owner.Editable)
+                Color color = (Color)col.GetValue(col, null);
+                _color.AddNewItem(color, () =>
                 {
+                    _color.AuxilaryColor = color;
                     Owner.SpriteColor = _color.AuxilaryColor;
-                }
-
-                _color.Hide();
-            });
-            _color.AddNewItem("White", () =>
-            {
-                _color.Text = "White";
-                _color.AuxilaryColor = Color.White;
-
-                if (Owner.Editable)
-                {
-                    Owner.SpriteColor = _color.AuxilaryColor;
-
-                }
-
-                _color.Hide();
-
-            });
-            _color.AddNewItem("Green", () =>
-            {
-                _color.AuxilaryColor = Color.Green;
-                _color.Text = "Green";
-
-                if (Owner.Editable)
-                {
-                    Owner.SpriteColor = _color.AuxilaryColor;
-                }
-
-                _color.Hide();
-
-            });
+                    _color.Hide();
+                    _color.RearrangeContainer();
+                });
+               
+            }         
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             _txPicker.MouseEvent.onMouseClick += (sender, args) =>
             {
@@ -168,8 +149,7 @@ namespace _GUIProject.UI
 
         public void Update(GameTime gameTime)
         {
-            _color.AuxilaryColor = Owner.SpriteColor;
-            _color.Text = Owner.SpriteColor.Text;
+            _color.AuxilaryColor = Owner.SpriteColor;            
             _alpha.Text = Owner.Alpha.ToString();
             
             if (!(Owner is Label))

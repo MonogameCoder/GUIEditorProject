@@ -59,19 +59,7 @@ namespace _GUIProject.UI
             SliderButton = new Button("DefaultScrollBarBARTX", OverlayOption.NORMAL, DrawPriority.LOW);  
             SliderButton.Text = "";
             _scrollEvent = new ScrollEvents();
-
-            // Exception to the rule, I need to think this through and change it later on
-            UpButton.Setup();
-            DownButton.Setup();
-            SliderButton.Setup();
-
-            UpButton.Position = new Point(Left, Top);
-            DownButton.Position = new Point(Left, Bottom - DownButton.Height);
-            SliderButton.Position = new Point(Left, UpButton.Bottom + CurrentScrollValue);
-
-            _itemsContainer.AddItem(UpButton.Position, UpButton);
-            _itemsContainer.AddItem(DownButton.Position, DownButton);
-            _itemsContainer.AddItem(SliderButton.Position, SliderButton);
+         
 
             _itemsContainer.Initialize();
 
@@ -82,7 +70,19 @@ namespace _GUIProject.UI
             base.Setup();
             Size = new Point(Size.X, Parent.Size.Y);
             _itemsContainer.Position = Position;
-            
+            _itemsContainer.Setup();
+
+            UpButton.Setup();
+            DownButton.Setup();
+            SliderButton.Setup();
+
+            UpButton.Position = new Point(Left, Top);
+            DownButton.Position = new Point(Left, Parent.Height - DownButton.Height);
+            SliderButton.Position = new Point(Left, UpButton.Bottom + CurrentScrollValue);
+
+            _itemsContainer.AddItem(UpButton.Position, UpButton);
+            _itemsContainer.AddItem(DownButton.Position, DownButton);
+            _itemsContainer.AddItem(SliderButton.Position, SliderButton);
 
             _scrollEvent.onScroll += ScrollBar_onScrollEvent;
 
@@ -108,18 +108,16 @@ namespace _GUIProject.UI
         private void ScrollBar_onScrollEvent(object sender, ScrollEventArgs e)
         {
             direction = e.Direction;
+            var parent = (e.Owner as IScrollable);
 
             if (direction == ScrollDirection.DOWN)
             {
                 if (GetBounds(e.ScrollValue) == 0)
                 {
-                    var parent = (e.Owner as MultiTextBox);
-                    int maxLinesLength = parent.Height / (parent.Pointer.Height - 3);
-
-                    if (CurrentScrollValue + e.ScrollValue < (e.Owner as MultiTextBox).NumberOfLines - maxLinesLength)
+                    if (CurrentScrollValue + e.ScrollValue < parent.NumberOfLines - parent.MaxLinesLength)
                     {
-                        CurrentScrollValue+= e.ScrollValue;                        
-                        (e.Owner as MultiTextBox).ApplyScrollOffset();
+                        CurrentScrollValue+= e.ScrollValue;
+                        parent.ApplyScrollOffset();
                     }
                    
                 }
@@ -137,21 +135,25 @@ namespace _GUIProject.UI
 
                     if(CurrentScrollValue + e.ScrollValue >= 0)
                     {
-                        CurrentScrollValue+= e.ScrollValue; 
-                     
-                        (e.Owner as MultiTextBox).ApplyScrollOffset();
+                        CurrentScrollValue+= e.ScrollValue;
+                        parent.ApplyScrollOffset();
                     }                 
                    
                 }
                 else
                 {
                     var up = _itemsContainer[UpButton].Position;
-                    _itemsContainer.UpdateSlot(SliderButton, new Point(up.X, up.Y + UpButton.Height));
+                    _itemsContainer.UpdateSlot(SliderButton, new Point(up.X, up.Y + UpButton.Height));                  
 
                 }
             }
         }
-        
+        public void ResetScroll()
+        {
+            CurrentScrollValue = 0;
+            var up = _itemsContainer[UpButton].Position;
+            _itemsContainer.UpdateSlot(SliderButton, new Point(up.X, up.Y + UpButton.Height));
+        }
         public override void AddSpriteRenderer(SpriteBatch batch)
         {
             _itemsContainer.AddSpriteRenderer(batch);
@@ -203,25 +205,25 @@ namespace _GUIProject.UI
         {
 
             _itemsContainer.Position = new Point(Left, Top);         
-            MultiTextBox mtb = Parent as MultiTextBox;       
+            //MultiTextBox mtb = Parent as MultiTextBox;       
 
             Point lastPosition = SliderButton.Position;
             Point lastMousePosition = MouseGUI.Position;
             _itemsContainer.Update(gameTime);
             if (MouseGUI.Focus == SliderButton)
             {
-                Point delta = MouseGUI.Position - SliderButton.Center; 
-                  
-                direction = delta.Y > 0? ScrollDirection.DOWN : ScrollDirection.UP;               
-         
+                Point delta = MouseGUI.Position - SliderButton.Center;
+
+                direction = delta.Y > 0 ? ScrollDirection.DOWN : delta.Y < 0 ? ScrollDirection.UP : ScrollDirection.NONE;
+
                 if (direction == ScrollDirection.DOWN)
-                {                                 
+                {
                     if (GetBounds(delta.Y) == 0)
                     {
                         var slider = _itemsContainer[SliderButton].Position;
                         _itemsContainer.UpdateSlot(SliderButton, new Point(slider.X, slider.Y + delta.Y));
 
-                        _scrollEvent.OnScroll(mtb, ScrollDirection.DOWN, delta.Y);                       
+                        _scrollEvent.OnScroll(Parent, ScrollDirection.DOWN, delta.Y);
                     }
                     else
                     {
@@ -233,13 +235,13 @@ namespace _GUIProject.UI
                 else
                 {
                     if (direction == ScrollDirection.UP)
-                    {                        
+                    {
                         if (GetBounds(delta.Y) == 0)
                         {
                             var slider = _itemsContainer[SliderButton].Position;
                             _itemsContainer.UpdateSlot(SliderButton, new Point(slider.X, slider.Y + delta.Y));
 
-                            _scrollEvent.OnScroll(mtb, ScrollDirection.UP, delta.Y);
+                            _scrollEvent.OnScroll(Parent, ScrollDirection.UP, delta.Y);
                         }
                         else
                         {
@@ -248,26 +250,23 @@ namespace _GUIProject.UI
                         }
 
                     }
-                }              
+                }
             }
             else
             {
-                if (!string.IsNullOrEmpty(mtb.Text))
+                IScrollable parent = (Parent as IScrollable);
+                if (parent.NumberOfLines > parent.MaxLinesLength)
                 {
-                    int maxLinesLength = (int)(mtb.Height / (float)(mtb.Pointer.Height -3));
-                   
-                    if (mtb.NumberOfLines > maxLinesLength)
-                    {
-                        var slot = _itemsContainer[SliderButton];
-                        int delta = (slot.Position.Y + CurrentScrollValue) - slot.Position.Y;
+                    var slot = _itemsContainer[SliderButton];
+                    int delta = (slot.Position.Y + CurrentScrollValue) - slot.Position.Y;
 
-                        if (delta > 0)
-                        {
-                            _itemsContainer.UpdateSlot(SliderButton, new Point(slot.Position.X, DownButton.Height + CurrentScrollValue));
-                        }
+                    if (delta > 0)
+                    {
+                        _itemsContainer.UpdateSlot(SliderButton, new Point(slot.Position.X, DownButton.Height + CurrentScrollValue));
                     }
-                }     
-            }          
+                }
+
+            }       
           
             base.Update(gameTime);          
 
