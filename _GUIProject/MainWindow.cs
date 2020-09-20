@@ -186,46 +186,54 @@ namespace _GUIProject
 
             //Button btn = new Button();
             //btn.Initialize();
+            //btn.Editable = true;
             //btn.Name = "btn1";
             //btn.TextColor = Color.Black;
             //btn.Setup();
 
             //Label lb = new Label("Hello World");
             //lb.Initialize();
+            //lb.Editable = true;
             //lb.Name = "lb1";
             //lb.TextColor = Color.White;
             //lb.Setup();
 
             //ComboBox cb = new ComboBox();
             //cb.Initialize();
+            //cb.Editable = true;
             //cb.Name = "cb1";
             //cb.TextColor = Color.Black;
             //cb.Setup();
 
             //SliderBar sb = new SliderBar();
             //sb.Initialize();
+            //sb.Editable = true;
             //sb.Name = "sb1";
             //sb.Setup();
 
             //CheckBox ckb = new CheckBox();
             //ckb.Initialize();
+            //ckb.Editable = true;
             //ckb.Name = "ckb1";
             //ckb.Text = "Checkbox";
             //ckb.Setup();
 
             //ToggleButton tb = new ToggleButton();
             //tb.Initialize();
+            //tb.Editable = true;
             //tb.Name = "tb1";
             //tb.Setup();
 
             //TextBox txt = new TextBox();
             //txt.Initialize();
+            //txt.Editable = true;
             //txt.Setup();
             //txt.Name = "txt1";
             //txt.Text = "Sample";
 
             //MultiTextBox mtb = new MultiTextBox();
             //mtb.Initialize();
+            //mtb.Editable = true;
             //mtb.Setup();
             //mtb.Name = "mtb1";
             //RootContainer = new Grid();
@@ -277,20 +285,20 @@ namespace _GUIProject
                 RootContainer.Position = new Point(568, 100);
                 List<Slot<UIObject>> backup = new List<Slot<UIObject>>();
                 backup = RootContainer.Slots.ToList();
-                
+
                 // Temporary workaround to add items in the same order as it was saved
                 // However it is not perfect yet               
                 backup = backup.OrderBy(s => s, Comparer<Slot<UIObject>>.Create((x, y) =>
-                (Point)x.Position > y.Position? 1 :
+                (Point)x.Position > y.Position ? 1 :
                 (Point)x.Position < y.Position ? -1 :
                 0)).ToList();
-              
-                for (int i = backup.Count -1; i >= 0; i-- )
+
+                for (int i = backup.Count - 1; i >= 0; i--)
                 {
                     backup[i].Item.Editable = true;
                     backup[i].Item.Locked = false;
                     RootContainer.Insert(backup[i]);
-                    
+
                 }
                 RootContainer.UpdateLayout();
                 RootContainer.Show();

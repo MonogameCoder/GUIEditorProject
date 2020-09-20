@@ -80,6 +80,10 @@ namespace _GUIProject
         }
         public static Point operator /(Point source, Point divisor)
         {
+            if(divisor.X == 0 || divisor.Y == 0)
+            {
+                return Point.Zero;
+            }
             return new Point(source.X / divisor.X, source.Y / divisor.Y);
         }
         public static implicit operator Vector2(Point rhs)

@@ -31,7 +31,7 @@ namespace _GUIProject.UI
                 }
                 Caption.Text = Text;
             }
-        }
+        }       
         private Frame container;
       
         public Frame Container
@@ -58,6 +58,8 @@ namespace _GUIProject.UI
         private Button _defaultItem;      
         readonly string _defaultTXName;
         private readonly Sprite _bgSprite;
+
+        int start = 0, end = 0;
         public ComboMulti()
         {
 
@@ -153,14 +155,15 @@ namespace _GUIProject.UI
             _auxiliaryInfo.Initialize();
             _auxiliaryInfo.Active = true;
         }
-        public void AddNewItem(Color color, Action buttonClickEvent)
+        public void AddNewItem(string name, Color color, Action buttonClickEvent)
         {
             Button newButton = new Button("ComboBoxAuxiliaryTX", OverlayOption.NORMAL, DrawPriority.LOWEST);
             newButton.Initialize();
             newButton.Setup();
             newButton.SpriteColor = color;
-            newButton.Active = true;
-            newButton.Name = "ComboMultiItem";
+            newButton.SpriteColor.Text = name;
+            newButton.Active = true;            
+            newButton.Name = name;
             newButton.Text = "";
 
             int bottom = Container.Slots.Where(s => s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
@@ -173,7 +176,7 @@ namespace _GUIProject.UI
             Point position = Point.Zero;
             for (int i = 1; i <= Container.Length; i++)
             {
-                int mod = i % 6;
+                int mod = i % LINE;
                 if (mod == 0)
                 {
                     line++;
@@ -193,7 +196,7 @@ namespace _GUIProject.UI
             int line = 0;
             for (int i = 0; i < Container.Length; i++)
             {
-                int mod = i  % 6;
+                int mod = i  % LINE;
                 if (mod == 0)
                 {
                     line++;
@@ -207,19 +210,19 @@ namespace _GUIProject.UI
             if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue <= NumberOfLines)
             {
 
-                int start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
-                int end = MaxLinesLength + _scrollBar.CurrentScrollValue;
+                start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
+                end = MaxLinesLength + _scrollBar.CurrentScrollValue;
 
                 int line = 0;
                 for (int i = start * LINE; i < end * LINE; i++)
                 {
-                    if (i % 6 == 0)
+                    if (i % LINE == 0)
                     {
                         line++;
                     }
                     
                     Point newPos = new Point(Container[i].Position.X, (Container[i].Item.Height * line) - Container[i].Item.Height);
-                    Container.UpdateSlot(Container[i].Item, newPos);
+                    Container.UpdateSlot(Container[i].Item, newPos);                    
                 }
 
                 Container.UpdateLayout();
@@ -227,6 +230,9 @@ namespace _GUIProject.UI
         }
         public override void Update(GameTime gameTime)
         {
+            start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
+            end = MaxLinesLength + _scrollBar.CurrentScrollValue;
+
             Container.Update(gameTime);
             
             _scrollBar.Update(gameTime);
@@ -242,34 +248,34 @@ namespace _GUIProject.UI
                 {
                     return result;
                 }
-
-                result = Container.HitTest(mousePosition);
-                if (result != null)
+            }
+            if(Container.Active)
+            {               
+                for (int i = start * LINE; i < end * LINE; i++)
                 {
-                    return result;
-                }             
+                    result = Container[i].Item.HitTest(mousePosition);
+                    if(result != null)
+                    {                     
+                        return result;
+                    }
+                }
             }
             
             return base.HitTest(mousePosition);
         }
-       
+
         public override void Draw()
         {
-          
-            base.Draw();           
-           
-            if(Container.Active)
+
+            base.Draw();
+
+            if (Container.Active)
             {
                 _bgSprite.Draw();
-                if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue <= NumberOfLines)
+
+                for (int i = start * LINE; i < end * LINE; i++)
                 {
-                    int start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue: 0;
-                    int end = MaxLinesLength + _scrollBar.CurrentScrollValue ;
-                 
-                    for (int i = start * LINE; i < end * LINE; i++)
-                    {                       
-                        Container[i].Item.Draw();
-                    }
+                    Container[i].Item.Draw();
                 }
             }
             if (_auxiliaryInfo != null)

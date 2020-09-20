@@ -37,30 +37,7 @@ namespace _GUIProject.UI
         {
 
         }
-        public string Text
-        {
-            get
-            {
-                if (Color == Color.Green)
-                {
-                    return "Green";
-                }
-                if (Color == Color.Black)
-                {
-                    return "Black";
-                }
-                if (Color == Color.White)
-                {
-                    return "White";
-
-                }
-                else
-                {
-                    return "";
-                }
-            }
-
-        }
+        public string Text { get; set; }
       
         public static implicit operator Color(ColorObject rhs)
         {

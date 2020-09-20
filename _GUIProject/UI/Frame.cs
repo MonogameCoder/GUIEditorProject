@@ -206,8 +206,7 @@ namespace _GUIProject.UI
 
                 if (slot.Item != null)
                 {
-                    slot.Item.Position = Position + slot.Position;                
-
+                    slot.Item.Position = Position + slot.Position;                    
                 }
             }
         }
