@@ -8,7 +8,7 @@ TODO list:
 - and much more to come !
 
 
-############ new years roadmap ##################
+############ New Year's Roadmap ##################
 Preparing repo for next year, a full fledged XRML( Extended Romulo Markup Language) editor will be developed. Almost ready!
--Copy, Paste, Edit Text, Change Editor Theme, Color text parts in XML like style using Regex, Redo, Undo and much more to come.
+-- Copy, Paste, Edit Text, Change Editor Theme, Color text parts in XML like style using Regex, Redo, Undo and much more to come.
 --> The Multiline Textbox will be used as the bases for the editor. Live Adding/Editing of objects using the editor will be possible soon. Event Handling will also be supported soon too. <--
