@@ -66,17 +66,17 @@ namespace _GUIProject
         public MainWindow()
         {
             _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";            
+            Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
-        
-           
+
+
             _guiList = new List<IObject>();
-        }      
-       
+        }
+
         protected override void Initialize()
         {
-            _guiList = new List<IObject>();           
+            _guiList = new List<IObject>();
             MainInstance = this;
 
             // This is necessary for performance, it caches the resources before first use
@@ -268,6 +268,7 @@ namespace _GUIProject
 
             // Live editing is already possible only by using the Text2.XRML file
             // A full fledged XML Editor will be implemented next
+            /*
             try
             {
                 using (var XmlReader = XmlTool.OpenXmlReader("Text2.XRML"))
@@ -312,12 +313,17 @@ namespace _GUIProject
             {
                 _xrml_text = reader.ReadToEnd();
             }
+            */
+            RootContainer = new Grid();
+            RootContainer.Initialize();
+            RootContainer.Setup();
+            RootContainer.Position = new Point(568, 100);
 
             _guiList.Add(Selection);
             _guiList.Add(_fileMenu);
             _guiList.Add(UIToolShelf);
             _guiList.Add(RootContainer);
-        
+
             base.Initialize();
         }
 
@@ -335,8 +341,8 @@ namespace _GUIProject
             {
                 _guiList[i].Setup();
             }
-         
-           
+
+
             UIToolShelf.Size += new Point(0, 256);
 
             MouseGUI.AddSpriteRenderer(_spriteBatch);
@@ -358,7 +364,7 @@ namespace _GUIProject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-
+            /*
             string xrml_current = "";
             if (!string.IsNullOrEmpty(_xrml_text))
             {
@@ -416,8 +422,7 @@ namespace _GUIProject
                     }
                 }
             }
-
-
+            */
 
 
 
@@ -432,8 +437,8 @@ namespace _GUIProject
                 RootContainer.Update(gameTime);
                 RootContainer.UpdateLayout();
             }
-           
-           
+
+
 
             for (int i = _guiList.Count - 1; i >= 0; i--)
             {
@@ -443,19 +448,20 @@ namespace _GUIProject
             _fileMenu.Update(gameTime);
 
             Singleton.Input.Update();
-           
 
+            MouseGUI.Update();
             MouseGUI.HitObject = null;
-           
+
             for (int i = 0; i < _guiList.Count; i++)
             {
-                MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);              
+                MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);
                 if (MouseGUI.HitObject != null)
-                {                    
+                {
                     break;
                 }
             }
-           
+
+
             if (MouseGUI.HitObject != null)
             {
 
@@ -485,7 +491,7 @@ namespace _GUIProject
                             // TODO: Make sure this is inside the MainWindowFrame bounds
                             if (MouseGUI.LeftIsPressed && RootContainer.Contains(MouseGUI.Position))
                             {
-                               
+
                                 Point newItemPosition = RootContainer.SimulateInsert(MouseGUI.Focus.Position - RootContainer.Position, MouseGUI.Focus);
                                 newItemPosition += RootContainer.Position;
 
@@ -576,7 +582,7 @@ namespace _GUIProject
                 }
             }
 
-            MouseGUI.Update();
+
             base.Update(gameTime);
         }
 

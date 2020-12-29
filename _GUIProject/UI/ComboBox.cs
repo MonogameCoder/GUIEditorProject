@@ -143,7 +143,7 @@ namespace _GUIProject.UI
       
         public UIObject this[string name]
         {
-            get { return Container.Slots.Where(s => s.Item.Text == name).Single().Item; }
+            get { return Container.Slots.Where(s => s.Item.Text == name).FirstOrDefault().Item; }
         }
        
         public override void AddSpriteRenderer(SpriteBatch batch)

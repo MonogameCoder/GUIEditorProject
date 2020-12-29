@@ -205,7 +205,7 @@ namespace _GUIProject.UI
                 slot.Position = new Point(slot.Item.Width * mod, slot.Item.Height * (line-1));            
             }
         }
-        public void ApplyScrollOffset()
+        public void ApplyScroll()
         {
             if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue <= NumberOfLines)
             {

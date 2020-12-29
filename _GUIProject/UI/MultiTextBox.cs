@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 using ExtensionMethods;
 using System.Xml.Serialization;
+using static _GUIProject.UI.TextBox.CharacterBucket;
+using static _GUIProject.AssetManager;
 
 namespace _GUIProject.UI
 {
@@ -20,36 +22,129 @@ namespace _GUIProject.UI
     // This class will be fully refactored
     public class MultiTextBox : TextBox, IScrollable
     {
-        [XmlIgnore]
-        public int MaxLinesLength { get; set; }
-
-        [XmlIgnore]
-        public int NumberOfLines
+        enum Selection
         {
-            get { return TextLines.Length; }
+            UP,
+            DOWN,
+            LEFT,
+            RIGHT,
+            NONE
         }
-        [XmlIgnore]
-        public string LastLine
+
+        private static FontContent _font;
+        public class Line
         {
-            get
+            
+            private readonly List<Character> _characters;         
+            public string Text 
             {
-                return TextLines[NumberOfLines - 1];
+                get { return String.Concat(_characters.Select(c => c.Text).ToList()); } 
+            }
+            public Point Size 
+            { 
+                get { return Text.Size(_font).ToPoint(); } 
+            }
+            public Character this[int index]
+            {
+                get { return _characters[index]; }                
+            }
+
+            public List<Character> Characters
+            {
+                get { return _characters; }
+            }
+            public Line()
+            {
+                _characters = new List<Character>();          
+            }            
+            public void InsertCharacter(Character character)
+            {
+                _characters.Add(character);
+            }    
+            public void RemoveCharacter(Character character)
+            {                
+                _characters.Remove(character);                
+            }
+            public Character HitTest(Point mousePosition)
+            {
+                return _characters.Where(c => c.Rect.Contains(mousePosition.ToPoint())).FirstOrDefault();
+            }
+            
+            public void Draw(SpriteBatch batch)
+            {
+                foreach (Character ch in _characters)
+                {
+                    ch.Draw(batch);
+                }
+            }
+
+
+        }
+        class TextLines
+        {
+            private readonly List<Line> _lines;
+            public Line LastLine 
+            { get
+                {
+                    return _lines[_lines.Count - 1];
+                } 
+            }
+            public int NumberOfLines
+            {
+                get { return _lines.Count; }
+            }
+            public List<Line> Lines 
+            { 
+                get { return _lines; } 
+            }
+            public TextLines()
+            {
+                _lines = new List<Line>();
+                _lines.Add(new Line());
+            }
+
+            public Line this[int index]
+            {
+                get { return _lines[index]; }
+            }
+            public void AddLine(Line line)
+            {
+                _lines.Add(line);
+            }
+            public void AddCharacter(Character character)
+            {
+                LastLine.InsertCharacter(character);
+            }
+
+            public Character HitTest(Point mousePosition)
+            {
+                Character result = null;
+                for (int i = 0; i < _lines.Count; i++)
+                {
+                    Line current = _lines[i];
+                    result =  current.HitTest(mousePosition);
+                }
+                return result;
             }
         }
+        
         [XmlIgnore]
-        public string[] TextLines
+        public int MaxLinesLength 
         {
-            get { return _keyboardString.Split('\n'); }
+            get { return Height / (Pointer.Height - 3); }
+            set { }
         }
-        [XmlIgnore]
-        public Vector2 LastLineSize
+
+       [XmlIgnore]
+        public int NumberOfLines
         {
-            get { return LastLine.Replace('\n', ' ').Size(TextFont); }
+            get { return _textLine.NumberOfLines; }
         }
+        
         [XmlElement]
         public override string Text
         {
-            get { return DisplayText; }
+            get { return String.Concat(_displayLines.Select(l => l.Text)); }
             set 
             {
                 foreach (char character in value)
@@ -59,30 +154,53 @@ namespace _GUIProject.UI
                 }          
             }
         }
-
+        public Character TopSelect
+        {
+            get { return _textLine.Lines.AsReadOnly().SelectMany(l => l.Characters.Where(ch => ch.Selected)).FirstOrDefault(); }
+        }
+        public Character BottomSelect
+        {
+            get
+            {                
+                return _textLine.Lines.AsReadOnly().SelectMany(l => l.Characters.Where(ch => ch.Selected)).LastOrDefault();
+            }
+        }
+        private readonly TextLines _textLine;
+     
+        private List<Line> _displayLines;
         private ScrollBar _scrollBar;
+        private Character _topChar;
+        private Character _bottomChar;
+        private Character _currChar;       
+        private Point _prevPosition;
+        private Selection _prevSelect;
         public MultiTextBox() : base("DefaultMultiTexboxTX", "DefaultTextboxPointerTX", TextBoxType.TEXT, DrawPriority.NORMAL)
         {            
             MoveState = MoveOption.DYNAMIC;
             XPolicy = SizePolicy.EXPAND;
             YPolicy = SizePolicy.EXPAND;
             LoadAttributes();
-            
+            _textLine = new TextLines();
+            _displayLines = new List<Line>();
+          
         }
         void LoadAttributes()
         {
             base.Setup();
-            CharBucket = new CharacterBucket(Left, Top);            
+            CharBucket = new CharacterBucket();            
             _scrollBar = new ScrollBar();
             _scrollBar.Parent = this;
             _scrollBar.Initialize();
            
             _scrollBar.Setup();
            
-            _scrollBar.Position = new Point(Right - _scrollBar.Width, Top);            
+            _scrollBar.Position = new Point(Right - _scrollBar.Width, Top);
+            Pointer.Active = true;
 
-            TextColor = Color.Black;          
+            TextColor = Color.Black;
+            _font = TextFont;
 
+            _prevSelect = Selection.NONE;
         }
         public override void Initialize()
         {
@@ -99,8 +217,8 @@ namespace _GUIProject.UI
         }
         public override void Setup()
         {
-            base.Setup();
-          
+            base.Setup();          
+           
             Pointer += new Point(Left, Top);
             CurrItemRect = Pointer.Rect;
             MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
@@ -125,426 +243,99 @@ namespace _GUIProject.UI
         {
             _isShift = _myclsinput.isShiftPressed(Keyboard.GetState().GetPressedKeys());
             _isControl = _myclsinput.isControlPressed(Keyboard.GetState().GetPressedKeys());
-    
-
-            if (Singleton.Input.KeyReleased(Keys.A))
-            {
-                _keyboardString += _isShift ? "A" : "a";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.Space))
-            {
-                _keyboardString += " ";
-                CreateText(); KeyboardEvents.Released(); 
-            }
 
 
-            if (Singleton.Input.KeyReleased(Keys.B))
-            {
-                _keyboardString += _isShift ? "B" : "b";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.Z))
-            {
-                _keyboardString += _isShift ? "Z" : "z";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.C))
-            {
-                _keyboardString += _isShift ? "C" : "c";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ////////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D))
-            {
-                _keyboardString += _isShift ? "D" : "d";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            ////////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.E))
-            {
-                _keyboardString += _isShift ? "E" : "e";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.F))
-            {
-                _keyboardString += _isShift ? "F" : "f";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.G))
-            {
-                _keyboardString += _isShift ? "G" : "g";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.H))
-            {
-                _keyboardString += _isShift ? "H" : "h";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.I))
-            {
-                _keyboardString += _isShift ? "I" : "i";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.J))
-            {
-                _keyboardString += _isShift ? "J" : "j";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.K))
-            {
-                _keyboardString += _isShift ? "K" : "k";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            if (Singleton.Input.KeyReleased(Keys.L))
-            {
-                _keyboardString += _isShift ? "L" : "l";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.M))
-            {
-                _keyboardString += _isShift ? "M" : "m";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.N))
-            {
-                _keyboardString += _isShift ? "N" : "n";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.O))
-            {
-                _keyboardString += _isShift ? "O" : "o";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.P))
-            {
-                _keyboardString += _isShift ? "P" : "p";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.Q))
-            {
-                _keyboardString += _isShift ? "Q" : "q";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.R))
-            {
-                _keyboardString += _isShift ? "R" : "r";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.S))
-            {
-                _keyboardString += _isShift ? "S" : "s";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.T))
-            {
-                _keyboardString += _isShift ? "T" : "t";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.U))
-            {
-                _keyboardString += _isShift ? "U" : "u";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.V))
-            {
-                _keyboardString += _isShift ? "V" : "v";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.W))
-            {
-                _keyboardString += _isShift ? "W" : "w";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.Y))
-            {
-                _keyboardString += _isShift ? "Y" : "y";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.X))
-            {
-                _keyboardString += _isShift ? "X" : "x";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            /////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemSemicolon))
-            {
-                _keyboardString += _isShift ? ":" : ";";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            /////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemQuotes))
-            {
-                _keyboardString += _isShift ? "\"" : "'";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemComma))
-            {
-                _keyboardString += _isShift ? "<" : ",";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemPeriod))
-            {
-                _keyboardString += _isShift ? ">" : ".";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemQuestion))
-            {
-                _keyboardString += _isShift ? "?" : "/";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemOpenBrackets))
-            {
-                _keyboardString += _isShift ? "{" : "[";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemCloseBrackets))
-            {
-                _keyboardString += _isShift ? "}" : "]";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemPipe))
-            {
-                _keyboardString += _isShift ? "|" : "\\";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D1))
-            {
-                _keyboardString += _isShift ? "!" : "1";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D2))
-            {
-                _keyboardString += _isShift ? "@" : "2";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D3))
-            {
-                _keyboardString += _isShift ? "#" : "3";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D4))
-            {
-                _keyboardString += _isShift ? "$" : "4";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D5))
-            {
-                _keyboardString += _isShift ? "%" : "5";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D6))
-            {
-                _keyboardString += _isShift ? "^" : "6";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D7))
-            {
-                _keyboardString += _isShift ? "&" : "7";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D8))
-            {
-                _keyboardString += _isShift ? "*" : "8";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D9))
-            {
-                _keyboardString += _isShift ? "(" : "9";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.D0))
-            {
-                _keyboardString += _isShift ? ")" : "0";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemTilde))
-            {
-                _keyboardString += _isShift ? "~" : "`";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemMinus))
-            {
-                _keyboardString += _isShift ? "_" : "-";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            ///////////////////////////////////////////////////////////
-            if (Singleton.Input.KeyReleased(Keys.OemPlus))
-            {
-                _keyboardString += _isShift ? "+" : "=";
-                CreateText(); KeyboardEvents.Released(); 
-            }
-
-            if (Singleton.Input.CurrentKey != Keys.None)
-            {
-
-                // ToDo
-
-            }
-
-            if (Singleton.Input.KeyReleased(Keys.Enter))
-            {
-                if (_myclsinput.EnterKeyState == "down")
-                {
-                    _myclsinput.EnterKeyState = "none";
-                    //DrawTextsOnWindow(_spriteBatch, _chatGlobalList);
-
-                    // Clear();
-                    //enter = true;
-
-                }
-            }
             if (Singleton.Input.KeyReleased(Keys.Back))
             {
-                // textList.Remove(textList.LastOrDefault());
 
                 if (!string.IsNullOrEmpty(_keyboardString))
                 {
-
-
-                    bool isNewLine = LastChar == "\n";
-                    MaxLinesLength = Height / (Pointer.Height - 3);
-
-                    if (isNewLine)
+                    List<Character> characters = new List<Character>();
+                    foreach (Line line in _textLine.Lines)
                     {
-                        CharBucket.RemoveCharacter();
-                        CharBucket.RemoveCharacter();
-                        _keyboardString = _keyboardString.Remove(_keyboardString.Length - 2, 2);
-
-                        if (NumberOfLines > MaxLinesLength && (NumberOfLines - (MaxLinesLength + 1)) < _scrollBar.CurrentScrollValue / 2)
+                        characters.AddRange(line.Characters.Select(l => l).Where(ch => ch.Selected));
+                    }
+                    bool isSelected = characters.Count > 0;
+                    if (isSelected)
+                    {
+                        foreach (Line line in _textLine.Lines)
                         {
-
-                            _scrollBar.CurrentScrollValue = (NumberOfLines - (MaxLinesLength + 1));
+                            foreach (Character ch in characters)
+                            {
+                                line.RemoveCharacter(ch);
+                            }
                         }
-
-
                     }
                     else
                     {
-                        CurrItemRect = CharBucket.CurrentItemRectangle;
-                        CharBucket.RemoveCharacter();
-                        _keyboardString = _keyboardString.Remove(_keyboardString.Length - 1, 1);
+                        bool isNewLine = LastChar == "\n";
+                        if (isNewLine)
+                        {
+                            CharBucket.RemoveCharacter();
+                            CharBucket.RemoveCharacter();
+                            _keyboardString = _keyboardString.Remove(_keyboardString.Length - 2, 2);
 
+                            if (NumberOfLines > MaxLinesLength && (NumberOfLines - (MaxLinesLength + 1)) < _scrollBar.CurrentScrollValue / 2)
+                            {
+
+                                _scrollBar.CurrentScrollValue = (NumberOfLines - (MaxLinesLength + 1));
+                            }
+                        }
+                        else
+                        {
+                            CharBucket.RemoveCharacter();
+                            _keyboardString = _keyboardString.Remove(_keyboardString.Length - 1, 1);
+
+                        }
                     }
                 }
+
+                UpdatePointerAndCharacters();
                 KeyboardEvents.Released();
+            }
+            else
+            {
+                base.OnKeyboardPressed();
             }
 
         }
-
+        public Character CreateCharacter(string character, int row, int column)
+        {
+            Point size = character.Size(TextFont).ToPoint();
+            Point position = new Point
+            {
+                X = TextOffset.X + _textLine.LastLine.Size.X,
+                Y = (_textLine.NumberOfLines -1) * _textLine.LastLine.Size.Y
+            };
+            return new Character(new Rectangle(Position + position, size), character, row, column);
+        }
         protected override void CreateText()
-        {           
-            ApplyTextOffset();
+        {
+            if (NumberOfLines > (MaxLinesLength + 1) && _scrollBar.SliderButton.Bottom < _scrollBar.Bottom - _scrollBar.SliderButton.Height)
+            {
+                _scrollBar.CurrentScrollValue = (NumberOfLines - (MaxLinesLength + 1));
+            }      
 
-            Point textDimensions = DisplayText.Size(TextFont).ToPoint();
-            //Point characterDimensions = TextFont.Font.MeasureString(LastChar).ToPoint();
+            _textLine.LastLine.InsertCharacter(CreateCharacter(LastChar, _textLine.NumberOfLines, _textLine.LastLine.Text.Length +1));        
 
-            int x = (int)textDimensions.X;
-            int y = (int)textDimensions.Y;
-            //y = y <= Top + 2 ? Pointer.Height : y;
+            if (_textLine.NumberOfLines > 0  && IsOutOfBounds())
+            {            
+                _keyboardString += '\n';
+                _textLine.AddCharacter(CreateCharacter("\n", _textLine.NumberOfLines, _textLine.LastLine.Text.Length + 1));
+                _textLine.AddLine(new Line());              
+            }       
 
-            Point newPosition = new Point(x, y);          
-            CharBucket.AddCharacter(LastChar, newPosition, textDimensions);
-            ProcessString();
+            UpdatePointerAndCharacters();
 
         }
         bool IsOutOfBounds()
         {
-            float x = Left + LastLineSize.X + "H|".Size(TextFont).X;
-            float y = Top + LastLineSize.Y;
+            float x = Left + _textLine.LastLine.Size.X + "H|".Size(TextFont).X;
+            float y = Top + _textLine.LastLine.Size.Y;
             Vector2 curTextPosition = new Vector2(x, y);
             return curTextPosition.X > _scrollBar.Left;
         }
-        void ProcessString()
-        {
-
-            if (LastLine.Length > 0 && LastLine[LastLine.Length - 1] != '\n' && IsOutOfBounds())
-            {
-                _keyboardString += '\n';
-                CreateText();
-            }
-        }
+       
         public override UIObject HitTest(Point mousePosition)
         {
             UIObject result = null;
@@ -566,65 +357,34 @@ namespace _GUIProject.UI
             }
             return base.HitTest(mousePosition); 
         }
-      
-        public void ApplyScrollOffset()
+        
+        public void ApplyScroll()
         {
-            DisplayText = _keyboardString;
-            if(string.IsNullOrEmpty(DisplayText))
-            {
-                return;
-            }
-            MaxLinesLength = Height / (Pointer.Height -3);
+          
+            _displayLines.Clear();
 
             if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue + 1 <= NumberOfLines)
             {
                 DisplayText = "";
                 int start, end;
 
-                start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
+                start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue: 0;
                 end = MaxLinesLength + _scrollBar.CurrentScrollValue + 1;
           
                 for (int i = start; i < end; i++)
                 {
-                    DisplayText += TextLines[i] + "\n";
-                }
-             
-            }
-        }
-        protected override void ApplyTextOffset()
-        {           
-            DisplayText = _keyboardString;
-            if(string.IsNullOrEmpty(DisplayText))
-            {
-                return;
-            }
-
-            MaxLinesLength = Height / (Pointer.Height - 3);
-            if (NumberOfLines > 1)
-            {
-                DisplayText = "";
-                int start, end;
-
-                start = NumberOfLines > MaxLinesLength ? (NumberOfLines - 1) - MaxLinesLength : 0;
-                end = NumberOfLines;
-
-                for (int i = start; i < end; i++)
-                {
-                    DisplayText += TextLines[i] + "\n";
-                }
-
-                if (end > (MaxLinesLength + 1) && _scrollBar.SliderButton.Bottom < _scrollBar.Bottom - _scrollBar.SliderButton.Height)
-                {
-                    _scrollBar.CurrentScrollValue = (end - (MaxLinesLength + 1));
+                    _displayLines.Add(_textLine[i]);
                 }
             }
         }
+       
         public override void ResetSize()
         {
-            _scrollBar.ResetSize();
+            _scrollBar.ResetSize();          
+            
+            ApplyScroll();
             UpdateText();
-            ApplyTextOffset();
-            ApplyScrollOffset();
+            UpdatePointerAndCharacters();
 
             base.ResetSize();
         }
@@ -637,11 +397,11 @@ namespace _GUIProject.UI
             int border = 4;
             int newAmount = (_scrollBar.Position.Y + _scrollBar.Height) - Bottom;
             newAmount += border;
-            _scrollBar.Resize(new Point(0, -newAmount));
-
+            _scrollBar.Resize(new Point(0, -newAmount));           
+           
+            ApplyScroll();
             UpdateText();
-            ApplyTextOffset();
-            ApplyScrollOffset();
+            UpdatePointerAndCharacters();
 
         }
         void UpdateText()
@@ -679,103 +439,315 @@ namespace _GUIProject.UI
                 }
                 DisplayText = _keyboardString;
             }
-            UpdateCharacters();
+            UpdatePointerAndCharacters();
         }
-        void UpdateCharacters()
+       
+       List<Line> GetCurrentLines()
         {
-            int maxSize = Height / (Pointer.Height - 3);
-            int start = NumberOfLines > maxSize ? (NumberOfLines - 1) - maxSize : 0;
+            int start = NumberOfLines > MaxLinesLength ? (NumberOfLines - 1) - MaxLinesLength : 0;
             int end = NumberOfLines;
 
-            string displayLocalText = "";
+            List<Line> currentLines = new List<Line>();
 
             for (int i = start; i < end; i++)
-            {
-                displayLocalText += TextLines[i] + (i == end - 1 ? "" : "\n");
+            {                
+                currentLines.Add(_textLine[i]);
             }
-            string[] lines = displayLocalText.Split('\n');
+            return currentLines;
+        }
+        void UpdatePointerAndCharacters()
+        {          
+            List<Line> lines = GetCurrentLines();          
+            _displayLines = lines;    
+           
+            for (int i = 0; i < lines.Count; i++)
+            {              
+                int y = 0;
+                int x = 0;
+                string copyLines = lines[i].Text;
 
-
-            for (int i = 0; i < lines.Length - 1; i++)
-            {
-                lines[i] = lines[i].Insert(lines[i].Length, "\n");
-            }
-
-            int charIndex = (_keyboardString.Length - displayLocalText.Length);
-            for (int i = 0; i < lines.Length; i++)
-            {
-                int height = 0;
-                int width = 0;
-                string copyLines = lines[i];
-
-                for (int j = 0; j < lines[i].Length; j++)
+                for (int j = 0; j < lines[i].Text.Length; j++)
                 {
-
                     string subStr = copyLines.Substring(0, j + 1);
-                    string character = lines[i][j].ToString();
+                    string character = lines[i].Text[j].ToString();
 
                     Vector2 dim = subStr.Replace("\n", "").Size(TextFont);
                     Vector2 charSize = character.Size(TextFont);
 
-                    height = (int)(dim.Y * (i + 1)) + 2;
-                    width = (int)dim.X + 2;
+                    x = (int)dim.X - (int)charSize.X + TextOffset.X;
+                    y = (int)dim.Y * i;
 
-                    Point location = new Point(width, height);
-                    CharBucket.Update(charIndex, location, charSize.ToPoint());
-                    charIndex++;
+                    lines[i][j].Rect = new Rectangle(Position + new Point(x, y), charSize.ToPoint());                   
+                    Pointer += (Point)lines[i][j].Rect.Location + new Point((int)charSize.X, 0);
+                    
                 }
 
             }
+            if (string.IsNullOrEmpty(lines[0].Text))
+            {
+                Pointer += new Point(Left, Top);
+            }
         }
-        protected override void UpdatePointer(GameTime gameTime)
+        void ResetSelection()
         {
-            ProcessString();
-            int x, y;
-
-            int i = _keyboardString.Length - 1;
-            if (LastChar == "\n")
+            foreach (Line line in _displayLines)
             {
-                x = Left + (int)TextLines[NumberOfLines - 2].Size(TextFont).X;
-                y = Top + CharBucket[i].Y - Pointer.Height;
+                foreach (Character ch in line.Characters)
+                {
+                    ch.Selected = false;
+                }
+               
             }
-            else
-            {
-                x = CharBucket[i] != Point.Zero ? Left + CharBucket[i].X : Left + 2;
-                y = CharBucket[i] != Point.Zero ? Top + CharBucket[i].Y - Pointer.Height : Top + 2;
-            }
-
-            y = y <= Top ? Top + 2 : y;
-            Point newPosition = new Point(x, y);
-
-
-            Pointer += newPosition;
-
-            Pointer.Active = true;
-            Pointer.Update(gameTime);
+            _topChar = null;
+            _bottomChar = null;
+            _prevSelect = Selection.NONE;
         }
+      
 
+        void SelectCharacters(Selection selection)
+        {
+            if (_bottomChar != null && _topChar != null)
+            {
+                if (selection == Selection.UP)
+                {                   
+                    if (_topChar.Row < _bottomChar.Row)
+                    { 
+                        foreach (Character ch in _textLine.Lines[_bottomChar.Row - 1].Characters)
+                        {
+                            if (ch.Selected && ch.Column >= _bottomChar.Column)
+                            {
+                                ch.Selected = false;
+                            }
+                            if (!ch.Selected && ch.Column < _bottomChar.Column)
+                            {
+                                ch.Selected = true;
+                            }
+                        }
+
+                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                        {
+                            if (!ch.Selected && ch.Column > _topChar.Column)
+                            {
+                                ch.Selected = true;
+                            }
+                        }
+
+                        // Lines in between
+                        foreach (Line line in _textLine.Lines)
+                        {
+
+                            foreach (Character ch in line.Characters.Where(ch => ch.Row > _topChar.Row && ch.Row < _bottomChar.Row))
+                            {
+                                if (!ch.Selected)
+                                {
+                                    ch.Selected = true;
+                                }
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
+                        Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
+                     
+                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                        {
+                            if (ch.Column > first.Column && ch.Column < last.Column)
+                            {
+                           
+                                ch.Selected = true;
+                            }
+                        }
+                    }
+                }
+                else if (selection == Selection.DOWN)
+                {                
+                    if (_topChar.Row > _bottomChar.Row)
+                    {                      
+                        foreach (Character ch in _textLine.Lines[_bottomChar.Row - 1].Characters)
+                        {
+                            if (ch.Selected && ch.Column <= _bottomChar.Column)
+                            {
+                                ch.Selected = false;
+                            }
+                            if (!ch.Selected && ch.Column > _bottomChar.Column)
+                            {
+                                ch.Selected = true;
+                            }
+                        }
+
+                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                        {
+                            if (!ch.Selected && ch.Column < _topChar.Column)
+                            {
+                                ch.Selected = true;
+                            }
+                        }
+
+                        // Lines in between
+                        foreach (Line line in _textLine.Lines)
+                        {
+
+                            foreach (Character ch in line.Characters.Where(ch => ch.Row < _topChar.Row && ch.Row > _bottomChar.Row))
+                            {
+                                if (!ch.Selected)
+                                {
+                                    ch.Selected = true;
+                                }
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
+                        Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
+
+                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                        {
+                            if (ch.Column > first.Column && ch.Column < last.Column)
+                            {
+                                ch.Selected = true;
+                            }
+                        }
+                    }
+                }
+                else if (selection == Selection.RIGHT)
+                {
+                   
+                    Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
+                    Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
+                  
+                    foreach (Character ch in _textLine.Lines[_topChar.Row -1].Characters)
+                    {
+                        if(last != null)
+                        {
+                            if (!ch.Selected && ch.Column > first.Column && ch.Column < last.Column)
+                            {
+                                ch.Selected = true;
+                            }
+                            else if (ch.Selected && last.Rect.Left > MouseGUI.Position.X && MouseGUI.Position.X > ch.Rect.Right)
+                            {
+                                ch.Selected = false;
+                            }
+                        }
+                    
+                    }
+
+                }
+                else if (selection == Selection.LEFT)
+                {
+                    Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
+                    Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
+
+                    foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                    {
+                        if (!ch.Selected && ch.Column > first.Column && ch.Column < last.Column)
+                        {
+                            ch.Selected = !ch.Selected;
+                        }
+                        else if (ch.Selected && first.Rect.Right < MouseGUI.Position.X && MouseGUI.Position.X < ch.Rect.Left)
+                        {
+                            ch.Selected = false;
+                        }                       
+                    }
+                }
+            }
+           
+        }
+        public void SelectRow(int row, bool select = true)
+        {
+            foreach (Line line in _textLine.Lines)
+            {
+                var selectables = line.Characters.Where(ch => ch.Row == row);
+
+                foreach (Character ch  in selectables)
+                {
+                    ch.Selected = select;
+                }
+            }
+        }
         public override void Update(GameTime gameTime)
         {
             if (Active)
             {
-                UpdateResize();
+                if (MouseGUI.LeftWasPressed)
+                {
+                    _prevPosition = MouseGUI.Position;
+                    ResetSelection();
+                }
 
-                MaxLinesLength = Height / (Pointer.Height - 3);
 
+                if (MouseGUI.LeftIsPressed)
+                {
+                    for (int i = 0; i < _displayLines.Count; i++)
+                    {
+                        _currChar = _displayLines[i].HitTest(MouseGUI.Position);
+                        if (_currChar != null)
+                        {
+                            break;
+                        }
+                    }
+
+                    Point delta = MouseGUI.Position - _prevPosition;
+
+                    if (_currChar != null)
+                    {
+                        _currChar.Selected = true;  
+
+                        Pointer += new Point(_currChar.Rect.Right, _currChar.Rect.Top);
+                    }
+
+                    if (MouseGUI.LeftWasPressed)
+                    {
+                        _bottomChar = BottomSelect;
+                    }
+
+                    if(_bottomChar == null)
+                    {
+                        _bottomChar = TopSelect;
+                    }
+
+                    if (TopSelect != null && BottomSelect != null)
+                    {
+                        _topChar = TopSelect.Row < _bottomChar.Row ? TopSelect : BottomSelect;
+                    }                                  
+                  
+                    if (_prevPosition != MouseGUI.Position)
+                    {
+                        if (delta.Y > 0)
+                        {
+                            SelectCharacters(Selection.DOWN);
+                        }
+                        else if (delta.Y < 0)
+                        {
+                            SelectCharacters(Selection.UP);
+                        }
+                        else if (delta.X > 0)
+                        {
+                            SelectCharacters(Selection.RIGHT);
+                        }
+                        else if (delta.X < 0)
+                        {
+                            SelectCharacters(Selection.LEFT);
+                        }
+
+                    }
+                }
+              
+
+                _prevPosition = MouseGUI.Position;
+
+                Pointer.Update(gameTime);
 
                 TextPosition = new Vector2(Left + TextOffset.X, Top);
+
 
                 if (IsClicked && !Editable)
                 {
                     OnKeyboardPressed();
-                    ApplyTextOffset();
                 }
-
-
-                //ApplyTextOffset();
-                UpdateCharacters();
-                UpdatePointer(gameTime);
-
 
                 if (MouseGUI.LeftIsPressed && MouseGUI.Focus != this)
                 {
@@ -793,43 +765,37 @@ namespace _GUIProject.UI
 
 
                 _scrollBar.Position = new Point(Right - _scrollBar.Width, Top);
-                _scrollBar.Update(gameTime);               
+                _scrollBar.Update(gameTime);
             }
             if (Property != null)
             {
                 Property.Update(gameTime);
             }
         }
-        void UpdateResize()
-        {
-            if (MouseGUI.Focus == this && !Editable && MouseGUI.isScaleMode)
-            {
-                Point cornerPosition = new Point(Rect.Right, Rect.Bottom);
 
-                Point changeAmount = (MouseGUI.Position - cornerPosition);
 
-                Point newSize = new Point(changeAmount.X + MouseGUI._mouseScale.Width / 4, changeAmount.Y + MouseGUI._mouseScale.Height / 4);
-                Resize(newSize);
 
-            }
-        }
-
-        protected override void RenderText()
-        {
-            _stringRenderer.DrawString(TextFont, DisplayText, TextPosition, TextColor);
-        }
         public override void Draw()
         {
             if (Active)
             {
+
                 _spriteRenderer.Draw(Texture.Texture, Rect, SpriteColor * Alpha);
+
+                foreach (Line line in _displayLines)
+                {
+                    line.Draw(_spriteRenderer);
+                }
+
                 if (IsClicked && !Editable)
                 {
                     _spriteRenderer.Draw(Pointer.Texture.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
                 }
-                RenderText();
+
+                _stringRenderer.DrawString(TextFont, Text, TextPosition, TextColor);
+
                 _scrollBar.Draw();
-              
+
             }
             if (Property != null)
             {

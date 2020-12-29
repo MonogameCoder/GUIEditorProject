@@ -37,7 +37,7 @@ namespace _GUIProject.UI
         [XmlIgnore]
         public Slot<UIObject> this[UIObject item]
         {
-            get { return Slots.Where(s => s.Item == item).Single(); }
+            get { return Slots.Where(s => s.Item == item).FirstOrDefault(); }
         }
         [XmlIgnore]
         public Slot<UIObject> this[int index]

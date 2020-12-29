@@ -288,7 +288,7 @@ namespace _GUIProject
                     
                     try
                     {                      
-                        _textures[i].Texture = content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(_textures[i].Name);
+                        _textures[i].Texture = content.Load<Texture2D>(_textures[i].Name);
 
 
                     }

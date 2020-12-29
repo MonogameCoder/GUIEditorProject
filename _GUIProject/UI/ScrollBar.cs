@@ -117,7 +117,7 @@ namespace _GUIProject.UI
                     if (CurrentScrollValue + e.ScrollValue < parent.NumberOfLines - parent.MaxLinesLength)
                     {
                         CurrentScrollValue+= e.ScrollValue;
-                        parent.ApplyScrollOffset();
+                        parent.ApplyScroll();
                     }
                    
                 }
@@ -136,7 +136,7 @@ namespace _GUIProject.UI
                     if(CurrentScrollValue + e.ScrollValue >= 0)
                     {
                         CurrentScrollValue+= e.ScrollValue;
-                        parent.ApplyScrollOffset();
+                        parent.ApplyScroll();
                     }                 
                    
                 }

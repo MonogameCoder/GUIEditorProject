@@ -8,6 +8,6 @@ namespace _GUIProject.UI
     {
         int MaxLinesLength { get; set; }
         int NumberOfLines { get; }
-        void ApplyScrollOffset();
+        void ApplyScroll();
     }
 }
