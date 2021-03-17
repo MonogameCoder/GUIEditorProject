@@ -20,7 +20,7 @@ namespace _GUIProject.UI
 {
 
     // This class will be fully refactored
-    public class MultiTextBox : TextBox, IScrollable
+    public class TextArea : TextBox, IScrollable
     {
         enum Selection
         {
@@ -34,6 +34,11 @@ namespace _GUIProject.UI
         private static FontContent _font;
         public class Line
         {
+            public enum SelectionMode
+            {
+                DISSELECT,
+                SELECT
+            };
             
             private readonly List<Character> _characters;         
             public string Text 
@@ -56,7 +61,14 @@ namespace _GUIProject.UI
             public Line()
             {
                 _characters = new List<Character>();          
-            }            
+            } 
+            public void LineSelection(Func<Character, bool> predicate, SelectionMode selection)
+            {
+                foreach(Character ch in _characters.Where(predicate))
+                {
+                    ch.Selected = Convert.ToBoolean(selection);
+                }
+            }
             public void InsertCharacter(Character character)
             {
                 _characters.Add(character);
@@ -69,7 +81,10 @@ namespace _GUIProject.UI
             {
                 return _characters.Where(c => c.Rect.Contains(mousePosition.ToPoint())).FirstOrDefault();
             }
-            
+            public bool Contains(Point mousePosition)
+            {               
+                return _characters.AsParallel().Any(ch => ch.Contains(MouseGUI.Position));
+            }
             public void Draw(SpriteBatch batch)
             {
                 foreach (Character ch in _characters)
@@ -77,17 +92,31 @@ namespace _GUIProject.UI
                     ch.Draw(batch);
                 }
             }
-
-
+            public static bool operator ==(Line l1, Line l2)
+            {
+                return l1.Text.Equals(l2.Text);
+            }
+            public static bool operator !=(Line l1, Line l2)
+            {
+                return !(l1 == l2);
+            }
         }
         class TextLines
         {
             private readonly List<Line> _lines;
-            public Line LastLine 
-            { get
+            public Line Last
+            { 
+                get
                 {
-                    return _lines[_lines.Count - 1];
+                    return _lines.LastOrDefault();
                 } 
+            }
+            public Line First
+            {
+                get
+                {
+                    return _lines.FirstOrDefault();
+                }
             }
             public int NumberOfLines
             {
@@ -113,7 +142,7 @@ namespace _GUIProject.UI
             }
             public void AddCharacter(Character character)
             {
-                LastLine.InsertCharacter(character);
+                Last.InsertCharacter(character);
             }
 
             public Character HitTest(Point mousePosition)
@@ -154,27 +183,31 @@ namespace _GUIProject.UI
                 }          
             }
         }
-        public Character TopSelect
-        {
-            get { return _textLine.Lines.AsReadOnly().SelectMany(l => l.Characters.Where(ch => ch.Selected)).FirstOrDefault(); }
-        }
-        public Character BottomSelect
+        public Line TopSelected
         {
             get
-            {                
-                return _textLine.Lines.AsReadOnly().SelectMany(l => l.Characters.Where(ch => ch.Selected)).LastOrDefault();
+            {              
+                return _textLine.Lines.First(l => l.Characters.Exists(ch => ch.Selected));
             }
         }
+        public Line BottomSelected
+        {
+            get
+            {
+                return _textLine.Lines.Last(l => l.Characters.Exists(ch => ch.Selected));
+            }
+        }
+
+
         private readonly TextLines _textLine;
      
         private List<Line> _displayLines;
-        private ScrollBar _scrollBar;
-        private Character _topChar;
-        private Character _bottomChar;
+        private ScrollBar _scrollBar;   
+        private Character _firstSelected;
         private Character _currChar;       
         private Point _prevPosition;
         private Selection _prevSelect;
-        public MultiTextBox() : base("DefaultMultiTexboxTX", "DefaultTextboxPointerTX", TextBoxType.TEXT, DrawPriority.NORMAL)
+        public TextArea() : base("DefaultMultiTexboxTX", "DefaultTextboxPointerTX", TextBoxType.TEXT, DrawPriority.NORMAL)
         {            
             MoveState = MoveOption.DYNAMIC;
             XPolicy = SizePolicy.EXPAND;
@@ -304,8 +337,8 @@ namespace _GUIProject.UI
             Point size = character.Size(TextFont).ToPoint();
             Point position = new Point
             {
-                X = TextOffset.X + _textLine.LastLine.Size.X,
-                Y = (_textLine.NumberOfLines -1) * _textLine.LastLine.Size.Y
+                X = TextOffset.X + _textLine.Last.Size.X,
+                Y = (_textLine.NumberOfLines -1) * _textLine.Last.Size.Y
             };
             return new Character(new Rectangle(Position + position, size), character, row, column);
         }
@@ -316,12 +349,12 @@ namespace _GUIProject.UI
                 _scrollBar.CurrentScrollValue = (NumberOfLines - (MaxLinesLength + 1));
             }      
 
-            _textLine.LastLine.InsertCharacter(CreateCharacter(LastChar, _textLine.NumberOfLines, _textLine.LastLine.Text.Length +1));        
+            _textLine.Last.InsertCharacter(CreateCharacter(LastChar, _textLine.NumberOfLines, _textLine.Last.Text.Length +1));        
 
             if (_textLine.NumberOfLines > 0  && IsOutOfBounds())
             {            
                 _keyboardString += '\n';
-                _textLine.AddCharacter(CreateCharacter("\n", _textLine.NumberOfLines, _textLine.LastLine.Text.Length + 1));
+                _textLine.AddCharacter(CreateCharacter("\n", _textLine.NumberOfLines, _textLine.Last.Text.Length + 1));
                 _textLine.AddLine(new Line());              
             }       
 
@@ -330,8 +363,8 @@ namespace _GUIProject.UI
         }
         bool IsOutOfBounds()
         {
-            float x = Left + _textLine.LastLine.Size.X + "H|".Size(TextFont).X;
-            float y = Top + _textLine.LastLine.Size.Y;
+            float x = Left + _textLine.Last.Size.X + "H|".Size(TextFont).X;
+            float y = Top + _textLine.Last.Size.Y;
             Vector2 curTextPosition = new Vector2(x, y);
             return curTextPosition.X > _scrollBar.Left;
         }
@@ -497,177 +530,123 @@ namespace _GUIProject.UI
                     ch.Selected = false;
                 }
                
-            }
-            _topChar = null;
-            _bottomChar = null;
+            }           
+            _firstSelected = null;
             _prevSelect = Selection.NONE;
         }
       
 
         void SelectCharacters(Selection selection)
         {
-            if (_bottomChar != null && _topChar != null)
+            if (_firstSelected != null)
             {
                 if (selection == Selection.UP)
-                {                   
-                    if (_topChar.Row < _bottomChar.Row)
-                    { 
-                        foreach (Character ch in _textLine.Lines[_bottomChar.Row - 1].Characters)
-                        {
-                            if (ch.Selected && ch.Column >= _bottomChar.Column)
-                            {
-                                ch.Selected = false;
-                            }
-                            if (!ch.Selected && ch.Column < _bottomChar.Column)
-                            {
-                                ch.Selected = true;
-                            }
-                        }
+                {
+                    Line firstLine = BottomSelected;
 
-                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
-                        {
-                            if (!ch.Selected && ch.Column > _topChar.Column)
-                            {
-                                ch.Selected = true;
-                            }
-                        }
-
-                        // Lines in between
-                        foreach (Line line in _textLine.Lines)
-                        {
-
-                            foreach (Character ch in line.Characters.Where(ch => ch.Row > _topChar.Row && ch.Row < _bottomChar.Row))
-                            {
-                                if (!ch.Selected)
-                                {
-                                    ch.Selected = true;
-                                }
-                            }
-
-                        }
-                    }
-                    else
+                    foreach (Line line in _textLine.Lines)
                     {
-                        Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
-                        Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
-                     
-                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                        if (line.Contains(MouseGUI.Position))
                         {
-                            if (ch.Column > first.Column && ch.Column < last.Column)
+                            if (line != firstLine)
                             {
-                           
-                                ch.Selected = true;
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => !ch.Selected && ch.Left >= MouseGUI.Position.X && ch.Row < _firstSelected.Row),
+                                    Line.SelectionMode.SELECT);
+                            }
+                        }
+                        else
+                        {
+                            if (line != firstLine)
+                            {
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => !ch.Selected && ch.Row < _firstSelected.Row && ch.Top > MouseGUI.Position.Y),
+                                    Line.SelectionMode.SELECT);
+                            }
+                            else
+                            {
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => !ch.Selected && ch.Column < _firstSelected.Column && ch.Top > MouseGUI.Position.Y),
+                                    Line.SelectionMode.SELECT);
                             }
                         }
                     }
+
                 }
                 else if (selection == Selection.DOWN)
-                {                
-                    if (_topChar.Row > _bottomChar.Row)
-                    {                      
-                        foreach (Character ch in _textLine.Lines[_bottomChar.Row - 1].Characters)
-                        {
-                            if (ch.Selected && ch.Column <= _bottomChar.Column)
-                            {
-                                ch.Selected = false;
-                            }
-                            if (!ch.Selected && ch.Column > _bottomChar.Column)
-                            {
-                                ch.Selected = true;
-                            }
-                        }
+                {                   
+                    Line firstLine = TopSelected;
 
-                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
-                        {
-                            if (!ch.Selected && ch.Column < _topChar.Column)
-                            {
-                                ch.Selected = true;
-                            }
-                        }
-
-                        // Lines in between
-                        foreach (Line line in _textLine.Lines)
-                        {
-
-                            foreach (Character ch in line.Characters.Where(ch => ch.Row < _topChar.Row && ch.Row > _bottomChar.Row))
-                            {
-                                if (!ch.Selected)
-                                {
-                                    ch.Selected = true;
-                                }
-                            }
-
-                        }
-                    }
-                    else
+                    Character firstSelected = firstLine.Characters.Where(ch => ch.Selected).FirstOrDefault();
+                    foreach (Line line in _textLine.Lines)
                     {
-                        Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
-                        Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
-
-                        foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
+                        if (line.Contains(MouseGUI.Position))
                         {
-                            if (ch.Column > first.Column && ch.Column < last.Column)
+                            if (line != firstLine)
                             {
-                                ch.Selected = true;
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => !ch.Selected && ch.Left <= MouseGUI.Position.X),
+                                    Line.SelectionMode.SELECT);                                
+                           
+                            }                          
+                        }
+                        else
+                        {
+                            if (line != firstLine)
+                            {
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => !ch.Selected && ch.Row >= firstSelected.Row &&
+                                     _firstSelected == firstSelected && ch.Bottom < MouseGUI.Position.Y),
+                                    Line.SelectionMode.SELECT);
+
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => ch.Selected && ch.Row >= firstSelected.Row &&
+                                    _firstSelected != firstSelected && ch.Bottom <= MouseGUI.Position.Y),
+                                    Line.SelectionMode.DISSELECT);
+                            }
+                            else
+                            {
+                                line.LineSelection(new Func<Character, bool>
+                                    (ch => !ch.Selected &&  ch.Column > firstSelected.Column &&
+                                     _firstSelected == firstSelected && ch.Bottom < MouseGUI.Position.Y),
+                                    Line.SelectionMode.SELECT);
+
+                                line.LineSelection(new Func<Character, bool>
+                                   (ch => ch.Selected && ch.Column >= firstSelected.Column &&
+                                     _firstSelected != firstSelected && ch.Bottom < MouseGUI.Position.Y),
+                                   Line.SelectionMode.DISSELECT);
                             }
                         }
                     }
                 }
                 else if (selection == Selection.RIGHT)
                 {
-                   
-                    Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
-                    Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
-                  
-                    foreach (Character ch in _textLine.Lines[_topChar.Row -1].Characters)
-                    {
-                        if(last != null)
-                        {
-                            if (!ch.Selected && ch.Column > first.Column && ch.Column < last.Column)
-                            {
-                                ch.Selected = true;
-                            }
-                            else if (ch.Selected && last.Rect.Left > MouseGUI.Position.X && MouseGUI.Position.X > ch.Rect.Right)
-                            {
-                                ch.Selected = false;
-                            }
-                        }
-                    
-                    }
+                    //Character lastChar = BottomSelected[BottomSelected.Characters.Count - 1];
+                    //foreach (Line line in _textLine.Lines)
+                    //{
+                    //    line.LineSelection(new Func<Character, bool>
+                    //   (ch => ch.Row == lastChar.Row && ch != _firstSelected 
+                    //   && ch.Left >= _firstSelected.Left && MouseGUI.Position.X >= ch.Left),
+                    //   Line.SelectionMode.SELECT);
+                    //}
+
 
                 }
                 else if (selection == Selection.LEFT)
                 {
-                    Character first = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).FirstOrDefault();
-                    Character last = _textLine.Lines[_topChar.Row - 1].Characters.Where(ch => ch.Selected).LastOrDefault();
-
-                    foreach (Character ch in _textLine.Lines[_topChar.Row - 1].Characters)
-                    {
-                        if (!ch.Selected && ch.Column > first.Column && ch.Column < last.Column)
-                        {
-                            ch.Selected = !ch.Selected;
-                        }
-                        else if (ch.Selected && first.Rect.Right < MouseGUI.Position.X && MouseGUI.Position.X < ch.Rect.Left)
-                        {
-                            ch.Selected = false;
-                        }                       
-                    }
+                    //Character firstChar = TopSelected[0];
+                    //foreach (Line line in _textLine.Lines)
+                    //{
+                    //    line.LineSelection(new Func<Character, bool>
+                    //    (ch => ch.Row == firstChar.Row && ch != _firstSelected 
+                    //    && ch.Right <= _firstSelected.Left && MouseGUI.Position.X <= ch.Right),
+                    //    Line.SelectionMode.SELECT);
+                    //}
                 }
             }
            
         }
-        public void SelectRow(int row, bool select = true)
-        {
-            foreach (Line line in _textLine.Lines)
-            {
-                var selectables = line.Characters.Where(ch => ch.Row == row);
-
-                foreach (Character ch  in selectables)
-                {
-                    ch.Selected = select;
-                }
-            }
-        }
+     
         public override void Update(GameTime gameTime)
         {
             if (Active)
@@ -676,69 +655,46 @@ namespace _GUIProject.UI
                 {
                     _prevPosition = MouseGUI.Position;
                     ResetSelection();
+                    if (_prevPosition != (MouseGUI.Position + MouseGUI.DragOffset))
+                    {
+                        for (int i = 0; i < _displayLines.Count; i++)
+                        {
+                            _currChar = _displayLines[i].HitTest(MouseGUI.Position);
+                            if (_currChar != null)
+                            {
+                                Pointer += new Point(_currChar.Rect.Right, _currChar.Rect.Top);
+                                _firstSelected = _currChar;
+                                _currChar.Selected = true;
+                                break;
+                            }
+                        }
+                    }
+                       
                 }
-
 
                 if (MouseGUI.LeftIsPressed)
-                {
-                    for (int i = 0; i < _displayLines.Count; i++)
-                    {
-                        _currChar = _displayLines[i].HitTest(MouseGUI.Position);
-                        if (_currChar != null)
-                        {
-                            break;
-                        }
-                    }
-
+                {                    
+                    
                     Point delta = MouseGUI.Position - _prevPosition;
 
-                    if (_currChar != null)
+                    if (delta.Y > 0)
                     {
-                        _currChar.Selected = true;  
-
-                        Pointer += new Point(_currChar.Rect.Right, _currChar.Rect.Top);
+                        SelectCharacters(Selection.DOWN);
                     }
-
-                    if (MouseGUI.LeftWasPressed)
+                    else if (delta.Y < 0)
                     {
-                        _bottomChar = BottomSelect;
+                        SelectCharacters(Selection.UP);
                     }
-
-                    if(_bottomChar == null)
+                    else if (delta.X > 0)
                     {
-                        _bottomChar = TopSelect;
+                        SelectCharacters(Selection.RIGHT);
                     }
-
-                    if (TopSelect != null && BottomSelect != null)
+                    else if (delta.X < 0)
                     {
-                        _topChar = TopSelect.Row < _bottomChar.Row ? TopSelect : BottomSelect;
-                    }                                  
-                  
-                    if (_prevPosition != MouseGUI.Position)
-                    {
-                        if (delta.Y > 0)
-                        {
-                            SelectCharacters(Selection.DOWN);
-                        }
-                        else if (delta.Y < 0)
-                        {
-                            SelectCharacters(Selection.UP);
-                        }
-                        else if (delta.X > 0)
-                        {
-                            SelectCharacters(Selection.RIGHT);
-                        }
-                        else if (delta.X < 0)
-                        {
-                            SelectCharacters(Selection.LEFT);
-                        }
-
+                        SelectCharacters(Selection.LEFT);
                     }
                 }
-              
-
                 _prevPosition = MouseGUI.Position;
-
                 Pointer.Update(gameTime);
 
                 TextPosition = new Vector2(Left + TextOffset.X, Top);

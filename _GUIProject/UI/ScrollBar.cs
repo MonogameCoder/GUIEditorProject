@@ -212,7 +212,7 @@ namespace _GUIProject.UI
             _itemsContainer.Update(gameTime);
             if (MouseGUI.Focus == SliderButton)
             {
-                Point delta = MouseGUI.Position - SliderButton.Center;
+                Point delta = MouseGUI.Position  - SliderButton.Center;
 
                 direction = delta.Y > 0 ? ScrollDirection.DOWN : delta.Y < 0 ? ScrollDirection.UP : ScrollDirection.NONE;
 

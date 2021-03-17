@@ -213,21 +213,12 @@ namespace _GUIProject.UI
         public void UpdateSlot(UIObject item, Point newLocation)
         {
             Slot<UIObject> slot = this[item];
-            
+
             Vector2 delta;
             delta.X = newLocation.X - slot.Position.X;
-            delta.Y = newLocation.Y - slot.Position.Y;
-            float dist = delta.Length();
+            delta.Y = newLocation.Y - slot.Position.Y;   
 
-            if (dist >= 0.0f)
-            {
-               slot.Position += delta.ToPoint();              
-            }
-            else
-            {               
-                slot.Position -= delta.ToPoint();
-            }
-
+            slot.Position += delta.ToPoint();
         }      
         public override void Draw()
         {

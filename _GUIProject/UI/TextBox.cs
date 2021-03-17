@@ -59,10 +59,40 @@ namespace _GUIProject.UI
             {
                 return new Point(character.Rect.Location);
             }
+           
             public bool Equals([AllowNull] Character other)
             {
                 return GetHashCode().Equals(other.GetHashCode());
             }
+            public bool Contains(Point mousePosition)
+            {
+                return Rect.Contains(mousePosition.ToPoint());
+            }
+            public int Top 
+            {
+                get { return Rect.Top; }
+            }
+            public int Bottom 
+            { 
+                get { return Rect.Bottom; }
+            }
+            public int Right
+            {
+                get { return Rect.Right; }
+            }
+            public int Left
+            {
+                get { return Rect.Left; }
+            }
+            public Point Center
+            {
+                get { return Rect.Center; }
+            }
+            public Point Size
+            {
+                get { return Rect.Size; }
+            }
+
 
         }
         public class CharacterBucket
@@ -129,15 +159,19 @@ namespace _GUIProject.UI
 
             }
          
-            public int CurrentIndex
+            public Character Current
             {
-                get { return index - 1; }
+                get
+                {
+                    return this[index - 1];
+                }
             }
+
             public Character this[int index]
             {
                 get
                 {
-                    return _bucket.Values.ElementAt(index);
+                    return _bucket[index];
                 }
             }
             public Character this[string character]
@@ -392,6 +426,7 @@ namespace _GUIProject.UI
         {
             base.Initialize();
             CharBucket = new CharacterBucket();
+          
             KeyboardEvents = new KeyboardEvents(this);
             MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
             
@@ -415,8 +450,12 @@ namespace _GUIProject.UI
 
             Pointer.Position = new Point(TextOffset.X, (Top + Height / 2) - Pointer.Texture.Height / 2);
             Pointer.Setup();
+            if(CharBucket != null)
+            {
+                CharBucket.AddCharacter("", new Point(Left, Top), "".Size(TextFont).ToPoint());
+            }
+         
 
-            
 
         }
         public void SimulateInput(string textInput)
@@ -894,23 +933,22 @@ namespace _GUIProject.UI
         }
         protected virtual void UpdatePointer(GameTime gameTime)
         {
-            int i = _keyboardString.Length - 1;
-            int x = Left + ((Point)CharBucket[i]).X + Pointer.Width;
-            int y = Center.Y - Pointer.Height /2 ;
+            int x = Left + ((Point)CharBucket.Current).X + Pointer.Width;
+            int y = Center.Y - Pointer.Height / 2;
 
             Pointer += new Point(x, y);
-
             Pointer.Active = true;
             Pointer.Update(gameTime);
         }
-        
-
-
         public virtual void Clear()
         {
             _textList.Clear();
+            
             CharBucket.Clear();
-             _keyboardString = "";
+            CharBucket.AddCharacter("", Point.Zero, "".Size(TextFont).ToPoint());
+            Pointer += Point.Zero;
+
+            _keyboardString = "";
             DisplayText = "";
         }
 

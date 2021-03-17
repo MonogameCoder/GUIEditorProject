@@ -47,7 +47,7 @@ namespace _GUIProject
         private ComboBox _toolShelfComboBox;
         private ToggleButton _toolShelfToggle;
         private SliderBar _toolShelfSlider;
-        private MultiTextBox _toolShelfMultilineTextbox;
+        private TextArea _toolShelfMultilineTextbox;
 
         private readonly GraphicsDeviceManager _graphics;
 
@@ -159,7 +159,7 @@ namespace _GUIProject
             _toolShelfSlider.Initialize();
             _toolShelfSlider.Editable = true; ;
 
-            _toolShelfMultilineTextbox = new MultiTextBox();
+            _toolShelfMultilineTextbox = new TextArea();
             _toolShelfMultilineTextbox.Initialize();
             _toolShelfMultilineTextbox.Editable = true; ;
 
