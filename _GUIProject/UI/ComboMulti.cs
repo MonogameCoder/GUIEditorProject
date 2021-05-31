@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using _GUIProject.Events;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using static _GUIProject.AssetManager;
+using static _GUIProject.UI.ScrollBar;
 
 namespace _GUIProject.UI
 {
@@ -45,7 +47,7 @@ namespace _GUIProject.UI
         }
 
 
-        public int MaxLinesLength { get; set; } = 5;
+        public int MaxNumberOfLines { get; set; } = 5;
         public int NumberOfLines
         {
             get { return Container.Length / LINE; }
@@ -58,6 +60,7 @@ namespace _GUIProject.UI
         private Button _defaultItem;      
         readonly string _defaultTXName;
         private readonly Sprite _bgSprite;
+        private ScrollEvents _scrollEvent;
 
         int start = 0, end = 0;
         public ComboMulti()
@@ -72,7 +75,7 @@ namespace _GUIProject.UI
         }
         void LoadAttributes()
         {
-         
+            _scrollEvent = new ScrollEvents();
             Container = new Frame(_defaultTXName, DrawPriority.LOWEST, MoveOption.STATIC);
             Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
@@ -86,10 +89,20 @@ namespace _GUIProject.UI
             Container.Initialize();
             _scrollBar = new ScrollBar();
             _scrollBar.Parent = this;
-            _scrollBar.Initialize();      
+            _scrollBar.Initialize();
+            _scrollEvent.onScroll += _scrollEvent_onScroll;
+
             Container.Active = false;
             Active = true;
         }
+
+        private void _scrollEvent_onScroll(object sender, ScrollEventArgs e)
+        {
+            var parent = (e.Owner as IScrollable);
+            _scrollBar.CurrentScrollValue += e.ScrollValue;
+            parent.ApplyScroll();
+        }
+
         public override void Setup()
         {
             base.Setup();
@@ -207,11 +220,11 @@ namespace _GUIProject.UI
         }
         public void ApplyScroll()
         {
-            if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue <= NumberOfLines)
+            if (NumberOfLines > MaxNumberOfLines && MaxNumberOfLines + _scrollBar.CurrentScrollValue <= NumberOfLines)
             {
 
-                start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
-                end = MaxLinesLength + _scrollBar.CurrentScrollValue;
+                start = NumberOfLines > MaxNumberOfLines ? _scrollBar.CurrentScrollValue : 0;
+                end = MaxNumberOfLines + _scrollBar.CurrentScrollValue;
 
                 int line = 0;
                 for (int i = start * LINE; i < end * LINE; i++)
@@ -230,8 +243,27 @@ namespace _GUIProject.UI
         }
         public override void Update(GameTime gameTime)
         {
-            start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
-            end = MaxLinesLength + _scrollBar.CurrentScrollValue;
+            if (NumberOfLines > MaxNumberOfLines && Container.Active)
+            {
+                if (MouseGUI.ScrollerValue > 0)
+                {
+                    if (_scrollBar.CurrentScrollValue - MouseGUI.ScrollerValue >= 0)
+                    {
+                        _scrollEvent.OnScroll(this, ScrollDirection.UP, -MouseGUI.ScrollerValue);
+                    }
+
+                }
+                if (MouseGUI.ScrollerValue < 0)
+                {
+                    if (_scrollBar.CurrentScrollValue - MouseGUI.ScrollerValue <= NumberOfLines - MaxNumberOfLines)
+                    {
+                        _scrollEvent.OnScroll(this, ScrollDirection.DOWN, -MouseGUI.ScrollerValue);
+                    }
+                }
+            }
+
+            start = NumberOfLines > MaxNumberOfLines ? _scrollBar.CurrentScrollValue : 0;
+            end = MaxNumberOfLines + _scrollBar.CurrentScrollValue;
 
             Container.Update(gameTime);
             

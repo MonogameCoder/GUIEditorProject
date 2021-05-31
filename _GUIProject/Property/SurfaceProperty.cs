@@ -38,7 +38,7 @@ namespace _GUIProject.UI
         }
         public void AddProperties(PropertyOwner owner)
         {
-            _color = new ComboMulti("PropertyPanelCBTX", "PropertyPanelCBBGTX", DrawPriority.LOWEST);
+            _color = new ComboMulti("PropertyPanelCBTX", "PropertyPanelCBBGTX", DrawPriority.LOW);
             _txPicker = new FilePicker();
             _alpha = new InputInfoArea("PropertyPanelCombinedArrowsTX");
 

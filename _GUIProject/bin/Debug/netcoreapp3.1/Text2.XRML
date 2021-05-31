@@ -5,7 +5,15 @@
       <SpriteColor R="255" G="255" B="255" A="255" />
       <TextColor R="0" G="0" B="0" A="255" />
       <Texture Name="DefaultComboBoxTX" />
-      <Container Priority="LOWEST" XPolicy="FIXED" YPolicy="FIXED" Height="0" Width="0" />
+      <Container Priority="LOWEST" XPolicy="FIXED" YPolicy="FIXED" Height="0" Width="0">
+        <Child Position="2:0">
+          <Button Priority="LOWEST" XPolicy="EXPAND" YPolicy="EXPAND" Height="0" Width="-4" Text="" Font="STANDARD" FontSize="21">
+            <SpriteColor R="255" G="255" B="255" A="255" />
+            <TextColor R="0" G="0" B="0" A="255" />
+            <Texture Name="DefaultComboBoxFootTX" />
+          </Button>
+        </Child>
+      </Container>
     </ComboBox>
   </Child>
   <Child Position="934:473">

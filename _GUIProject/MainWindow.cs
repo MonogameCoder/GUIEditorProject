@@ -62,18 +62,25 @@ namespace _GUIProject
             _guiList.Remove(RootContainer);
         }
 
-
+        public MainWindow Instance;
         public MainWindow()
         {
+            Instance = this;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
 
-
             _guiList = new List<IObject>();
         }
-
+        public void ShowMouse()
+        {
+            IsMouseVisible = true;
+        }
+        public void HideMouse()
+        {
+            IsMouseVisible = false;
+        }
         protected override void Initialize()
         {
             _guiList = new List<IObject>();
@@ -330,6 +337,7 @@ namespace _GUIProject
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _mainBatch = _spriteBatch;
             foreach (Slot<UIObject> slot in RootContainer.Slots)
             {
                 slot.Item.InitPropertyPanel();
@@ -354,7 +362,7 @@ namespace _GUIProject
                 _guiList[i].AddStringRenderer(_spriteBatch);
             }
 
-            _mainBatch = _spriteBatch;
+          
 
             // TODO: use this.Content to load your game content here
         }
@@ -432,10 +440,14 @@ namespace _GUIProject
             }
             if (Singleton.Input.KeyReleased(Keys.Delete))
             {
-                RootContainer.RemoveItem(CurrentObject);
-                RootContainer.RemoveSlot(CurrentObject);
-                RootContainer.Update(gameTime);
-                RootContainer.UpdateLayout();
+                if(CurrentObject.Editable)
+                {
+                    RootContainer.RemoveItem(CurrentObject);
+                    RootContainer.RemoveSlot(CurrentObject);
+                    RootContainer.Update(gameTime);
+                    RootContainer.UpdateLayout();
+                }
+               
             }
 
 

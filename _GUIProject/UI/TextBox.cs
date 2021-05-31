@@ -15,6 +15,7 @@ using ExtensionMethods;
 using static _GUIProject.FontManager;
 using static _GUIProject.AssetManager;
 using System.Diagnostics.CodeAnalysis;
+using static _GUIProject.UI.TextArea;
 
 namespace _GUIProject.UI
 {
@@ -30,26 +31,42 @@ namespace _GUIProject.UI
         }
         public class Character : IEquatable<Character>
         {
-            private readonly int _column;
-            private readonly int _row;
+            private int _column;
+            private int _row;
             private readonly Sprite _charSprite;
 
-            public int Column { get { return _column; } }
-            public int Row { get { return _row; } }
-            public Character(Rectangle rect, string text, int row, int column)
+            public int Column 
+            {
+                get { return _column; }
+                set { _column = value; }
+            }
+            public int Row
+            {
+                get { return _row; }
+                set { _row = value; }
+            }
+            public bool Pointed 
+            { 
+                get;
+                set; 
+            }
+            public Character(Rectangle rect, string text)
             {
                 Rect = rect;
                 Text = text;
                 _charSprite = new Sprite("char", DrawPriority.LOWEST);
-                _charSprite.Resize(Rect.Size);                
-                _row = row;
-                _column = column;
+                _charSprite.Resize(Rect.Size);
+                _row = _column = 1;
             }
 
             public string Text { get; private set; }
             public Rectangle Rect { get; set; }
             public bool Selected { get; set; }
-         
+
+            //public static implicit operator Tuple<int,int>(Character rhs)
+            //{
+            //    return new Tuple<int,int>(rhs.Row - 1, rhs.Column - 1);
+            //}
             public void Draw(SpriteBatch batch)
             {
                 batch.Draw(_charSprite.Texture, Rect, Selected ? Color.CornflowerBlue : Color.Transparent);
@@ -67,6 +84,10 @@ namespace _GUIProject.UI
             public bool Contains(Point mousePosition)
             {
                 return Rect.Contains(mousePosition.ToPoint());
+            }
+            public bool NewLine 
+            {
+                get { return Text.Equals("\n"); }
             }
             public int Top 
             {
@@ -88,11 +109,15 @@ namespace _GUIProject.UI
             {
                 get { return Rect.Center; }
             }
-            public Point Size
+            
+            public int Width
             {
-                get { return Rect.Size; }
+                get { return Rect.Size.X; }
             }
-
+            public int Height
+            {
+                get { return Rect.Size.Y; }
+            }
 
         }
         public class CharacterBucket
@@ -116,7 +141,7 @@ namespace _GUIProject.UI
 
                 _fullText += character;              
              
-                _bucket.Add(index++, new Character(new Rectangle(location, size), character, 1,1));
+                _bucket.Add(index++, new Character(new Rectangle(location, size), character));
 
             }
             public Character HitTest(Point mousePosition)
@@ -298,7 +323,7 @@ namespace _GUIProject.UI
         public Rectangle CurrItemRect { get; set; }
       
         [XmlIgnore]
-        public Sprite Pointer { get; protected set;}
+        public static Sprite Pointer { get; protected set;}
         
         [XmlIgnore]
         public FontContent TextFont { get; set; }
@@ -352,7 +377,7 @@ namespace _GUIProject.UI
 
         protected string LastChar
         {
-            get { return _keyboardString.Length > 0 ? _keyboardString[_keyboardString.Length - 1].ToString() : " "; }
+            get { return _keyboardString.Length > 0 ? _keyboardString.Last().ToString() : " "; }
         }
        
 
@@ -413,7 +438,7 @@ namespace _GUIProject.UI
             YPolicy = SizePolicy.FIXED;
             MoveState = MoveOption.DYNAMIC;
             TextColor = Color.Black;
-            TextFont = Singleton.Font.GetFont(FontType.STANDARD);
+            TextFont = Singleton.Font.GetFont(FontType.GEORGIA);
             FieldWidth = 0;
             TextOffset = new Point(4, 4);
             Pointer = new Sprite("DefaultTextboxPointerTX", DrawPriority.LOW);
@@ -1011,7 +1036,7 @@ namespace _GUIProject.UI
             {
                 base.Draw();
                 
-                if (IsClicked)
+                if (IsClicked && Pointer.Active)
                 {
                     _spriteRenderer.Draw(Pointer.Texture.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
                 }

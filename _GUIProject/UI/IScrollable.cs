@@ -6,7 +6,7 @@ namespace _GUIProject.UI
 {
     interface IScrollable
     {
-        int MaxLinesLength { get; set; }
+        int MaxNumberOfLines { get; set; }
         int NumberOfLines { get; }
         void ApplyScroll();
     }
