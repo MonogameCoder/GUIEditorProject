@@ -8,6 +8,7 @@ using static _GUIProject.FontManager;
 using _GUIProject.UI;
 using System.Diagnostics;
 
+// set up git vs code
 namespace _GUIProject.UI
 {    
     public class Button : Sprite
