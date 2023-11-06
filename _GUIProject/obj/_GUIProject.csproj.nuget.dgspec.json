@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj": {}
+    "C:\\Users\\AccessRestricted\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj": {
+    "C:\\Users\\AccessRestricted\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj",
+        "projectUniqueName": "C:\\Users\\AccessRestricted\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj",
         "projectName": "_GUIProject",
-        "projectPath": "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj",
-        "packagesPath": "C:\\Users\\ForbiddenArea\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ForbiddenArea\\source\\repos\\GUIEditorProject\\_GUIProject\\obj\\",
+        "projectPath": "C:\\Users\\AccessRestricted\\source\\repos\\GUIEditorProject\\_GUIProject\\_GUIProject.csproj",
+        "packagesPath": "C:\\Users\\AccessRestricted\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\AccessRestricted\\source\\repos\\GUIEditorProject\\_GUIProject\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ForbiddenArea\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\AccessRestricted\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

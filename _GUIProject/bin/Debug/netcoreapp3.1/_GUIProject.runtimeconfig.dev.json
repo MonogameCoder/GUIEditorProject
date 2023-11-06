@@ -1,8 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\ForbiddenArea\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\ForbiddenArea\\.nuget\\packages"
+      "C:\\Users\\AccessRestricted\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\AccessRestricted\\.nuget\\packages"
     ]
   }
 }

@@ -38,7 +38,7 @@ namespace _GUIProject.UI
         }
         public void AddProperties(PropertyOwner owner)
         {
-            _color = new ComboMulti("PropertyPanelCBTX", "PropertyPanelCBBGTX", DrawPriority.LOWEST);
+            _color = new ComboMulti("PropertyPanelCBTX", "PropertyPanelCBBGTX", DrawPriority.LOW);
             _txPicker = new FilePicker();
             _alpha = new InputInfoArea("PropertyPanelCombinedArrowsTX");
 
@@ -95,12 +95,12 @@ namespace _GUIProject.UI
             foreach (var col in colors)
             {
                 Color color = (Color)col.GetValue(col, null);
-                _color.AddNewItem(color, () =>
+                _color.AddNewItem(col.Name, color, () =>
                 {
-                    _color.AuxilaryColor = color;
+                    _color.Text = col.Name;
+                    _color.AuxilaryColor = color;                    
                     Owner.SpriteColor = _color.AuxilaryColor;
-                    _color.Hide();
-                    _color.RearrangeContainer();
+                    _color.Hide();                    
                 });
                
             }         

@@ -14,18 +14,10 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using _GUIProject;
+using static _GUIProject.UI.TextBox;
+using static _GUIProject.UI.TextArea;
 
 
-namespace ExtensionMethods
-{
-    public static class MyExtensions
-    {
-        public static Vector2 Size(this String str, AssetManager.FontContent font)
-        {
-            return ((SpriteFont)font).MeasureString(str);
-        }
-    }
-}
 namespace _GUIProject
 {
     
@@ -288,7 +280,7 @@ namespace _GUIProject
                     
                     try
                     {                      
-                        _textures[i].Texture = content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(_textures[i].Name);
+                        _textures[i].Texture = content.Load<Texture2D>(_textures[i].Name);
 
 
                     }

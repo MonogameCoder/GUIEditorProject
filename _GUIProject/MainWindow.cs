@@ -47,7 +47,7 @@ namespace _GUIProject
         private ComboBox _toolShelfComboBox;
         private ToggleButton _toolShelfToggle;
         private SliderBar _toolShelfSlider;
-        private MultiTextBox _toolShelfMultilineTextbox;
+        private TextArea _toolShelfMultilineTextbox;
 
         private readonly GraphicsDeviceManager _graphics;
 
@@ -62,21 +62,28 @@ namespace _GUIProject
             _guiList.Remove(RootContainer);
         }
 
-
+        public MainWindow Instance;
         public MainWindow()
         {
+            Instance = this;
             _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";            
+            Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
-        
-           
+
             _guiList = new List<IObject>();
-        }      
-       
+        }
+        public void ShowMouse()
+        {
+            IsMouseVisible = true;
+        }
+        public void HideMouse()
+        {
+            IsMouseVisible = false;
+        }
         protected override void Initialize()
         {
-            _guiList = new List<IObject>();           
+            _guiList = new List<IObject>();
             MainInstance = this;
 
             // This is necessary for performance, it caches the resources before first use
@@ -159,7 +166,7 @@ namespace _GUIProject
             _toolShelfSlider.Initialize();
             _toolShelfSlider.Editable = true; ;
 
-            _toolShelfMultilineTextbox = new MultiTextBox();
+            _toolShelfMultilineTextbox = new TextArea();
             _toolShelfMultilineTextbox.Initialize();
             _toolShelfMultilineTextbox.Editable = true; ;
 
@@ -186,46 +193,54 @@ namespace _GUIProject
 
             //Button btn = new Button();
             //btn.Initialize();
+            //btn.Editable = true;
             //btn.Name = "btn1";
             //btn.TextColor = Color.Black;
             //btn.Setup();
 
             //Label lb = new Label("Hello World");
             //lb.Initialize();
+            //lb.Editable = true;
             //lb.Name = "lb1";
             //lb.TextColor = Color.White;
             //lb.Setup();
 
             //ComboBox cb = new ComboBox();
             //cb.Initialize();
+            //cb.Editable = true;
             //cb.Name = "cb1";
             //cb.TextColor = Color.Black;
             //cb.Setup();
 
             //SliderBar sb = new SliderBar();
             //sb.Initialize();
+            //sb.Editable = true;
             //sb.Name = "sb1";
             //sb.Setup();
 
             //CheckBox ckb = new CheckBox();
             //ckb.Initialize();
+            //ckb.Editable = true;
             //ckb.Name = "ckb1";
             //ckb.Text = "Checkbox";
             //ckb.Setup();
 
             //ToggleButton tb = new ToggleButton();
             //tb.Initialize();
+            //tb.Editable = true;
             //tb.Name = "tb1";
             //tb.Setup();
 
             //TextBox txt = new TextBox();
             //txt.Initialize();
+            //txt.Editable = true;
             //txt.Setup();
             //txt.Name = "txt1";
             //txt.Text = "Sample";
 
             //MultiTextBox mtb = new MultiTextBox();
             //mtb.Initialize();
+            //mtb.Editable = true;
             //mtb.Setup();
             //mtb.Name = "mtb1";
             //RootContainer = new Grid();
@@ -260,6 +275,7 @@ namespace _GUIProject
 
             // Live editing is already possible only by using the Text2.XRML file
             // A full fledged XML Editor will be implemented next
+            /*
             try
             {
                 using (var XmlReader = XmlTool.OpenXmlReader("Text2.XRML"))
@@ -277,20 +293,20 @@ namespace _GUIProject
                 RootContainer.Position = new Point(568, 100);
                 List<Slot<UIObject>> backup = new List<Slot<UIObject>>();
                 backup = RootContainer.Slots.ToList();
-                
+
                 // Temporary workaround to add items in the same order as it was saved
                 // However it is not perfect yet               
                 backup = backup.OrderBy(s => s, Comparer<Slot<UIObject>>.Create((x, y) =>
-                (Point)x.Position > y.Position? 1 :
+                (Point)x.Position > y.Position ? 1 :
                 (Point)x.Position < y.Position ? -1 :
                 0)).ToList();
-              
-                for (int i = backup.Count -1; i >= 0; i-- )
+
+                for (int i = backup.Count - 1; i >= 0; i--)
                 {
                     backup[i].Item.Editable = true;
                     backup[i].Item.Locked = false;
                     RootContainer.Insert(backup[i]);
-                    
+
                 }
                 RootContainer.UpdateLayout();
                 RootContainer.Show();
@@ -304,18 +320,24 @@ namespace _GUIProject
             {
                 _xrml_text = reader.ReadToEnd();
             }
+            */
+            RootContainer = new Grid();
+            RootContainer.Initialize();
+            RootContainer.Setup();
+            RootContainer.Position = new Point(568, 100);
 
             _guiList.Add(Selection);
             _guiList.Add(_fileMenu);
             _guiList.Add(UIToolShelf);
             _guiList.Add(RootContainer);
-        
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _mainBatch = _spriteBatch;
             foreach (Slot<UIObject> slot in RootContainer.Slots)
             {
                 slot.Item.InitPropertyPanel();
@@ -327,8 +349,8 @@ namespace _GUIProject
             {
                 _guiList[i].Setup();
             }
-         
-           
+
+
             UIToolShelf.Size += new Point(0, 256);
 
             MouseGUI.AddSpriteRenderer(_spriteBatch);
@@ -340,7 +362,7 @@ namespace _GUIProject
                 _guiList[i].AddStringRenderer(_spriteBatch);
             }
 
-            _mainBatch = _spriteBatch;
+          
 
             // TODO: use this.Content to load your game content here
         }
@@ -350,7 +372,7 @@ namespace _GUIProject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-
+            /*
             string xrml_current = "";
             if (!string.IsNullOrEmpty(_xrml_text))
             {
@@ -408,8 +430,7 @@ namespace _GUIProject
                     }
                 }
             }
-
-
+            */
 
 
 
@@ -419,13 +440,17 @@ namespace _GUIProject
             }
             if (Singleton.Input.KeyReleased(Keys.Delete))
             {
-                RootContainer.RemoveItem(CurrentObject);
-                RootContainer.RemoveSlot(CurrentObject);
-                RootContainer.Update(gameTime);
-                RootContainer.UpdateLayout();
+                if(CurrentObject.Editable)
+                {
+                    RootContainer.RemoveItem(CurrentObject);
+                    RootContainer.RemoveSlot(CurrentObject);
+                    RootContainer.Update(gameTime);
+                    RootContainer.UpdateLayout();
+                }
+               
             }
-           
-           
+
+
 
             for (int i = _guiList.Count - 1; i >= 0; i--)
             {
@@ -435,19 +460,20 @@ namespace _GUIProject
             _fileMenu.Update(gameTime);
 
             Singleton.Input.Update();
-           
 
+            MouseGUI.Update();
             MouseGUI.HitObject = null;
-           
+
             for (int i = 0; i < _guiList.Count; i++)
             {
-                MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);              
+                MouseGUI.HitObject = _guiList[i].HitTest(MouseGUI.Position);
                 if (MouseGUI.HitObject != null)
-                {                    
+                {
                     break;
                 }
             }
-           
+
+
             if (MouseGUI.HitObject != null)
             {
 
@@ -477,7 +503,7 @@ namespace _GUIProject
                             // TODO: Make sure this is inside the MainWindowFrame bounds
                             if (MouseGUI.LeftIsPressed && RootContainer.Contains(MouseGUI.Position))
                             {
-                               
+
                                 Point newItemPosition = RootContainer.SimulateInsert(MouseGUI.Focus.Position - RootContainer.Position, MouseGUI.Focus);
                                 newItemPosition += RootContainer.Position;
 
@@ -568,7 +594,7 @@ namespace _GUIProject
                 }
             }
 
-            MouseGUI.Update();
+
             base.Update(gameTime);
         }
 

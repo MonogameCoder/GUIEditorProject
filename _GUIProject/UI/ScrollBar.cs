@@ -37,7 +37,7 @@ namespace _GUIProject.UI
         private Frame _itemsContainer;
         private ScrollEvents _scrollEvent;
         private ScrollDirection direction;
-
+        private const int SCROLL_SPEED = 1;
         public ScrollBar() : base("DefaultScrollbarTX", DrawPriority.LOW)
         {
             XPolicy = SizePolicy.EXPAND;
@@ -68,7 +68,8 @@ namespace _GUIProject.UI
         public override void Setup()
         {
             base.Setup();
-            Size = new Point(Size.X, Parent.Size.Y);
+            base.Resize(new Point(Size.X, Parent.Height) - Size);
+
             _itemsContainer.Position = Position;
             _itemsContainer.Setup();
 
@@ -114,10 +115,10 @@ namespace _GUIProject.UI
             {
                 if (GetBounds(e.ScrollValue) == 0)
                 {
-                    if (CurrentScrollValue + e.ScrollValue < parent.NumberOfLines - parent.MaxLinesLength)
+                    if (CurrentScrollValue + e.ScrollValue <= parent.NumberOfLines - parent.MaxNumberOfLines)
                     {
                         CurrentScrollValue+= e.ScrollValue;
-                        parent.ApplyScrollOffset();
+                        parent.ApplyScroll();
                     }
                    
                 }
@@ -136,7 +137,7 @@ namespace _GUIProject.UI
                     if(CurrentScrollValue + e.ScrollValue >= 0)
                     {
                         CurrentScrollValue+= e.ScrollValue;
-                        parent.ApplyScrollOffset();
+                        parent.ApplyScroll();
                     }                 
                    
                 }
@@ -166,13 +167,13 @@ namespace _GUIProject.UI
         }
         public override void ResetSize()
         {
-            _itemsContainer.UpdateSlot(DownButton, new Point(0, Height - DownButton.Height));
+            _itemsContainer.UpdateSlot(DownButton, new Point(0, Parent.Height - DownButton.Height));
             base.ResetSize();
         }
         public override void Resize(Point amount)
         {
             base.Resize(new Point(0, amount.Y));
-            _itemsContainer.UpdateSlot(DownButton, new Point(0, Height - DownButton.Height));
+            _itemsContainer.UpdateSlot(DownButton, new Point(0, Parent.Height - DownButton.Height));
         }
         public override UIObject HitTest(Point mousePosition)
         {
@@ -205,25 +206,24 @@ namespace _GUIProject.UI
         {
 
             _itemsContainer.Position = new Point(Left, Top);         
-            //MultiTextBox mtb = Parent as MultiTextBox;       
+            //MultiTextBox mtb = Parent as MultiTextBox;  
 
-            Point lastPosition = SliderButton.Position;
-            Point lastMousePosition = MouseGUI.Position;
             _itemsContainer.Update(gameTime);
             if (MouseGUI.Focus == SliderButton)
             {
-                Point delta = MouseGUI.Position - SliderButton.Center;
+                Point delta = (MouseGUI.Position + MouseGUI.DragOffset) - SliderButton.Position;
 
+               
                 direction = delta.Y > 0 ? ScrollDirection.DOWN : delta.Y < 0 ? ScrollDirection.UP : ScrollDirection.NONE;
 
                 if (direction == ScrollDirection.DOWN)
-                {
-                    if (GetBounds(delta.Y) == 0)
+                {                    
+                    if (GetBounds(1) == 0)
                     {
                         var slider = _itemsContainer[SliderButton].Position;
-                        _itemsContainer.UpdateSlot(SliderButton, new Point(slider.X, slider.Y + delta.Y));
+                        _itemsContainer.UpdateSlot(SliderButton, new Point(slider.X, slider.Y + SCROLL_SPEED));
 
-                        _scrollEvent.OnScroll(Parent, ScrollDirection.DOWN, delta.Y);
+                        _scrollEvent.OnScroll(Parent, ScrollDirection.DOWN, 1);
                     }
                     else
                     {
@@ -236,12 +236,12 @@ namespace _GUIProject.UI
                 {
                     if (direction == ScrollDirection.UP)
                     {
-                        if (GetBounds(delta.Y) == 0)
+                        if (GetBounds(-1) == 0)
                         {
                             var slider = _itemsContainer[SliderButton].Position;
-                            _itemsContainer.UpdateSlot(SliderButton, new Point(slider.X, slider.Y + delta.Y));
+                            _itemsContainer.UpdateSlot(SliderButton, new Point(slider.X, slider.Y - SCROLL_SPEED));
 
-                            _scrollEvent.OnScroll(Parent, ScrollDirection.UP, delta.Y);
+                            _scrollEvent.OnScroll(Parent, ScrollDirection.UP, -1);
                         }
                         else
                         {
@@ -255,7 +255,7 @@ namespace _GUIProject.UI
             else
             {
                 IScrollable parent = (Parent as IScrollable);
-                if (parent.NumberOfLines > parent.MaxLinesLength)
+                if (parent.NumberOfLines > parent.MaxNumberOfLines)
                 {
                     var slot = _itemsContainer[SliderButton];
                     int delta = (slot.Position.Y + CurrentScrollValue) - slot.Position.Y;
@@ -266,8 +266,8 @@ namespace _GUIProject.UI
                     }
                 }
 
-            }       
-          
+            }
+            Size = new Point(Size.X, Parent.Height);
             base.Update(gameTime);          
 
         }
@@ -280,14 +280,30 @@ namespace _GUIProject.UI
           
         }
         public override void Show()
-        {
-            base.Show();
-            _itemsContainer.Show();
+        {  
+            if(Parent is TextArea)
+            {
+                _itemsContainer.Show();
+                base.Show();
+            }
+            else
+            {
+                base.Show();
+                _itemsContainer.Show();
+            }
+           
         }
         public override void Hide()
         {
-            base.Hide();
-            _itemsContainer.Hide();
+            if (Parent is TextArea)
+            {
+                _itemsContainer.Hide();               
+            }
+            else
+            {
+                _itemsContainer.Hide();
+                base.Hide();
+            }         
         }
 
     }

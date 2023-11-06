@@ -37,7 +37,7 @@ namespace _GUIProject.UI
         [XmlIgnore]
         public Slot<UIObject> this[UIObject item]
         {
-            get { return Slots.Where(s => s.Item == item).Single(); }
+            get { return Slots.Where(s => s.Item == item).FirstOrDefault(); }
         }
         [XmlIgnore]
         public Slot<UIObject> this[int index]
@@ -206,29 +206,19 @@ namespace _GUIProject.UI
 
                 if (slot.Item != null)
                 {
-                    slot.Item.Position = Position + slot.Position;                
-
+                    slot.Item.Position = Position + slot.Position;                    
                 }
             }
         }
         public void UpdateSlot(UIObject item, Point newLocation)
         {
             Slot<UIObject> slot = this[item];
-            
+
             Vector2 delta;
             delta.X = newLocation.X - slot.Position.X;
-            delta.Y = newLocation.Y - slot.Position.Y;
-            float dist = delta.Length();
+            delta.Y = newLocation.Y - slot.Position.Y;   
 
-            if (dist >= 0.0f)
-            {
-               slot.Position += delta.ToPoint();              
-            }
-            else
-            {               
-                slot.Position -= delta.ToPoint();
-            }
-
+            slot.Position += delta.ToPoint();
         }      
         public override void Draw()
         {

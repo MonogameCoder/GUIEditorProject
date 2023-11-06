@@ -114,8 +114,9 @@ namespace _GUIProject.UI
             foreach (var col in colors)
             {
                 Color color = (Color)col.GetValue(col, null);
-                _textColor.AddNewItem(color, () =>
+                _textColor.AddNewItem(col.Name, color, () =>
                 {
+                    _textColor.Text = col.Name;
                     _textColor.AuxilaryColor = color;
                     Owner.TextColor = _textColor.AuxilaryColor;
                     _textColor.Hide();

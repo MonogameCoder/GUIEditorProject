@@ -14,6 +14,8 @@ using _GUIProject.Events;
 using ExtensionMethods;
 using static _GUIProject.FontManager;
 using static _GUIProject.AssetManager;
+using System.Diagnostics.CodeAnalysis;
+using static _GUIProject.UI.TextArea;
 
 namespace _GUIProject.UI
 {
@@ -26,118 +28,201 @@ namespace _GUIProject.UI
         {
             TEXT,
             PASSWORD
-        }       
-        
-        public class CharacterBucket
+        }
+        public class Character : IEquatable<Character>
         {
-            public class ItemTable
-            {
-                Rectangle rect;
-                string text;
-                public ItemTable(Rectangle rectangle, string textCharacter)
-                {
-                    rect = rectangle;
-                    text = textCharacter;
-                }
+            private int _column;
+            private int _row;
+            private readonly Sprite _charSprite;
 
-                public string Text
-                {
-                    get { return text; }
-                }
-                public Rectangle Rect
-                {
-                    get { return rect; }
-                    set { rect = value; }
-                }
+            public int Column 
+            {
+                get { return _column; }
+                set { _column = value; }
+            }
+            public int Row
+            {
+                get { return _row; }
+                set { _row = value; }
+            }
+            public bool Pointed 
+            { 
+                get;
+                set; 
+            }
+            public Character(Rectangle rect, string text)
+            {
+                Rect = rect;
+                Text = text;
+                _charSprite = new Sprite("char", DrawPriority.LOWEST);
+                _charSprite.Resize(Rect.Size);
+                _row = _column = 1;
             }
 
+            public string Text { get; private set; }
+            public Rectangle Rect { get; set; }
+            public bool Selected { get; set; }
 
-            int index = 0;
-            string text;
-            SortedList<int, ItemTable> item;
-            int top, left;
-            public CharacterBucket(int rectTop, int recLeft)
+            //public static implicit operator Tuple<int,int>(Character rhs)
+            //{
+            //    return new Tuple<int,int>(rhs.Row - 1, rhs.Column - 1);
+            //}
+            public void Draw(SpriteBatch batch)
             {
-                item = new SortedList<int, ItemTable>();
-                text = "";
-                top = rectTop;
-                left = recLeft;
+                batch.Draw(_charSprite.Texture, Rect, Selected ? Color.CornflowerBlue : Color.Transparent);
+            }
+           
+            public static implicit operator Point(Character character)
+            {
+                return new Point(character.Rect.Location);
+            }
+           
+            public bool Equals([AllowNull] Character other)
+            {
+                return GetHashCode().Equals(other.GetHashCode());
+            }
+            public bool Contains(Point mousePosition)
+            {
+                return Rect.Contains(mousePosition.ToPoint());
+            }
+            public bool NewLine 
+            {
+                get { return Text.Equals("\n"); }
+            }
+            public int Top 
+            {
+                get { return Rect.Top; }
+            }
+            public int Bottom 
+            { 
+                get { return Rect.Bottom; }
+            }
+            public int Right
+            {
+                get { return Rect.Right; }
+            }
+            public int Left
+            {
+                get { return Rect.Left; }
+            }
+            public Point Center
+            {
+                get { return Rect.Center; }
+            }
+            
+            public int Width
+            {
+                get { return Rect.Size.X; }
+            }
+            public int Height
+            {
+                get { return Rect.Size.Y; }
+            }
+
+        }
+        public class CharacterBucket
+        {
+            private Sprite _charSprite;
+            readonly Dictionary<int, Character> _bucket;
+
+            private int index = 0;
+            private string _fullText;     
+           
+
+            public CharacterBucket()
+            {
+                _bucket = new Dictionary<int, Character>();
+                _fullText = "";                
+                _charSprite = new Sprite("char", DrawPriority.LOWEST); 
 
             }
             public void AddCharacter(string character, Point location, Point size)
             {
 
-                text += character;
-
-                Rectangle rect = new Rectangle(location, size);
-                ItemTable newItem = new ItemTable(rect, character);
-                item.Add(++index, newItem);
+                _fullText += character;              
+             
+                _bucket.Add(index++, new Character(new Rectangle(location, size), character));
 
             }
-            public void Update(int index, Point location, Point size)
+            public Character HitTest(Point mousePosition)
+            {                
+                return _bucket.Where(s => s.Value.Rect.Contains(mousePosition.ToPoint())).FirstOrDefault().Value;
+            }
+            public void Update(int index, Point position, Point size)
             {
-                if (index < item.Values.Count)
+                if (index < _bucket.Values.Count)
                 {
-                    item.Values.ElementAt(index).Rect = new Rectangle(location, size);
+                    _bucket[index].Rect = new Rectangle(position, size);
                 }
 
             }
             public void InsertAt(int index, string character)
             {
-                text.Insert(index, character);
+                _fullText.Insert(index, character);
             }
-            public void Update(GameTime gameTime)
+
+            public void Draw(SpriteFont font, SpriteBatch batch)
             {
-
+                foreach (var item in _bucket)
+                {
+                    item.Value.Draw(batch);
+                }
             }
-
             public void Clear()
             {
-                text = "";
-                item.Clear();
+                _fullText = "";
+                _bucket.Clear();
                 index = 0;
             }
             public void RemoveCharacter()
             {
-                if(text.Length > 0)
+                if (_fullText.Length > 0)
                 {
-                    text = text.Remove(index - 1, 1);
-                    item.Remove(index--);
+                    _fullText = _fullText.Remove(index - 1, 1);
+                    _bucket.Remove(index--);
                 }
-              
-            }
-            public string FullText
-            {
-                get { return text; }
 
             }
-            public int CurrentIndex
-            {
-                get { return index - 1; }
-            }
-            public Point this[int index]
+         
+            public Character Current
             {
                 get
                 {
-                    if (text.Length > 0 && index >= 0 && index < item.Values.Count)
-                    {
-                        Rectangle itemRect = item.Values.ElementAt(index).Rect;
-                        Point position = new Point(itemRect.Left, itemRect.Top);
-                        return position;
-                    }
-                    return new Point(left, top);
+                    return this[index - 1];
                 }
-
             }
 
-            public Rectangle CurrentItemRectangle
+            public Character this[int index]
             {
                 get
                 {
-                    return item.Values.ElementAt(CurrentIndex).Rect;
+                    return _bucket[index];
+                }
+            }
+            public Character this[string character]
+            {
+                get
+                {
+                    return _bucket.Values.Where(v => v.Text == character).FirstOrDefault();
                 }
             }
 
+
+            public Dictionary<int, Character> Bucket
+            {
+                get { return _bucket; }
+            }
+        }
+        public class CustomText
+        {
+            public string _text;
+            public ColorObject _color;
+
+            public CustomText(string word)
+            {
+
+            }
+           
         }
         protected class clsInput
         {
@@ -221,36 +306,13 @@ namespace _GUIProject.UI
                 return false;
             }
         }
-        public class CustomText : IComparable<CustomText>
-        {
-            public int key;
-            public string myText;
-            public int FontSize;
-            public Rectangle rect;
-            public Color mycolor;
-            public Color nameColor;
-            public string strplaceOfUse;
-            public bool ShouldItBeShownInThisScreen;
-            public string wrappedString;
-            public int HorizontalMargin;
-            public string Action;
-            public bool isFocused;
-            public string userName;
-
-
-
-            public int CompareTo(CustomText other)
-            {
-                return wrappedString.CompareTo(other.wrappedString);
-            }
-        }
+       
         public struct mylist
         {
             public string mystring;
             public int key;
 
         }
-
       
 
 
@@ -261,7 +323,7 @@ namespace _GUIProject.UI
         public Rectangle CurrItemRect { get; set; }
       
         [XmlIgnore]
-        public Sprite Pointer { get; protected set;}
+        public static Sprite Pointer { get; protected set;}
         
         [XmlIgnore]
         public FontContent TextFont { get; set; }
@@ -315,7 +377,7 @@ namespace _GUIProject.UI
 
         protected string LastChar
         {
-            get { return _keyboardString.Length > 0 ? _keyboardString[_keyboardString.Length - 1].ToString() : " "; }
+            get { return _keyboardString.Length > 0 ? _keyboardString.Last().ToString() : " "; }
         }
        
 
@@ -328,7 +390,7 @@ namespace _GUIProject.UI
                 _keyboardString = value;
                 DisplayText = _keyboardString;
          
-                ApplyTextOffset();
+                ApplyTextLines();
             }
         }
         [XmlAttribute]
@@ -376,7 +438,7 @@ namespace _GUIProject.UI
             YPolicy = SizePolicy.FIXED;
             MoveState = MoveOption.DYNAMIC;
             TextColor = Color.Black;
-            TextFont = Singleton.Font.GetFont(FontType.STANDARD);
+            TextFont = Singleton.Font.GetFont(FontType.GEORGIA);
             FieldWidth = 0;
             TextOffset = new Point(4, 4);
             Pointer = new Sprite("DefaultTextboxPointerTX", DrawPriority.LOW);
@@ -388,7 +450,8 @@ namespace _GUIProject.UI
         public override void Initialize()
         {
             base.Initialize();
-            CharBucket = new CharacterBucket(Left, Top);
+            CharBucket = new CharacterBucket();
+          
             KeyboardEvents = new KeyboardEvents(this);
             MouseEvent.onMouseOut += (sender, args) => { Selected = false; };
             
@@ -412,8 +475,12 @@ namespace _GUIProject.UI
 
             Pointer.Position = new Point(TextOffset.X, (Top + Height / 2) - Pointer.Texture.Height / 2);
             Pointer.Setup();
+            if(CharBucket != null)
+            {
+                CharBucket.AddCharacter("", new Point(Left, Top), "".Size(TextFont).ToPoint());
+            }
+         
 
-            
 
         }
         public void SimulateInput(string textInput)
@@ -800,8 +867,7 @@ namespace _GUIProject.UI
 
                 if (!string.IsNullOrEmpty(_keyboardString))
                 {
-                    CurrItemRect = CharBucket.CurrentItemRectangle;
-
+                   
                     _keyboardString = _keyboardString.Remove(_keyboardString.Length - 1, 1);
                     int startIndex = _keyboardString.Length - DisplayText.Length;
 
@@ -839,7 +905,7 @@ namespace _GUIProject.UI
         }
         protected virtual void CreateText()
         {           
-            ApplyTextOffset();
+            ApplyTextLines();
             //Point characterDimensions = TextFont.Font.MeasureString(LastChar).ToPoint();
             Point currCharDim = DisplayText.Size(TextFont).ToPoint();
             int x = currCharDim.X;
@@ -865,7 +931,7 @@ namespace _GUIProject.UI
             }
 
         }
-        protected virtual void ApplyTextOffset()
+        protected virtual void ApplyTextLines()
         {
             float currentDisplayTextSize = DisplayText.Size(TextFont).X;
             
@@ -892,27 +958,21 @@ namespace _GUIProject.UI
         }
         protected virtual void UpdatePointer(GameTime gameTime)
         {
-            int i = _keyboardString.Length - 1;
-            int x = Left + CharBucket[i].X + Pointer.Width;
-            int y = Center.Y - Pointer.Height /2 ;
+            int x = Left + ((Point)CharBucket.Current).X + Pointer.Width;
+            int y = Center.Y - Pointer.Height / 2;
 
             Pointer += new Point(x, y);
-
             Pointer.Active = true;
             Pointer.Update(gameTime);
         }
-        
-
-
         public virtual void Clear()
         {
             _textList.Clear();
-
-            for (int i = 0; i < _keyboardString.Length; i++)
-            {
-                CharBucket.RemoveCharacter();
-            }
             
+            CharBucket.Clear();
+            CharBucket.AddCharacter("", Point.Zero, "".Size(TextFont).ToPoint());
+            Pointer += Point.Zero;
+
             _keyboardString = "";
             DisplayText = "";
         }
@@ -969,22 +1029,19 @@ namespace _GUIProject.UI
             }
         }     
 
-        protected virtual void RenderText()
-        {
-            _stringRenderer.DrawString(TextFont, IsClicked ? DisplayText : (StickSampleText ? SampleText : DisplayText), TextPosition, TextColor);           
-        }
 
         public override void Draw()
         {
-
             if (Active)
             {
                 base.Draw();
-                if (IsClicked)
+                
+                if (IsClicked && Pointer.Active)
                 {
                     _spriteRenderer.Draw(Pointer.Texture.Texture, Pointer.Rect, TextColor * Pointer.Alpha);
                 }
-                RenderText();
+                _stringRenderer.DrawString(TextFont, IsClicked ? DisplayText : (StickSampleText ? SampleText : DisplayText), TextPosition, TextColor);
+
             }
 
             if (Property != null)

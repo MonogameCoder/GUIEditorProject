@@ -22,6 +22,11 @@ namespace _GUIProject
             X = value;
             Y = value;
         }
+        public Point(Microsoft.Xna.Framework.Point value)
+        {
+            X = value.X;
+            Y = value.Y;
+        }
         public Point(int x, int y)
         {
             X = x;
@@ -80,7 +85,27 @@ namespace _GUIProject
         }
         public static Point operator /(Point source, Point divisor)
         {
+            if(divisor.X == 0 || divisor.Y == 0)
+            {
+                return Point.Zero;
+            }
             return new Point(source.X / divisor.X, source.Y / divisor.Y);
+        }
+        public static Point operator /(Point source, int divisor)
+        {
+            if (divisor == 0)
+            {
+                return Point.Zero;
+            }
+            return new Point(source.X / divisor, source.Y / divisor);
+        }
+        public static Point operator /(Point source, float divisor)
+        {
+            if (divisor == 0)
+            {
+                return Point.Zero;
+            }
+            return new Point((int)(source.X / divisor), (int)(source.Y / divisor));
         }
         public static implicit operator Vector2(Point rhs)
         {

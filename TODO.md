@@ -6,3 +6,9 @@ TODO list:
 - Create a FilePicker for OnMouseOver and OnMouseOut textures
 - Make each PropertyPanel category as an IFrame, so it will more organized as each UIOBject has its own set of specific properties which differ from each other
 - and much more to come !
+
+
+############ New Year's Roadmap ##################
+Preparing repo for next year, a full fledged XRML( Extended Romulo Markup Language) editor will be developed. Almost ready!
+-- Copy, Paste, Edit Text, Change Editor Theme, Color text parts in XML like style using Regex, Redo, Undo and much more to come.
+--> The Multiline Textbox will be used as the bases for the editor. Live Adding/Editing of objects using the editor will be possible soon. Event Handling will also be supported soon too. <--

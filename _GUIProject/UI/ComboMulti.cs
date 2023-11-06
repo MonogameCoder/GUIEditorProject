@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using _GUIProject.Events;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using static _GUIProject.AssetManager;
+using static _GUIProject.UI.ScrollBar;
 
 namespace _GUIProject.UI
 {
@@ -31,7 +33,7 @@ namespace _GUIProject.UI
                 }
                 Caption.Text = Text;
             }
-        }
+        }       
         private Frame container;
       
         public Frame Container
@@ -45,7 +47,7 @@ namespace _GUIProject.UI
         }
 
 
-        public int MaxLinesLength { get; set; } = 5;
+        public int MaxNumberOfLines { get; set; } = 5;
         public int NumberOfLines
         {
             get { return Container.Length / LINE; }
@@ -58,6 +60,9 @@ namespace _GUIProject.UI
         private Button _defaultItem;      
         readonly string _defaultTXName;
         private readonly Sprite _bgSprite;
+        private ScrollEvents _scrollEvent;
+
+        int start = 0, end = 0;
         public ComboMulti()
         {
 
@@ -70,7 +75,7 @@ namespace _GUIProject.UI
         }
         void LoadAttributes()
         {
-         
+            _scrollEvent = new ScrollEvents();
             Container = new Frame(_defaultTXName, DrawPriority.LOWEST, MoveOption.STATIC);
             Caption.TextFont = Singleton.Font.GetFont(FontManager.FontType.LUCIDA_CONSOLE);
             _defaultItem = new Button(_defaultTXName, OverlayOption.NORMAL, DrawPriority.LOWEST);
@@ -84,10 +89,20 @@ namespace _GUIProject.UI
             Container.Initialize();
             _scrollBar = new ScrollBar();
             _scrollBar.Parent = this;
-            _scrollBar.Initialize();      
+            _scrollBar.Initialize();
+            _scrollEvent.onScroll += _scrollEvent_onScroll;
+
             Container.Active = false;
             Active = true;
         }
+
+        private void _scrollEvent_onScroll(object sender, ScrollEventArgs e)
+        {
+            var parent = (e.Owner as IScrollable);
+            _scrollBar.CurrentScrollValue += e.ScrollValue;
+            parent.ApplyScroll();
+        }
+
         public override void Setup()
         {
             base.Setup();
@@ -153,14 +168,15 @@ namespace _GUIProject.UI
             _auxiliaryInfo.Initialize();
             _auxiliaryInfo.Active = true;
         }
-        public void AddNewItem(Color color, Action buttonClickEvent)
+        public void AddNewItem(string name, Color color, Action buttonClickEvent)
         {
             Button newButton = new Button("ComboBoxAuxiliaryTX", OverlayOption.NORMAL, DrawPriority.LOWEST);
             newButton.Initialize();
             newButton.Setup();
             newButton.SpriteColor = color;
-            newButton.Active = true;
-            newButton.Name = "ComboMultiItem";
+            newButton.SpriteColor.Text = name;
+            newButton.Active = true;            
+            newButton.Name = name;
             newButton.Text = "";
 
             int bottom = Container.Slots.Where(s => s.Item != _auxiliaryInfo).Sum(s => s.Item.Height);
@@ -173,7 +189,7 @@ namespace _GUIProject.UI
             Point position = Point.Zero;
             for (int i = 1; i <= Container.Length; i++)
             {
-                int mod = i % 6;
+                int mod = i % LINE;
                 if (mod == 0)
                 {
                     line++;
@@ -193,7 +209,7 @@ namespace _GUIProject.UI
             int line = 0;
             for (int i = 0; i < Container.Length; i++)
             {
-                int mod = i  % 6;
+                int mod = i  % LINE;
                 if (mod == 0)
                 {
                     line++;
@@ -202,24 +218,24 @@ namespace _GUIProject.UI
                 slot.Position = new Point(slot.Item.Width * mod, slot.Item.Height * (line-1));            
             }
         }
-        public void ApplyScrollOffset()
+        public void ApplyScroll()
         {
-            if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue <= NumberOfLines)
+            if (NumberOfLines > MaxNumberOfLines && MaxNumberOfLines + _scrollBar.CurrentScrollValue <= NumberOfLines)
             {
 
-                int start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue : 0;
-                int end = MaxLinesLength + _scrollBar.CurrentScrollValue;
+                start = NumberOfLines > MaxNumberOfLines ? _scrollBar.CurrentScrollValue : 0;
+                end = MaxNumberOfLines + _scrollBar.CurrentScrollValue;
 
                 int line = 0;
                 for (int i = start * LINE; i < end * LINE; i++)
                 {
-                    if (i % 6 == 0)
+                    if (i % LINE == 0)
                     {
                         line++;
                     }
                     
                     Point newPos = new Point(Container[i].Position.X, (Container[i].Item.Height * line) - Container[i].Item.Height);
-                    Container.UpdateSlot(Container[i].Item, newPos);
+                    Container.UpdateSlot(Container[i].Item, newPos);                    
                 }
 
                 Container.UpdateLayout();
@@ -227,6 +243,28 @@ namespace _GUIProject.UI
         }
         public override void Update(GameTime gameTime)
         {
+            if (NumberOfLines > MaxNumberOfLines && Container.Active)
+            {
+                if (MouseGUI.ScrollerValue > 0)
+                {
+                    if (_scrollBar.CurrentScrollValue - MouseGUI.ScrollerValue >= 0)
+                    {
+                        _scrollEvent.OnScroll(this, ScrollDirection.UP, -MouseGUI.ScrollerValue);
+                    }
+
+                }
+                if (MouseGUI.ScrollerValue < 0)
+                {
+                    if (_scrollBar.CurrentScrollValue - MouseGUI.ScrollerValue <= NumberOfLines - MaxNumberOfLines)
+                    {
+                        _scrollEvent.OnScroll(this, ScrollDirection.DOWN, -MouseGUI.ScrollerValue);
+                    }
+                }
+            }
+
+            start = NumberOfLines > MaxNumberOfLines ? _scrollBar.CurrentScrollValue : 0;
+            end = MaxNumberOfLines + _scrollBar.CurrentScrollValue;
+
             Container.Update(gameTime);
             
             _scrollBar.Update(gameTime);
@@ -242,34 +280,34 @@ namespace _GUIProject.UI
                 {
                     return result;
                 }
-
-                result = Container.HitTest(mousePosition);
-                if (result != null)
+            }
+            if(Container.Active)
+            {               
+                for (int i = start * LINE; i < end * LINE; i++)
                 {
-                    return result;
-                }             
+                    result = Container[i].Item.HitTest(mousePosition);
+                    if(result != null)
+                    {                     
+                        return result;
+                    }
+                }
             }
             
             return base.HitTest(mousePosition);
         }
-       
+
         public override void Draw()
         {
-          
-            base.Draw();           
-           
-            if(Container.Active)
+
+            base.Draw();
+
+            if (Container.Active)
             {
                 _bgSprite.Draw();
-                if (NumberOfLines > MaxLinesLength && MaxLinesLength + _scrollBar.CurrentScrollValue <= NumberOfLines)
+
+                for (int i = start * LINE; i < end * LINE; i++)
                 {
-                    int start = NumberOfLines > MaxLinesLength ? _scrollBar.CurrentScrollValue: 0;
-                    int end = MaxLinesLength + _scrollBar.CurrentScrollValue ;
-                 
-                    for (int i = start * LINE; i < end * LINE; i++)
-                    {                       
-                        Container[i].Item.Draw();
-                    }
+                    Container[i].Item.Draw();
                 }
             }
             if (_auxiliaryInfo != null)
